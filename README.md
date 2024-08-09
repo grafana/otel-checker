@@ -9,7 +9,7 @@ Requirement: Golang
 ### Installation
 1. Install the `otel-checker` binary
 ```
-go install https://github.com/grafana/otel-checker
+go install github.com/grafana/otel-checker@latest
 ```
 2. You can confirm it was installed with:
 ```
