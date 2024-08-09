@@ -37,6 +37,45 @@ Usage of otel-checker:
     	Path to package.json file. Required if instrumentation is in JavaScript and the file is not in the same location as the otel-checker is being executed from. E.g. "-package-json-path=src/inst/"
 ```
 
+### Checks
+
+#### Grafana Cloud
+- Endpoints
+- Authentication
+- Service name
+- Exporter protocol
+
+#### SDK
+
+##### JavaScript
+- Node version
+- Required dependencies on package.json
+- Required environment variables
+- Resource detectors
+- Dependencies compatible with Grafana Cloud
+
+#### Python
+TBD
+
+#### .NET
+TBD
+
+#### Java
+TBD
+
+#### Go
+TBD
+
+
+#### Collector
+- Config receivers and exporters
+
+#### Beyla
+TBD
+
+#### Alloy
+TBD
+
 ### Examples
 
 Application with auto-instrumentation
@@ -65,7 +104,7 @@ Requirement: Golang
 go run main.go
 ```
 
-### Create binary and run from different location
+### Create binary and run from different directory
 
 1. Build binary
 ```
