@@ -5,6 +5,7 @@ func CheckSDKSetup(
 	language string,
 	autoInstrumentation bool,
 	packageJsonPath string,
+	instrumentationFile string,
 ) {
 	switch language {
 	case "dotnet":
@@ -14,7 +15,7 @@ func CheckSDKSetup(
 	case "java":
 		CheckJavaSetup(messages, autoInstrumentation)
 	case "js":
-		CheckJSSetup(messages, autoInstrumentation, packageJsonPath)
+		CheckJSSetup(messages, autoInstrumentation, packageJsonPath, instrumentationFile)
 	case "python":
 		CheckPythonSetup(messages, autoInstrumentation)
 	}

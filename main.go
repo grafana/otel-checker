@@ -13,7 +13,7 @@ func main() {
 	messages := utils.CreateMessagesMap()
 	commands := utils.GetArguments()
 
-	grafana.CheckGrafanaSetup(&messages, commands.Language)
+	grafana.CheckGrafanaSetup(&messages, commands.Language, commands.Components)
 
 	for _, c := range commands.Components {
 		if c == "alloy" {
@@ -38,6 +38,7 @@ func main() {
 				commands.Language,
 				commands.AutoInstrumentation,
 				commands.PackageJsonPath,
+				commands.InstrumentationFile,
 			)
 		}
 	}

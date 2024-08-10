@@ -5,19 +5,30 @@ import (
 	"net/http"
 	"os"
 	"regexp"
+	"slices"
 	"strings"
 
 	utils "otel-checker/utils"
 )
 
-func CheckGrafanaSetup(messages *map[string][]string, language string) {
-	checkEnvVarsGrafana(messages, language)
+func CheckGrafanaSetup(
+	messages *map[string][]string,
+	language string,
+	components []string,
+) {
+	checkEnvVarsGrafana(messages, language, components)
 	checkAuth(messages)
 }
 
-func checkEnvVarsGrafana(messages *map[string][]string, language string) {
+func checkEnvVarsGrafana(
+	messages *map[string][]string,
+	language string,
+	components []string,
+) {
 	if os.Getenv("OTEL_SERVICE_NAME") == "" {
 		utils.AddWarning(messages, "Grafana Cloud", "It's recommended the environment variable OTEL_SERVICE_NAME to be set to your service name, for easier identification")
+	} else {
+		utils.AddSuccessfulCheck(messages, "Grafana Cloud", "OTEL_SERVICE_NAME is set")
 	}
 
 	if os.Getenv("OTEL_EXPORTER_OTLP_PROTOCOL") != "http/protobuf" {
@@ -46,6 +57,39 @@ func checkEnvVarsGrafana(messages *map[string][]string, language string) {
 	} else {
 		utils.AddError(messages, "Grafana Cloud", fmt.Sprintf("OTEL_EXPORTER_OTLP_HEADERS is not set. Value should have '%s'", tokenStart))
 	}
+
+	if slices.Contains(components, "beyla") {
+		if os.Getenv("BEYLA_SERVICE_NAME") == "" {
+			utils.AddWarning(messages, "Beyla", "It's recommended the environment variable BEYLA_SERVICE_NAME to be set to your service name")
+		} else {
+			utils.AddSuccessfulCheck(messages, "Beyla", "BEYLA_SERVICE_NAME is set")
+		}
+
+		if os.Getenv("BEYLA_OPEN_PORT") == "" {
+			utils.AddError(messages, "Beyla", "BEYLA_OPEN_PORT must be set")
+		} else {
+			utils.AddSuccessfulCheck(messages, "Beyla", "BEYLA_SERVICE_NAME is set")
+		}
+
+		if os.Getenv("GRAFANA_CLOUD_SUBMIT") == "" {
+			utils.AddError(messages, "Beyla", "GRAFANA_CLOUD_SUBMIT must be set to 'metrics' and/or 'traces'")
+		} else {
+			utils.AddSuccessfulCheck(messages, "Beyla", "GRAFANA_CLOUD_SUBMIT is set correctly")
+		}
+
+		if os.Getenv("GRAFANA_CLOUD_INSTANCE_ID") == "" {
+			utils.AddError(messages, "Beyla", "GRAFANA_CLOUD_INSTANCE_ID must be set")
+		} else {
+			utils.AddSuccessfulCheck(messages, "Beyla", "GRAFANA_CLOUD_INSTANCE_ID is set")
+		}
+
+		if os.Getenv("GRAFANA_CLOUD_API_KEY") == "" {
+			utils.AddError(messages, "Beyla", "GRAFANA_CLOUD_API_KEY must be set")
+		} else {
+			utils.AddSuccessfulCheck(messages, "Beyla", "GRAFANA_CLOUD_API_KEY is set")
+		}
+	}
+
 }
 
 func checkAuth(messages *map[string][]string) {

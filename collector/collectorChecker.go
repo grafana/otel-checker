@@ -11,8 +11,6 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// When using the collector, you don’t need the final part of the URL, which is signal-specific. There, “https://otlp-gateway-prod-us-central-0.grafana.net/otlp 4” will work. In other places, when
-
 func CheckCollectorSetup(messages *map[string][]string, language string, configPath string) {
 	checkCollectorConfig(messages, configPath)
 }

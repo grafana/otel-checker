@@ -14,13 +14,14 @@ func CheckJSSetup(
 	messages *map[string][]string,
 	autoInstrumentation bool,
 	packageJsonPath string,
+	instrumentationFile string,
 ) {
 	checkEnvVars(messages)
 	checkNodeVersion(messages)
 	if autoInstrumentation {
 		checkJSAutoInstrumentation(messages, packageJsonPath)
 	} else {
-		checkJSCodeBasedInstrumentation(messages, packageJsonPath)
+		checkJSCodeBasedInstrumentation(messages, packageJsonPath, instrumentationFile)
 	}
 }
 
@@ -55,7 +56,10 @@ func checkNodeVersion(messages *map[string][]string) {
 	}
 }
 
-func checkJSAutoInstrumentation(messages *map[string][]string, packageJsonPath string) {
+func checkJSAutoInstrumentation(
+	messages *map[string][]string,
+	packageJsonPath string,
+) {
 	// NODE_OPTIONS should be set or that requirement should be added when starting the app
 	if os.Getenv("NODE_OPTIONS") == "--require @opentelemetry/auto-instrumentations-node/register" {
 		utils.AddSuccessfulCheck(messages, "SDK", "NODE_OPTIONS set correctly")
@@ -83,25 +87,42 @@ func checkJSAutoInstrumentation(messages *map[string][]string, packageJsonPath s
 	}
 }
 
-func checkJSCodeBasedInstrumentation(messages *map[string][]string, packageJsonPath string) {
+func checkJSCodeBasedInstrumentation(
+	messages *map[string][]string,
+	packageJsonPath string,
+	instrumentationFile string,
+) {
 	if os.Getenv("NODE_OPTIONS") == "--require @opentelemetry/auto-instrumentations-node/register" {
 		utils.AddError(messages, "SDK", `The flag "-auto-instrumentation" was not passed to otel-checker, but the value of NODE_OPTIONS is set to require auto-instrumentation. Run "unset NODE_OPTIONS" to remove the requirement that can cause a conflict with manual instrumentations`)
 	}
 
 	// Dependencies for auto instrumentation on package.json
 	filePath := packageJsonPath + "package.json"
-	dat, err := os.ReadFile(filePath)
+	packageJsonContent, err := os.ReadFile(filePath)
 	if err != nil {
 		utils.AddError(messages, "SDK", fmt.Sprintf("Could not check file %s: %s", filePath, err))
 	} else {
-		if strings.Contains(string(dat), `"@opentelemetry/api"`) {
+		if strings.Contains(string(packageJsonContent), `"@opentelemetry/api"`) {
 			utils.AddSuccessfulCheck(messages, "SDK", "Dependency @opentelemetry/api added on package.json")
 		} else {
 			utils.AddError(messages, "SDK", "Dependency @opentelemetry/api missing on package.json")
 		}
 
-		if strings.Contains(string(dat), `"@opentelemetry/exporter-trace-otlp-proto"`) {
+		if strings.Contains(string(packageJsonContent), `"@opentelemetry/exporter-trace-otlp-proto"`) {
 			utils.AddError(messages, "SDK", `Dependency @opentelemetry/exporter-trace-otlp-proto added on package.json, which is not supported by Grafana. Switch the dependency to "@opentelemetry/exporter-trace-otlp-http" instead`)
+		}
+	}
+
+	// Check Exporter
+	instrumentationFileContent, err := os.ReadFile(instrumentationFile)
+	if err != nil {
+		utils.AddError(messages, "SDK", fmt.Sprintf("Could not check file %s: %s", instrumentationFile, err))
+	} else {
+		if strings.Contains(string(instrumentationFileContent), "ConsoleSpanExporter") {
+			utils.AddWarning(messages, "SDK", "Instrumentation file is using ConsoleSpanExporter. This exporter is useful during debugging, but replace with OTLPTraceExporter to send to Grafana Cloud")
+		}
+		if strings.Contains(string(instrumentationFileContent), "ConsoleMetricExporter") {
+			utils.AddWarning(messages, "SDK", "Instrumentation file is using ConsoleMetricExporter. This exporter is useful during debugging, but replace with OTLPMetricExporter to send to Grafana Cloud")
 		}
 	}
 }
