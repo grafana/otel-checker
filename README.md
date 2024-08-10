@@ -53,6 +53,7 @@ Usage of otel-checker:
 - Required environment variables
 - Resource detectors
 - Dependencies compatible with Grafana Cloud
+- Usage of Console Exporter
 
 #### Python
 TBD
@@ -71,7 +72,7 @@ TBD
 - Config receivers and exporters
 
 #### Beyla
-TBD
+- Environment variables
 
 #### Alloy
 TBD
