@@ -67,6 +67,9 @@ TBD
 #### Go
 TBD
 
+#### Ruby
+TBD
+
 
 #### Collector
 - Config receivers and exporters
