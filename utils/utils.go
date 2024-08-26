@@ -39,9 +39,9 @@ func GetArguments() Commands {
 	collectorConfigPath := flag.String("collector-config-path", "", `Path to collector's config.yaml file. Required if using Collector and the config file is not in the same location as the otel-checker is being executed from. E.g. "-collector-config-path=src/inst/"`)
 	flag.Parse()
 
-	possibleLanguages := []string{"dotnet", "go", "java", "js", "python"}
+	possibleLanguages := []string{"dotnet", "go", "java", "js", "python", "ruby"}
 	if !slices.Contains(possibleLanguages, *languageValue) {
-		fmt.Println(color.RedString(fmt.Sprintf("Language %s not supported. Possible values: dotnet, go, java, js, python", *languageValue)))
+		fmt.Println(color.RedString(fmt.Sprintf("Language %s not supported. Possible values: dotnet, go, java, js, python, ruby", *languageValue)))
 		os.Exit(1)
 	}
 
