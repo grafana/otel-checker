@@ -37,6 +37,34 @@ func checkEnvVarsGrafana(
 		utils.AddSuccessfulCheck(messages, "Grafana Cloud", "OTEL_EXPORTER_OTLP_PROTOCOL set to 'http/protobuf'")
 	}
 
+	if os.Getenv("OTEL_METRICS_EXPORTER") == "none" {
+		utils.AddError(messages, "Grafana Cloud", "The value of OTEL_METRICS_EXPORTER cannot be 'none'. Change the value to 'otlp' or leave it unset")
+	} else {
+		if os.Getenv("OTEL_METRICS_EXPORTER") == "" {
+			utils.AddSuccessfulCheck(messages, "Grafana Cloud", "OTEL_METRICS_EXPORTER is unset, with a default value of 'otlp'")
+		} else {
+			utils.AddSuccessfulCheck(messages, "Grafana Cloud", fmt.Sprintf("The value of OTEL_METRICS_EXPORTER is set to '%s'", os.Getenv("OTEL_METRICS_EXPORTER")))
+		}
+	}
+	if os.Getenv("OTEL_TRACES_EXPORTER") == "none" {
+		utils.AddError(messages, "Grafana Cloud", "The value of OTEL_TRACES_EXPORTER cannot be 'none'. Change the value to 'otlp' or leave it unset")
+	} else {
+		if os.Getenv("OTEL_TRACES_EXPORTER") == "" {
+			utils.AddSuccessfulCheck(messages, "Grafana Cloud", "OTEL_TRACES_EXPORTER is unset, with a default value of 'otlp'")
+		} else {
+			utils.AddSuccessfulCheck(messages, "Grafana Cloud", fmt.Sprintf("The value of OTEL_TRACES_EXPORTER is set to '%s'", os.Getenv("OTEL_TRACES_EXPORTER")))
+		}
+	}
+	if os.Getenv("OTEL_LOGS_EXPORTER") == "none" {
+		utils.AddError(messages, "Grafana Cloud", "The value of OTEL_LOGS_EXPORTER cannot be 'none'. Change the value to 'otlp' or leave it unset")
+	} else {
+		if os.Getenv("OTEL_LOGS_EXPORTER") == "" {
+			utils.AddSuccessfulCheck(messages, "Grafana Cloud", "OTEL_LOGS_EXPORTER is unset, with a default value of 'otlp'")
+		} else {
+			utils.AddSuccessfulCheck(messages, "Grafana Cloud", fmt.Sprintf("The value of OTEL_LOGS_EXPORTER is set to '%s'", os.Getenv("OTEL_LOGS_EXPORTER")))
+		}
+	}
+
 	match, _ := regexp.MatchString("https:\\/\\/.+\\.grafana\\.net\\/otlp", os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT"))
 	if match {
 		utils.AddSuccessfulCheck(messages, "Grafana Cloud", "OTEL_EXPORTER_OTLP_ENDPOINT set in the format similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp")
