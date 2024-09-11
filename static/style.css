@@ -1,0 +1,28 @@
+body {
+    background-color: #111217;
+    color: #ccccdc;
+}
+
+.header {
+    background-color: #191b1f;
+    border-bottom: 1px solid rgba(204, 204, 220, 0.15);
+    margin: -20px -8px 20px -8px;
+
+    h1 {
+        padding: 30px 10px 20px 10px;
+        margin: 0 auto;
+        text-align: center;
+    }
+}
+
+.checks {
+    color: #038103;
+}
+
+.errors {
+    color: #c10303;
+}
+
+.warnings {
+    color: #ffc700;
+}

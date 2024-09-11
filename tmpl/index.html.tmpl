@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTel Checker</title>
+    <link href="/static/style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+    <section class="header">
+        <h1>OTel Checker</h1>
+    </section>
+    
+    {{range $k, $v := .Messages}}
+    <h2 class="{{$k}}">{{$k}}</h2>
+    <ul>
+    {{range $v}}
+        <li>{{.}}</li>
+    {{end}}
+    </ul>
+    {{end}}
+</body>
+</html>

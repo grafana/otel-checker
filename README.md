@@ -101,7 +101,7 @@ Requirement: Golang
 ```
 2. Clone this repo in the go path folder, so you will have:
 ```
-/Users/maryliag/go/src/hackathon-2024-08-otel-me-if-its-right
+/Users/maryliag/go/src/otel-checker
 ```
 3. Run 
 ```
