@@ -64,7 +64,7 @@ func checkJSAutoInstrumentation(
 	if os.Getenv("NODE_OPTIONS") == "--require @opentelemetry/auto-instrumentations-node/register" {
 		utils.AddSuccessfulCheck(messages, "SDK", "NODE_OPTIONS set correctly")
 	} else {
-		utils.AddWarning(messages, "SDK", `NODE_OPTIONS not set. You can set it by running 'export NODE_OPTIONS="--require @opentelemetry/auto-instrumentations-node/register"' or add the same required when starting your application`)
+		utils.AddWarning(messages, "SDK", `NODE_OPTIONS not set. You can set it by running 'export NODE_OPTIONS="--require @opentelemetry/auto-instrumentations-node/register"' or add the same '--require ...' when starting your application`)
 	}
 
 	// Dependencies for auto instrumentation on package.json

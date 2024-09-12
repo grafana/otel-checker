@@ -83,7 +83,7 @@ func checkEnvVarsGrafana(
 	if strings.Contains(os.Getenv("OTEL_EXPORTER_OTLP_HEADERS"), tokenStart) {
 		utils.AddSuccessfulCheck(messages, "Grafana Cloud", "OTEL_EXPORTER_OTLP_HEADERS is set correctly")
 	} else {
-		utils.AddError(messages, "Grafana Cloud", fmt.Sprintf("OTEL_EXPORTER_OTLP_HEADERS is not set. Value should have '%s'", tokenStart))
+		utils.AddError(messages, "Grafana Cloud", fmt.Sprintf("OTEL_EXPORTER_OTLP_HEADERS is not set. Value should have '%s...'", tokenStart))
 	}
 
 	if slices.Contains(components, "beyla") {
@@ -126,7 +126,7 @@ func checkAuth(messages *map[string][]string) {
 		return
 	}
 	if os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT") == "" || os.Getenv("OTEL_EXPORTER_OTLP_HEADERS") == "" {
-		utils.AddWarning(messages, "Grafana Cloud", "Credentials not checked: Both environment variables OTEL_EXPORTER_OTLP_ENDPOINT and OTEL_EXPORTER_OTLP_HEADERS need to be set")
+		utils.AddWarning(messages, "Grafana Cloud", "Credentials not checked, since both environment variables OTEL_EXPORTER_OTLP_ENDPOINT and OTEL_EXPORTER_OTLP_HEADERS need to be set for this check")
 	} else {
 		endpoint := os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT") + "/v1/metrics"
 		req, err := http.NewRequest("POST", endpoint, nil)
