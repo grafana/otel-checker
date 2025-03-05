@@ -1,19 +1,18 @@
 package sdk
 
-func CheckGoSetup(
-	messages *map[string][]string,
-	autoInstrumentation bool,
-) {
-	checkGoVersion(messages)
+import "otel-checker/checks/utils"
+
+func CheckGoSetup(reporter *utils.ComponentReporter, autoInstrumentation bool) {
+	checkGoVersion(reporter)
 	if autoInstrumentation {
-		checkGoAutoInstrumentation(messages)
+		checkGoAutoInstrumentation(reporter)
 	} else {
-		checkGoCodeBasedInstrumentation(messages)
+		checkGoCodeBasedInstrumentation(reporter)
 	}
 }
 
-func checkGoVersion(messages *map[string][]string) {}
+func checkGoVersion(reporter *utils.ComponentReporter) {}
 
-func checkGoAutoInstrumentation(messages *map[string][]string) {}
+func checkGoAutoInstrumentation(reporter *utils.ComponentReporter) {}
 
-func checkGoCodeBasedInstrumentation(messages *map[string][]string) {}
+func checkGoCodeBasedInstrumentation(reporter *utils.ComponentReporter) {}

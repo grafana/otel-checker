@@ -47,50 +47,50 @@ const (
 	Library   InstrumentationType = "LIBRARY"
 )
 
-func CheckJavaSetup(messages *map[string][]string, autoInstrumentation bool, debug bool) {
-	checkJavaVersion(messages)
+func CheckJavaSetup(reporter *utils.ComponentReporter, autoInstrumentation bool, debug bool) {
+	checkJavaVersion(reporter)
 	if autoInstrumentation {
-		checkJavaAutoInstrumentation(messages, debug)
+		checkJavaAutoInstrumentation(reporter, debug)
 	} else {
-		checkJavaCodeBasedInstrumentation(messages, debug)
+		checkJavaCodeBasedInstrumentation(reporter, debug)
 	}
 }
 
-func checkJavaVersion(messages *map[string][]string) {
+func checkJavaVersion(reporter *utils.ComponentReporter) {
 	// check for java 8
 }
 
-func checkJavaAutoInstrumentation(messages *map[string][]string, debug bool) {
-	reportSupportedInstrumentations(messages, debug, Javaagent)
+func checkJavaAutoInstrumentation(reporter *utils.ComponentReporter, debug bool) {
+	reportSupportedInstrumentations(reporter, debug, Javaagent)
 }
 
-func checkJavaCodeBasedInstrumentation(messages *map[string][]string, debug bool) {
-	reportSupportedInstrumentations(messages, debug, Library)
+func checkJavaCodeBasedInstrumentation(reporter *utils.ComponentReporter, debug bool) {
+	reportSupportedInstrumentations(reporter, debug, Library)
 }
 
-func reportSupportedInstrumentations(messages *map[string][]string, debug bool, instrumentationType InstrumentationType) {
+func reportSupportedInstrumentations(reporter *utils.ComponentReporter, debug bool, instrumentationType InstrumentationType) {
 	supported, err := supportedLibraries()
 	if err != nil {
-		utils.AddError(messages, "SDK", fmt.Sprintf("Error reading supported libraries: %v", err))
+		reporter.AddError(fmt.Sprintf("Error reading supported libraries: %v", err))
 	}
 
-	deps := readDependencies(messages)
-	outputSupportedLibraries(deps, supported, messages, debug, instrumentationType)
+	deps := readDependencies(reporter)
+	outputSupportedLibraries(deps, supported, reporter, debug, instrumentationType)
 }
 
-func readDependencies(messages *map[string][]string) []JavaLibrary {
+func readDependencies(reporter *utils.ComponentReporter) []JavaLibrary {
 	if utils.FileExists("pom.xml") {
-		return checkMaven(messages)
+		return checkMaven(reporter)
 	}
 	for _, file := range gradleFiles {
 		if utils.FileExists(file) {
-			return checkGradle(file, messages)
+			return checkGradle(file, reporter)
 		}
 	}
 	return nil
 }
 
-func checkMaven(messages *map[string][]string) []JavaLibrary {
+func checkMaven(reporter *utils.ComponentReporter) []JavaLibrary {
 	println("Reading Maven dependencies")
 
 	tool := "mvn"
@@ -101,29 +101,29 @@ func checkMaven(messages *map[string][]string) []JavaLibrary {
 	cmd := exec.Command(tool, "dependency:tree", "-Dscope=runtime", "-DoutputType=json")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		utils.AddError(messages, "SDK", fmt.Sprintf("Error running maven dependency:tree:\n%v\n%s", err, output))
+		reporter.AddError(fmt.Sprintf("Error running maven dependency:tree:\n%v\n%s", err, output))
 	}
 	out := string(output)
 	deps := parseMavenDeps(out)
 	if len(deps) == 0 {
-		utils.AddWarning(messages, "SDK", "No Maven dependencies found")
+		reporter.AddWarning("No Maven dependencies found")
 	}
 	return deps
 }
 
 func outputSupportedLibraries(
-	deps []JavaLibrary, supported SupportedModules, messages *map[string][]string,
+	deps []JavaLibrary, supported SupportedModules, reporter *utils.ComponentReporter,
 	debug bool, instrumentationType InstrumentationType) {
 	for _, dep := range deps {
 		links := findSupportedLibraries(dep, supported, instrumentationType)
 		if len(links) > 0 {
-			utils.AddSuccessfulCheck(messages, "SDK",
+			reporter.AddSuccessfulCheck(
 				fmt.Sprintf("Found supported library: %s:%s:%s at %s",
 					dep.Group, dep.Artifact, dep.Version, strings.Join(links, ", ")))
 		} else if debug {
-			utils.AddWarning(messages, "SDK", fmt.Sprintf("Found unsupported library: %s:%s:%s", dep.Group, dep.Artifact, dep.Version))
+			reporter.AddWarning(fmt.Sprintf("Found unsupported library: %s:%s:%s", dep.Group, dep.Artifact, dep.Version))
 		}
-		outputSupportedLibraries(dep.Children, supported, messages, false, instrumentationType)
+		outputSupportedLibraries(dep.Children, supported, reporter, false, instrumentationType)
 	}
 }
 
@@ -184,7 +184,7 @@ func parseMavenDeps(out string) []JavaLibrary {
 	return []JavaLibrary{deps}
 }
 
-func checkGradle(file string, messages *map[string][]string) []JavaLibrary {
+func checkGradle(file string, reporter *utils.ComponentReporter) []JavaLibrary {
 	println(fmt.Sprintf("Reading Gradle dependencies from %s", file))
 
 	tool := "gradle"
@@ -194,12 +194,12 @@ func checkGradle(file string, messages *map[string][]string) []JavaLibrary {
 	cmd := exec.Command(tool, fmt.Sprintf("--build-file=%s", file), "dependencies", "--configuration=runtimeClasspath")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		utils.AddError(messages, "SDK", fmt.Sprintf("Error running '%s':\n%v\n%s", cmd.String(), err, output))
+		reporter.AddError(fmt.Sprintf("Error running '%s':\n%v\n%s", cmd.String(), err, output))
 	}
 	out := string(output)
 	deps := parseGradleDeps(out)
 	if len(deps) == 0 {
-		utils.AddWarning(messages, "SDK", "No Gradle dependencies found")
+		reporter.AddWarning("No Gradle dependencies found")
 	}
 	return deps
 }

@@ -1,19 +1,18 @@
 package sdk
 
-func CheckDotNetSetup(
-	messages *map[string][]string,
-	autoInstrumentation bool,
-) {
-	checkDotNetVersion(messages)
+import "otel-checker/checks/utils"
+
+func CheckDotNetSetup(reporter *utils.ComponentReporter, autoInstrumentation bool) {
+	checkDotNetVersion(reporter)
 	if autoInstrumentation {
-		checkDotNetAutoInstrumentation(messages)
+		checkDotNetAutoInstrumentation(reporter)
 	} else {
-		checkDotNetCodeBasedInstrumentation(messages)
+		checkDotNetCodeBasedInstrumentation(reporter)
 	}
 }
 
-func checkDotNetVersion(messages *map[string][]string) {}
+func checkDotNetVersion(reporter *utils.ComponentReporter) {}
 
-func checkDotNetAutoInstrumentation(messages *map[string][]string) {}
+func checkDotNetAutoInstrumentation(reporter *utils.ComponentReporter) {}
 
-func checkDotNetCodeBasedInstrumentation(messages *map[string][]string) {}
+func checkDotNetCodeBasedInstrumentation(reporter *utils.ComponentReporter) {}

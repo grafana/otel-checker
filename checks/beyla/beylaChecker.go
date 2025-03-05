@@ -1,3 +1,5 @@
 package beyla
 
-func CheckBeylaSetup(messages *map[string][]string, language string) {}
+import "otel-checker/checks/utils"
+
+func CheckBeylaSetup(reporter *utils.ComponentReporter, language string) {}

@@ -11,68 +11,60 @@ import (
 	utils "otel-checker/checks/utils"
 )
 
-func CheckGrafanaSetup(
-	messages *map[string][]string,
-	language string,
-	components []string,
-) {
-	checkEnvVarsGrafana(messages, language, components)
-	checkAuth(messages)
+func CheckGrafanaSetup(reporter utils.Reporter, grafanaReporter *utils.ComponentReporter, language string, components []string) {
+	checkEnvVarsGrafana(reporter, grafanaReporter, language, components)
+	checkAuth(grafanaReporter)
 }
 
-func checkEnvVarsGrafana(
-	messages *map[string][]string,
-	language string,
-	components []string,
-) {
+func checkEnvVarsGrafana(reporter utils.Reporter, grafana *utils.ComponentReporter, language string, components []string) {
 	if os.Getenv("OTEL_SERVICE_NAME") == "" {
-		utils.AddWarning(messages, "Grafana Cloud", "It's recommended the environment variable OTEL_SERVICE_NAME to be set to your service name, for easier identification")
+		grafana.AddWarning("It's recommended the environment variable OTEL_SERVICE_NAME to be set to your service name, for easier identification")
 	} else {
-		utils.AddSuccessfulCheck(messages, "Grafana Cloud", "OTEL_SERVICE_NAME is set")
+		grafana.AddSuccessfulCheck("OTEL_SERVICE_NAME is set")
 	}
 
 	if os.Getenv("OTEL_EXPORTER_OTLP_PROTOCOL") != "http/protobuf" {
-		utils.AddError(messages, "Grafana Cloud", "OTEL_EXPORTER_OTLP_PROTOCOL is not set to 'http/protobuf'")
+		grafana.AddError("OTEL_EXPORTER_OTLP_PROTOCOL is not set to 'http/protobuf'")
 	} else {
-		utils.AddSuccessfulCheck(messages, "Grafana Cloud", "OTEL_EXPORTER_OTLP_PROTOCOL set to 'http/protobuf'")
+		grafana.AddSuccessfulCheck("OTEL_EXPORTER_OTLP_PROTOCOL set to 'http/protobuf'")
 	}
 
 	if os.Getenv("OTEL_METRICS_EXPORTER") == "none" {
-		utils.AddError(messages, "Grafana Cloud", "The value of OTEL_METRICS_EXPORTER cannot be 'none'. Change the value to 'otlp' or leave it unset")
+		grafana.AddError("The value of OTEL_METRICS_EXPORTER cannot be 'none'. Change the value to 'otlp' or leave it unset")
 	} else {
 		if os.Getenv("OTEL_METRICS_EXPORTER") == "" {
-			utils.AddSuccessfulCheck(messages, "Grafana Cloud", "OTEL_METRICS_EXPORTER is unset, with a default value of 'otlp'")
+			grafana.AddSuccessfulCheck("OTEL_METRICS_EXPORTER is unset, with a default value of 'otlp'")
 		} else {
-			utils.AddSuccessfulCheck(messages, "Grafana Cloud", fmt.Sprintf("The value of OTEL_METRICS_EXPORTER is set to '%s'", os.Getenv("OTEL_METRICS_EXPORTER")))
+			grafana.AddSuccessfulCheck(fmt.Sprintf("The value of OTEL_METRICS_EXPORTER is set to '%s'", os.Getenv("OTEL_METRICS_EXPORTER")))
 		}
 	}
 	if os.Getenv("OTEL_TRACES_EXPORTER") == "none" {
-		utils.AddError(messages, "Grafana Cloud", "The value of OTEL_TRACES_EXPORTER cannot be 'none'. Change the value to 'otlp' or leave it unset")
+		grafana.AddError("The value of OTEL_TRACES_EXPORTER cannot be 'none'. Change the value to 'otlp' or leave it unset")
 	} else {
 		if os.Getenv("OTEL_TRACES_EXPORTER") == "" {
-			utils.AddSuccessfulCheck(messages, "Grafana Cloud", "OTEL_TRACES_EXPORTER is unset, with a default value of 'otlp'")
+			grafana.AddSuccessfulCheck("OTEL_TRACES_EXPORTER is unset, with a default value of 'otlp'")
 		} else {
-			utils.AddSuccessfulCheck(messages, "Grafana Cloud", fmt.Sprintf("The value of OTEL_TRACES_EXPORTER is set to '%s'", os.Getenv("OTEL_TRACES_EXPORTER")))
+			grafana.AddSuccessfulCheck(fmt.Sprintf("The value of OTEL_TRACES_EXPORTER is set to '%s'", os.Getenv("OTEL_TRACES_EXPORTER")))
 		}
 	}
 	if os.Getenv("OTEL_LOGS_EXPORTER") == "none" {
-		utils.AddError(messages, "Grafana Cloud", "The value of OTEL_LOGS_EXPORTER cannot be 'none'. Change the value to 'otlp' or leave it unset")
+		grafana.AddError("The value of OTEL_LOGS_EXPORTER cannot be 'none'. Change the value to 'otlp' or leave it unset")
 	} else {
 		if os.Getenv("OTEL_LOGS_EXPORTER") == "" {
-			utils.AddSuccessfulCheck(messages, "Grafana Cloud", "OTEL_LOGS_EXPORTER is unset, with a default value of 'otlp'")
+			grafana.AddSuccessfulCheck("OTEL_LOGS_EXPORTER is unset, with a default value of 'otlp'")
 		} else {
-			utils.AddSuccessfulCheck(messages, "Grafana Cloud", fmt.Sprintf("The value of OTEL_LOGS_EXPORTER is set to '%s'", os.Getenv("OTEL_LOGS_EXPORTER")))
+			grafana.AddSuccessfulCheck(fmt.Sprintf("The value of OTEL_LOGS_EXPORTER is set to '%s'", os.Getenv("OTEL_LOGS_EXPORTER")))
 		}
 	}
 
 	match, _ := regexp.MatchString("https:\\/\\/.+\\.grafana\\.net\\/otlp", os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT"))
 	if match {
-		utils.AddSuccessfulCheck(messages, "Grafana Cloud", "OTEL_EXPORTER_OTLP_ENDPOINT set in the format similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp")
+		grafana.AddSuccessfulCheck("OTEL_EXPORTER_OTLP_ENDPOINT set in the format similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp")
 	} else {
 		if strings.Contains(os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT"), "localhost") {
-			utils.AddWarning(messages, "Grafana Cloud", "OTEL_EXPORTER_OTLP_ENDPOINT is set to localhost. Update to a Grafana endpoint similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp to be able to send telemetry to your Grafana Cloud instance")
+			grafana.AddWarning("OTEL_EXPORTER_OTLP_ENDPOINT is set to localhost. Update to a Grafana endpoint similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp to be able to send telemetry to your Grafana Cloud instance")
 		} else {
-			utils.AddError(messages, "Grafana Cloud", "OTEL_EXPORTER_OTLP_ENDPOINT is not set in the format similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp")
+			grafana.AddError("OTEL_EXPORTER_OTLP_ENDPOINT is not set in the format similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp")
 		}
 	}
 
@@ -81,57 +73,58 @@ func checkEnvVarsGrafana(
 		tokenStart = "Authorization=Basic%20"
 	}
 	if strings.Contains(os.Getenv("OTEL_EXPORTER_OTLP_HEADERS"), tokenStart) {
-		utils.AddSuccessfulCheck(messages, "Grafana Cloud", "OTEL_EXPORTER_OTLP_HEADERS is set correctly")
+		grafana.AddSuccessfulCheck("OTEL_EXPORTER_OTLP_HEADERS is set correctly")
 	} else {
-		utils.AddError(messages, "Grafana Cloud", fmt.Sprintf("OTEL_EXPORTER_OTLP_HEADERS is not set. Value should have '%s...'", tokenStart))
+		grafana.AddError(fmt.Sprintf("OTEL_EXPORTER_OTLP_HEADERS is not set. Value should have '%s...'", tokenStart))
 	}
 
 	if slices.Contains(components, "beyla") {
+		beyla := reporter.Component("Beyla")
 		if os.Getenv("BEYLA_SERVICE_NAME") == "" {
-			utils.AddWarning(messages, "Beyla", "It's recommended the environment variable BEYLA_SERVICE_NAME to be set to your service name")
+			beyla.AddWarning("It's recommended the environment variable BEYLA_SERVICE_NAME to be set to your service name")
 		} else {
-			utils.AddSuccessfulCheck(messages, "Beyla", "BEYLA_SERVICE_NAME is set")
+			beyla.AddSuccessfulCheck("BEYLA_SERVICE_NAME is set")
 		}
 
 		if os.Getenv("BEYLA_OPEN_PORT") == "" {
-			utils.AddError(messages, "Beyla", "BEYLA_OPEN_PORT must be set")
+			beyla.AddError("BEYLA_OPEN_PORT must be set")
 		} else {
-			utils.AddSuccessfulCheck(messages, "Beyla", "BEYLA_SERVICE_NAME is set")
+			beyla.AddSuccessfulCheck("BEYLA_SERVICE_NAME is set")
 		}
 
 		if os.Getenv("GRAFANA_CLOUD_SUBMIT") == "" {
-			utils.AddError(messages, "Beyla", "GRAFANA_CLOUD_SUBMIT must be set to 'metrics' and/or 'traces'")
+			beyla.AddError("GRAFANA_CLOUD_SUBMIT must be set to 'metrics' and/or 'traces'")
 		} else {
-			utils.AddSuccessfulCheck(messages, "Beyla", "GRAFANA_CLOUD_SUBMIT is set correctly")
+			beyla.AddSuccessfulCheck("GRAFANA_CLOUD_SUBMIT is set correctly")
 		}
 
 		if os.Getenv("GRAFANA_CLOUD_INSTANCE_ID") == "" {
-			utils.AddError(messages, "Beyla", "GRAFANA_CLOUD_INSTANCE_ID must be set")
+			beyla.AddError("GRAFANA_CLOUD_INSTANCE_ID must be set")
 		} else {
-			utils.AddSuccessfulCheck(messages, "Beyla", "GRAFANA_CLOUD_INSTANCE_ID is set")
+			beyla.AddSuccessfulCheck("GRAFANA_CLOUD_INSTANCE_ID is set")
 		}
 
 		if os.Getenv("GRAFANA_CLOUD_API_KEY") == "" {
-			utils.AddError(messages, "Beyla", "GRAFANA_CLOUD_API_KEY must be set")
+			beyla.AddError("GRAFANA_CLOUD_API_KEY must be set")
 		} else {
-			utils.AddSuccessfulCheck(messages, "Beyla", "GRAFANA_CLOUD_API_KEY is set")
+			beyla.AddSuccessfulCheck("GRAFANA_CLOUD_API_KEY is set")
 		}
 	}
 
 }
 
-func checkAuth(messages *map[string][]string) {
+func checkAuth(reporter *utils.ComponentReporter) {
 	if strings.Contains(os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT"), "localhost") {
-		utils.AddWarning(messages, "Grafana Cloud", "Credentials not checked, since OTEL_EXPORTER_OTLP_ENDPOINT is using localhost")
+		reporter.AddWarning("Credentials not checked, since OTEL_EXPORTER_OTLP_ENDPOINT is using localhost")
 		return
 	}
 	if os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT") == "" || os.Getenv("OTEL_EXPORTER_OTLP_HEADERS") == "" {
-		utils.AddWarning(messages, "Grafana Cloud", "Credentials not checked, since both environment variables OTEL_EXPORTER_OTLP_ENDPOINT and OTEL_EXPORTER_OTLP_HEADERS need to be set for this check")
+		reporter.AddWarning("Credentials not checked, since both environment variables OTEL_EXPORTER_OTLP_ENDPOINT and OTEL_EXPORTER_OTLP_HEADERS need to be set for this check")
 	} else {
 		endpoint := os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT") + "/v1/metrics"
 		req, err := http.NewRequest("POST", endpoint, nil)
 		if err != nil {
-			utils.AddError(messages, "Grafana Cloud", fmt.Sprintf("Error while testing credentials of OTEL_EXPORTER_OTLP_ENDPOINT: %s", err))
+			reporter.AddError(fmt.Sprintf("Error while testing credentials of OTEL_EXPORTER_OTLP_ENDPOINT: %s", err))
 		}
 		authValue := ""
 		for _, h := range strings.SplitN(os.Getenv("OTEL_EXPORTER_OTLP_HEADERS"), ",", -1) {
@@ -144,13 +137,13 @@ func checkAuth(messages *map[string][]string) {
 
 		resp, err := http.DefaultClient.Do(req)
 		if err != nil {
-			utils.AddError(messages, "Grafana Cloud", fmt.Sprintf("Error while testing credentials of OTEL_EXPORTER_OTLP_ENDPOINT: %s", err))
+			reporter.AddError(fmt.Sprintf("Error while testing credentials of OTEL_EXPORTER_OTLP_ENDPOINT: %s", err))
 		}
 
 		if resp.StatusCode == 401 {
-			utils.AddError(messages, "Grafana Cloud", fmt.Sprintf("Error while testing credentials of OTEL_EXPORTER_OTLP_ENDPOINT: %s", resp.Status))
+			reporter.AddError(fmt.Sprintf("Error while testing credentials of OTEL_EXPORTER_OTLP_ENDPOINT: %s", resp.Status))
 		} else {
-			utils.AddSuccessfulCheck(messages, "Grafana Cloud", "Credentials for OTEL_EXPORTER_OTLP_ENDPOINT are correct")
+			reporter.AddSuccessfulCheck("Credentials for OTEL_EXPORTER_OTLP_ENDPOINT are correct")
 		}
 		defer resp.Body.Close()
 	}

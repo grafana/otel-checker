@@ -1,3 +1,5 @@
 package alloy
 
-func CheckAlloySetup(messages *map[string][]string, language string) {}
+import "otel-checker/checks/utils"
+
+func CheckAlloySetup(reporter *utils.ComponentReporter, language string) {}

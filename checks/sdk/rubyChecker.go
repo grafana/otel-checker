@@ -3,39 +3,36 @@ package sdk
 import (
 	"os"
 	"os/exec"
-	utils "otel-checker/checks/utils"
+	"otel-checker/checks/utils"
 	"strings"
 
 	"golang.org/x/mod/semver"
 )
 
-func CheckRubySetup(
-	messages *map[string][]string,
-	autoInstrumentation bool,
-) {
-	checkRubyVersion(messages)
-	checkBundlerInstalled(messages)
+func CheckRubySetup(reporter *utils.ComponentReporter, autoInstrumentation bool) {
+	checkRubyVersion(reporter)
+	checkBundlerInstalled(reporter)
 	if autoInstrumentation {
-		checkRubyAutoInstrumentation(messages)
+		checkRubyAutoInstrumentation(reporter)
 	} else {
-		checkRubyCodeBasedInstrumentation(messages)
+		checkRubyCodeBasedInstrumentation(reporter)
 	}
 }
 
 // While tested, support for jruby and truffleruby are on a best-effort basis at this time.
-func checkRubyVersion(messages *map[string][]string) {
-	hasCRuby := checkCRubyVersion(messages)
-	hasJRuby := checkJRubyVersion(messages)
-	hasTruffleRuby := checkJRubyVersion(messages)
+func checkRubyVersion(reporter *utils.ComponentReporter) {
+	hasCRuby := checkCRubyVersion(reporter)
+	hasJRuby := checkJRubyVersion(reporter)
+	hasTruffleRuby := checkJRubyVersion(reporter)
 
 	if hasCRuby || hasJRuby || hasTruffleRuby {
-		utils.AddSuccessfulCheck(messages, "SDK", "Ruby setup successful")
+		reporter.AddSuccessfulCheck("Ruby setup successful")
 	} else {
-		utils.AddError(messages, "SDK", "No Ruby found, install CRuby >= 3.0, JRuby >= 9.3.2.0, or TruffleRuby >= 22.1")
+		reporter.AddError("No Ruby found, install CRuby >= 3.0, JRuby >= 9.3.2.0, or TruffleRuby >= 22.1")
 	}
 }
 
-func checkCRubyVersion(messages *map[string][]string) bool {
+func checkCRubyVersion(reporter *utils.ComponentReporter) bool {
 	cmd := exec.Command("ruby", "-v")
 	stdout, err := cmd.Output()
 
@@ -44,15 +41,15 @@ func checkCRubyVersion(messages *map[string][]string) bool {
 	}
 
 	if strings.Contains(string(stdout), "ruby 3") {
-		utils.AddSuccessfulCheck(messages, "SDK", "Using CRuby >= 3.0")
+		reporter.AddSuccessfulCheck("Using CRuby >= 3.0")
 		return true
 	} else {
-		utils.AddError(messages, "SDK", "Not using recommended CRuby version, update to CRuby >= 3.0")
+		reporter.AddError("Not using recommended CRuby version, update to CRuby >= 3.0")
 		return false
 	}
 }
 
-func checkJRubyVersion(messages *map[string][]string) bool {
+func checkJRubyVersion(reporter *utils.ComponentReporter) bool {
 	cmd := exec.Command("jruby", "--version")
 	stdout, err := cmd.Output()
 
@@ -63,77 +60,77 @@ func checkJRubyVersion(messages *map[string][]string) bool {
 	version := strings.Fields(string(stdout))[2]
 
 	if semver.Compare(version, "9.3.2.0") >= 0 {
-		utils.AddSuccessfulCheck(messages, "SDK", "Using JRuby >= 9.3.2.0")
+		reporter.AddSuccessfulCheck("Using JRuby >= 9.3.2.0")
 		return true
 	} else {
-		utils.AddError(messages, "SDK", "Not using recommended JRuby version, update to JRuby >= 9.3.2.0")
+		reporter.AddError("Not using recommended JRuby version, update to JRuby >= 9.3.2.0")
 		return false
 	}
 }
 
-func checkBundlerInstalled(messages *map[string][]string) {
+func checkBundlerInstalled(reporter *utils.ComponentReporter) {
 	cmd := exec.Command("bundle", "-v")
 	_, err := cmd.Output()
 
 	if err != nil {
-		utils.AddError(messages, "SDK", "Bundler not found. Run 'gem install bundler' to install it.")
+		reporter.AddError("Bundler not found. Run 'gem install bundler' to install it.")
 	} else {
-		utils.AddSuccessfulCheck(messages, "SDK", "Bundler found. Run 'bundle install' to install dependencies.")
+		reporter.AddSuccessfulCheck("Bundler found. Run 'bundle install' to install dependencies.")
 	}
 }
 
 // TruffleRuby check is not supported yet
-//func checkTruffleRubyVersion(messages *map[string][]string) bool {
+//func checkTruffleRubyVersion(reporter *utils.ComponentReporter) bool {
 //	return false
 //}
 
-func checkRubyAutoInstrumentation(messages *map[string][]string) {
+func checkRubyAutoInstrumentation(reporter *utils.ComponentReporter) {
 	content, err := os.ReadFile("Gemfile.lock")
 	if err != nil {
-		utils.AddError(messages, "SDK", "Could not find Gemfile.lock. Run 'bundle install' to generate it.")
+		reporter.AddError("Could not find Gemfile.lock. Run 'bundle install' to generate it.")
 		return
 	}
 
 	contentStr := string(content)
 
 	if strings.Contains(contentStr, "opentelemetry-sdk") {
-		utils.AddSuccessfulCheck(messages, "SDK", "Found required dependency: opentelemetry-sdk")
+		reporter.AddSuccessfulCheck("Found required dependency: opentelemetry-sdk")
 	} else {
-		utils.AddError(messages, "SDK", "Missing required OpenTelemetry Ruby dependency: opentelemetry-sdk. Add it to your Gemfile and run 'bundle install'.")
+		reporter.AddError("Missing required OpenTelemetry Ruby dependency: opentelemetry-sdk. Add it to your Gemfile and run 'bundle install'.")
 	}
 
 	if strings.Contains(contentStr, "opentelemetry-instrumentation-all") {
-		utils.AddSuccessfulCheck(messages, "SDK", "Found required dependency: opentelemetry-instrumentation-all")
+		reporter.AddSuccessfulCheck("Found required dependency: opentelemetry-instrumentation-all")
 	} else {
-		utils.AddError(messages, "SDK", "Missing required OpenTelemetry Ruby dependency: opentelemetry-instrumentation-all. Add it to your Gemfile and run 'bundle install'.")
+		reporter.AddError("Missing required OpenTelemetry Ruby dependency: opentelemetry-instrumentation-all. Add it to your Gemfile and run 'bundle install'.")
 	}
 }
 
-func checkRubyCodeBasedInstrumentation(messages *map[string][]string) {
+func checkRubyCodeBasedInstrumentation(reporter *utils.ComponentReporter) {
 	content, err := os.ReadFile("Gemfile.lock")
 	if err != nil {
-		utils.AddError(messages, "SDK", "Could not find Gemfile.lock. Run 'bundle install' to generate it.")
+		reporter.AddError("Could not find Gemfile.lock. Run 'bundle install' to generate it.")
 		return
 	}
 
 	contentStr := string(content)
 
 	if strings.Contains(contentStr, "opentelemetry-sdk") {
-		utils.AddSuccessfulCheck(messages, "SDK", "Found required dependency: opentelemetry-sdk")
+		reporter.AddSuccessfulCheck("Found required dependency: opentelemetry-sdk")
 	} else {
-		utils.AddError(messages, "SDK", "Missing required OpenTelemetry Ruby dependency: opentelemetry-sdk. Add it to your Gemfile and run 'bundle install'.")
+		reporter.AddError("Missing required OpenTelemetry Ruby dependency: opentelemetry-sdk. Add it to your Gemfile and run 'bundle install'.")
 	}
 
 	if strings.Contains(contentStr, "opentelemetry-api") {
-		utils.AddSuccessfulCheck(messages, "SDK", "Found required dependency: opentelemetry-api")
+		reporter.AddSuccessfulCheck("Found required dependency: opentelemetry-api")
 	} else {
-		utils.AddError(messages, "SDK", "Missing required OpenTelemetry Ruby dependency: opentelemetry-api. Add it to your Gemfile and run 'bundle install'.")
+		reporter.AddError("Missing required OpenTelemetry Ruby dependency: opentelemetry-api. Add it to your Gemfile and run 'bundle install'.")
 	}
 
 	if strings.Contains(contentStr, "opentelemetry-common") {
-		utils.AddSuccessfulCheck(messages, "SDK", "Found required dependency: opentelemetry-common")
+		reporter.AddSuccessfulCheck("Found required dependency: opentelemetry-common")
 	} else {
-		utils.AddError(messages, "SDK", "Missing required OpenTelemetry Ruby dependency: opentelemetry-common. Add it to your Gemfile and run 'bundle install'.")
+		reporter.AddError("Missing required OpenTelemetry Ruby dependency: opentelemetry-common. Add it to your Gemfile and run 'bundle install'.")
 	}
 }
 

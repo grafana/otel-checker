@@ -10,22 +10,22 @@ import (
 )
 
 func RunAllChecks(commands utils.Commands) map[string][]string {
-	messages := utils.CreateMessagesMap()
+	reporter := utils.Reporter{}
 
-	grafana.CheckGrafanaSetup(&messages, commands.Language, commands.Components)
+	grafana.CheckGrafanaSetup(reporter, reporter.Component("Grafana Cloud"), commands.Language, commands.Components)
 
 	for _, c := range commands.Components {
 		if c == "alloy" {
-			alloy.CheckAlloySetup(&messages, commands.Language)
+			alloy.CheckAlloySetup(reporter.Component("Alloy"), commands.Language)
 		}
 
 		if c == "beyla" {
-			beyla.CheckBeylaSetup(&messages, commands.Language)
+			beyla.CheckBeylaSetup(reporter.Component("Beyla"), commands.Language)
 		}
 
 		if c == "collector" {
 			collector.CheckCollectorSetup(
-				&messages,
+				reporter.Component("Collector"),
 				commands.Language,
 				commands.CollectorConfigPath,
 			)
@@ -33,7 +33,7 @@ func RunAllChecks(commands utils.Commands) map[string][]string {
 
 		if c == "sdk" {
 			sdk.CheckSDKSetup(
-				&messages,
+				reporter.Component("SDK"),
 				commands.Language,
 				commands.AutoInstrumentation,
 				commands.PackageJsonPath,
@@ -43,6 +43,5 @@ func RunAllChecks(commands utils.Commands) map[string][]string {
 		}
 	}
 
-	utils.PrintResults(messages)
-	return messages
+	return reporter.PrintResults()
 }

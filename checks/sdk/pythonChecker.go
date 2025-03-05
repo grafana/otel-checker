@@ -1,19 +1,18 @@
 package sdk
 
-func CheckPythonSetup(
-	messages *map[string][]string,
-	autoInstrumentation bool,
-) {
-	checkPythonVersion(messages)
+import "otel-checker/checks/utils"
+
+func CheckPythonSetup(reporter *utils.ComponentReporter, autoInstrumentation bool) {
+	checkPythonVersion(reporter)
 	if autoInstrumentation {
-		checkPythonAutoInstrumentation(messages)
+		checkPythonAutoInstrumentation(reporter)
 	} else {
-		checkPythonCodeBasedInstrumentation(messages)
+		checkPythonCodeBasedInstrumentation(reporter)
 	}
 }
 
-func checkPythonVersion(messages *map[string][]string) {}
+func checkPythonVersion(reporter *utils.ComponentReporter) {}
 
-func checkPythonAutoInstrumentation(messages *map[string][]string) {}
+func checkPythonAutoInstrumentation(reporter *utils.ComponentReporter) {}
 
-func checkPythonCodeBasedInstrumentation(messages *map[string][]string) {}
+func checkPythonCodeBasedInstrumentation(reporter *utils.ComponentReporter) {}

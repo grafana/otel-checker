@@ -92,49 +92,86 @@ func GetArguments() Commands {
 	return command
 }
 
-func CreateMessagesMap() map[string][]string {
-	messages := make(map[string][]string)
-	messages[CHECKS] = make([]string, 0)
-	messages[WARNINGS] = make([]string, 0)
-	messages[ERRORS] = make([]string, 0)
-
-	return messages
+type Reporter struct {
+	components []*ComponentReporter
 }
 
-func PrintResults(messages map[string][]string) {
-	if len(messages[CHECKS]) > 0 {
+type ComponentReporter struct {
+	name     string
+	checks   []string
+	warnings []string
+	errors   []string
+}
+
+func (r *Reporter) Component(name string) *ComponentReporter {
+	for _, component := range r.components {
+		if component.name == name {
+			return component
+		}
+	}
+	c := &ComponentReporter{name: name}
+	r.components = append(r.components, c)
+	return c
+}
+
+func (r *Reporter) PrintResults() map[string][]string {
+	res := make(map[string][]string)
+	var checks []string
+	for _, component := range r.components {
+		for _, check := range component.checks {
+			checks = append(checks, check)
+		}
+	}
+	res[CHECKS] = checks
+	var warnings []string
+	for _, component := range r.components {
+		for _, warning := range component.warnings {
+			warnings = append(warnings, warning)
+		}
+	}
+	res[WARNINGS] = warnings
+	var errors []string
+	for _, component := range r.components {
+		for _, err := range component.errors {
+			errors = append(errors, err)
+		}
+	}
+	res[ERRORS] = errors
+
+	if len(checks) > 0 {
 		green := color.New(color.FgGreen)
-		green.Printf("\n%d Successful Check(s)\n", len(messages[CHECKS]))
-		for _, m := range messages[CHECKS] {
+		green.Printf("\n%d Successful Check(s)\n", len(checks))
+		for _, m := range checks {
 			green.Printf("✔ %s \n", m)
 		}
 	}
-	if len(messages[WARNINGS]) > 0 {
+	if len(warnings) > 0 {
 		yellow := color.New(color.FgYellow)
-		yellow.Printf("\n%d Warning(s)\n", len(messages[WARNINGS]))
-		for _, m := range messages[WARNINGS] {
+		yellow.Printf("\n%d Warning(s)\n", len(warnings))
+		for _, m := range warnings {
 			yellow.Printf("• %s \n", m)
 		}
 	}
-	if len(messages[ERRORS]) > 0 {
+	if len(errors) > 0 {
 		red := color.New(color.FgRed)
-		red.Printf("\n%d Error(s)\n", len(messages[ERRORS]))
-		for _, m := range messages[ERRORS] {
+		red.Printf("\n%d Error(s)\n", len(errors))
+		for _, m := range errors {
 			red.Printf("✖ %s \n", m)
 		}
 	}
+	return res
 }
 
-func AddSuccessfulCheck(messages *map[string][]string, component string, message string) {
-	(*messages)[CHECKS] = append((*messages)[CHECKS], fmt.Sprintf(`%s: %s`, component, message))
+func (r *ComponentReporter) AddSuccessfulCheck(message string) {
+	r.checks = append(r.checks, fmt.Sprintf(`%s: %s`, r.name, message))
 }
 
-func AddWarning(messages *map[string][]string, component string, message string) {
-	(*messages)[WARNINGS] = append((*messages)[WARNINGS], fmt.Sprintf(`%s: %s`, component, message))
+func (r *ComponentReporter) AddWarning(message string) {
+	r.warnings = append(r.warnings, fmt.Sprintf(`%s: %s`, r.name, message))
 }
 
-func AddError(messages *map[string][]string, component string, message string) {
-	(*messages)[ERRORS] = append((*messages)[ERRORS], fmt.Sprintf(`%s: %s`, component, message))
+func (r *ComponentReporter) AddError(message string) {
+	r.errors = append(r.errors, fmt.Sprintf(`%s: %s`, r.name, message))
 }
 
 func FileExists(path string) bool {
