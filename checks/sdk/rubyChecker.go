@@ -83,9 +83,9 @@ func checkBundlerInstalled(messages *map[string][]string) {
 }
 
 // TruffleRuby check is not supported yet
-func checkTruffleRubyVersion(messages *map[string][]string) bool {
-	return false
-}
+//func checkTruffleRubyVersion(messages *map[string][]string) bool {
+//	return false
+//}
 
 func checkRubyAutoInstrumentation(messages *map[string][]string) {
 	content, err := os.ReadFile("Gemfile.lock")

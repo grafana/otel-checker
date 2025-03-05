@@ -80,9 +80,7 @@ func FixVersion(version string) string {
 		return version
 	}
 	for _, suffix := range suffixes {
-		if strings.HasSuffix(version, suffix) {
-			version = strings.TrimSuffix(version, suffix)
-		}
+		version = strings.TrimSuffix(version, suffix)
 	}
 
 	if !strings.HasPrefix(version, "v") {
