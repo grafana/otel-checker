@@ -27,11 +27,10 @@ var ignoreVersionSuffixes = []string{
 func ParseVersionRange(version string) (VersionRange, error) {
 	split := strings.Split(version, ",")
 	if len(split) == 1 {
-		v := FixVersion(version)
 		return VersionRange{
-			lower:          v,
+			lower:          version,
 			lowerInclusive: true,
-			upper:          v,
+			upper:          version,
 			upperInclusive: true,
 		}, nil
 	}
@@ -110,7 +109,7 @@ func checkBound(bound string, inclusive bool, version string, sgn int) bool {
 	if bound == "" {
 		return true
 	}
-	cmp := semver.Compare(bound, version)
+	cmp := semver.Compare(FixVersion(bound), FixVersion(version))
 	if cmp == 0 {
 		return inclusive
 	}

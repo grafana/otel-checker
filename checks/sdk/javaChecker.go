@@ -31,23 +31,23 @@ func (l *JavaLibrary) String() string {
 	return fmt.Sprintf("%s:%s:%s", l.Group, l.Artifact, l.Version)
 }
 
-type SupportedModules map[string]SupportedModule
+type SupportedJavaModules map[string]SupportedJavaModule
 
-type SupportedModule struct {
-	Instrumentations []Instrumentation `yaml:"instrumentations"`
+type SupportedJavaModule struct {
+	Instrumentations []JavaInstrumentation `yaml:"instrumentations"`
 }
 
-type Instrumentation struct {
-	Name           string                           `yaml:"name"`
-	SrcPath        string                           `yaml:"srcPath"`
-	TargetVersions map[InstrumentationType][]string `yaml:"target_versions"`
+type JavaInstrumentation struct {
+	Name           string                               `yaml:"name"`
+	SrcPath        string                               `yaml:"srcPath"`
+	TargetVersions map[JavaInstrumentationType][]string `yaml:"target_versions"`
 }
 
-type InstrumentationType string
+type JavaInstrumentationType string
 
 const (
-	Javaagent InstrumentationType = "JAVAAGENT"
-	Library   InstrumentationType = "LIBRARY"
+	Javaagent JavaInstrumentationType = "JAVAAGENT"
+	Library   JavaInstrumentationType = "LIBRARY"
 )
 
 func CheckJavaSetup(reporter *utils.ComponentReporter, manualInstrumentation bool, debug bool) {
@@ -89,8 +89,8 @@ func checkJavaCodeBasedInstrumentation(reporter *utils.ComponentReporter, debug 
 	reportSupportedInstrumentations(reporter, debug, Library)
 }
 
-func reportSupportedInstrumentations(reporter *utils.ComponentReporter, debug bool, instrumentationType InstrumentationType) {
-	supported, err := supportedLibraries()
+func reportSupportedInstrumentations(reporter *utils.ComponentReporter, debug bool, instrumentationType JavaInstrumentationType) {
+	supported, err := supportedJavaLibraries()
 	if err != nil {
 		reporter.AddError(fmt.Sprintf("Error reading supported libraries: %v", err))
 	}
@@ -147,10 +147,10 @@ func getWrapper(wrapper string, level []string) string {
 }
 
 func outputSupportedLibraries(
-	deps []JavaLibrary, supported SupportedModules, reporter *utils.ComponentReporter,
-	debug bool, instrumentationType InstrumentationType) {
+	deps []JavaLibrary, supported SupportedJavaModules, reporter *utils.ComponentReporter,
+	debug bool, instrumentationType JavaInstrumentationType) {
 	for _, dep := range deps {
-		links := findSupportedLibraries(dep, supported, instrumentationType)
+		links := findSupportedJavaLibraries(dep, supported, instrumentationType)
 		if len(links) > 0 {
 			reporter.AddSuccessfulCheck(
 				fmt.Sprintf("Found supported library: %s:%s:%s at %s",
@@ -162,7 +162,7 @@ func outputSupportedLibraries(
 	}
 }
 
-func findSupportedLibraries(library JavaLibrary, supported SupportedModules, instrumentationType InstrumentationType) []string {
+func findSupportedJavaLibraries(library JavaLibrary, supported SupportedJavaModules, instrumentationType JavaInstrumentationType) []string {
 	var links []string
 	for moduleName, module := range supported {
 		for _, instrumentation := range module.Instrumentations {
@@ -241,8 +241,8 @@ func checkGradle(file string, reporter *utils.ComponentReporter) []JavaLibrary {
 //go:embed instrumentation-list.yaml
 var supportedModules []byte
 
-func supportedLibraries() (SupportedModules, error) {
-	modules := SupportedModules{}
+func supportedJavaLibraries() (SupportedJavaModules, error) {
+	modules := SupportedJavaModules{}
 	err := yaml.Unmarshal(supportedModules, &modules)
 	if err != nil {
 		return nil, err

@@ -7,11 +7,11 @@ import (
 )
 
 func TestFindSupportedLibrary(t *testing.T) {
-	modules, err := supportedLibraries()
+	modules, err := supportedJavaLibraries()
 	require.NoError(t, err)
 	assert.Equal(t,
 		[]string{"https://github.com/open-telemetry/opentelemetry-java-instrumentation/tree/main/instrumentation/logback/logback-appender-1.0"},
-		findSupportedLibraries(JavaLibrary{
+		findSupportedJavaLibraries(JavaLibrary{
 			Group:    "ch.qos.logback",
 			Artifact: "logback-classic",
 			Version:  "1.5.16",
