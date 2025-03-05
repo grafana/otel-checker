@@ -2,12 +2,12 @@ package sdk
 
 import "otel-checker/checks/utils"
 
-func CheckDotNetSetup(reporter *utils.ComponentReporter, manualInstrumentation bool) {
+func CheckDotNetSetup(reporter *utils.ComponentReporter, commands utils.Commands) {
 	checkDotNetVersion(reporter)
-	if !manualInstrumentation {
-		checkDotNetAutoInstrumentation(reporter)
-	} else {
+	if commands.ManualInstrumentation {
 		checkDotNetCodeBasedInstrumentation(reporter)
+	} else {
+		checkDotNetAutoInstrumentation(reporter)
 	}
 }
 

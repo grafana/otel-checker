@@ -11,12 +11,12 @@ import (
 	"strings"
 )
 
-func CheckSetup(reporter *utils.ComponentReporter, autoInstrumentation bool, debug bool) {
+func CheckSetup(reporter *utils.ComponentReporter, commands utils.Commands) {
 	checkPythonVersion(reporter)
-	if autoInstrumentation {
-		checkAutoInstrumentation(reporter, debug)
+	if commands.ManualInstrumentation {
+		checkCodeBasedInstrumentation(reporter, commands.Debug)
 	} else {
-		checkCodeBasedInstrumentation(reporter, debug)
+		checkAutoInstrumentation(reporter, commands.Debug)
 	}
 }
 

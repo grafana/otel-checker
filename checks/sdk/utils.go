@@ -10,10 +10,10 @@ import (
 )
 
 type VersionRange struct {
-	lower          string
-	lowerInclusive bool
-	upper          string
-	upperInclusive bool
+	Lower          string
+	LowerInclusive bool
+	Upper          string
+	UpperInclusive bool
 }
 
 var ignoreVersionSuffixes = []string{
@@ -28,10 +28,10 @@ func ParseVersionRange(version string) (VersionRange, error) {
 	split := strings.Split(version, ",")
 	if len(split) == 1 {
 		return VersionRange{
-			lower:          version,
-			lowerInclusive: true,
-			upper:          version,
-			upperInclusive: true,
+			Lower:          version,
+			LowerInclusive: true,
+			Upper:          version,
+			UpperInclusive: true,
 		}, nil
 	}
 
@@ -101,8 +101,8 @@ func FixVersion(version string) string {
 	return version
 }
 
-func (r *VersionRange) matches(version string) bool {
-	return checkBound(r.lower, r.lowerInclusive, version, -1) && checkBound(r.upper, r.upperInclusive, version, 1)
+func (r *VersionRange) Matches(version string) bool {
+	return checkBound(r.Lower, r.LowerInclusive, version, -1) && checkBound(r.Upper, r.UpperInclusive, version, 1)
 }
 
 func checkBound(bound string, inclusive bool, version string, sgn int) bool {
@@ -114,23 +114,6 @@ func checkBound(bound string, inclusive bool, version string, sgn int) bool {
 		return inclusive
 	}
 	return cmp == sgn
-}
-
-func CheckSDKSetup(reporter *utils.ComponentReporter, language string, manualInstrumentation bool, packageJsonPath string, instrumentationFile string, debug bool) {
-	switch language {
-	case "dotnet":
-		CheckDotNetSetup(reporter, manualInstrumentation)
-	case "go":
-		CheckGoSetup(reporter, manualInstrumentation)
-	case "java":
-		CheckJavaSetup(reporter, manualInstrumentation, debug)
-	case "js":
-		CheckJSSetup(reporter, manualInstrumentation, packageJsonPath, instrumentationFile)
-	case "python":
-		CheckPythonSetup(reporter, manualInstrumentation)
-	case "ruby":
-		CheckRubySetup(reporter, manualInstrumentation)
-	}
 }
 
 func RunCommand(reporter *utils.ComponentReporter, cmd *exec.Cmd) string {

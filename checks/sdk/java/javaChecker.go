@@ -51,12 +51,12 @@ const (
 	TypeLibrary   InstrumentationType = "LIBRARY"
 )
 
-func CheckSetup(reporter *utils.ComponentReporter, manualInstrumentation bool, debug bool) {
+func CheckSetup(reporter *utils.ComponentReporter, commands utils.Commands) {
 	checkJavaVersion(reporter)
-	if !manualInstrumentation {
-		checkAutoInstrumentation(reporter, debug)
+	if commands.ManualInstrumentation {
+		checkCodeBasedInstrumentation(reporter, commands.Debug)
 	} else {
-		checkCodeBasedInstrumentation(reporter, debug)
+		checkAutoInstrumentation(reporter, commands.Debug)
 	}
 }
 

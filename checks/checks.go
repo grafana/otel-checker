@@ -34,33 +34,26 @@ func RunAllChecks(commands utils.Commands) map[string][]string {
 		}
 
 		if c == "sdk" {
-			CheckSDKSetup(
-				reporter.Component("SDK"),
-				commands.Language,
-				commands.ManualInstrumentation,
-				commands.PackageJsonPath,
-				commands.InstrumentationFile,
-				commands.Debug,
-			)
+			SDKSetup(reporter.Component("SDK"), commands)
 		}
 	}
 
 	return reporter.PrintResults()
 }
 
-func CheckSDKSetup(reporter *utils.ComponentReporter, language string, autoInstrumentation bool, packageJsonPath string, instrumentationFile string, debug bool) {
-	switch language {
+func SDKSetup(reporter *utils.ComponentReporter, commands utils.Commands) {
+	switch commands.Language {
 	case "dotnet":
-		sdk.CheckDotNetSetup(reporter, autoInstrumentation)
+		sdk.CheckDotNetSetup(reporter, commands)
 	case "go":
-		sdk.CheckGoSetup(reporter, autoInstrumentation)
+		sdk.CheckGoSetup(reporter, commands)
 	case "java":
-		java.CheckSetup(reporter, autoInstrumentation, debug)
+		java.CheckSetup(reporter, commands)
 	case "js":
-		sdk.CheckJSSetup(reporter, autoInstrumentation, packageJsonPath, instrumentationFile)
+		sdk.CheckJSSetup(reporter, commands)
 	case "python":
-		python.CheckSetup(reporter, autoInstrumentation, debug)
+		python.CheckSetup(reporter, commands)
 	case "ruby":
-		sdk.CheckRubySetup(reporter, autoInstrumentation)
+		sdk.CheckRubySetup(reporter, commands)
 	}
 }
