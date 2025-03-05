@@ -10,7 +10,6 @@ env:
   GO_VERSION: "1.24.0"
   GO_LANG_CI_LINT_VERSION: "v1.64.6"
 
-name: run tests
 jobs:
   lint:
     runs-on: ubuntu-latest
