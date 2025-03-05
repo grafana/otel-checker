@@ -76,7 +76,9 @@ TBD
 
 - Ruby version
 - Bundler installation
-- Required dependencies in `Gemfile.lock`:
+- `Gemfile` and `Gemfile.lock` exist
+- Required dependencies in `Gemfile.lock`
+- Optional auto-instrumentation dependencies
 
 #### Collector
 - Config receivers and exporters
