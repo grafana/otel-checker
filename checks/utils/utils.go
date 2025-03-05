@@ -118,23 +118,17 @@ func (r *Reporter) PrintResults() map[string][]string {
 	res := make(map[string][]string)
 	var checks []string
 	for _, component := range r.components {
-		for _, check := range component.checks {
-			checks = append(checks, check)
-		}
+		checks = append(checks, component.checks...)
 	}
 	res[CHECKS] = checks
 	var warnings []string
 	for _, component := range r.components {
-		for _, warning := range component.warnings {
-			warnings = append(warnings, warning)
-		}
+		warnings = append(warnings, component.warnings...)
 	}
 	res[WARNINGS] = warnings
 	var errors []string
 	for _, component := range r.components {
-		for _, err := range component.errors {
-			errors = append(errors, err)
-		}
+		errors = append(errors, component.errors...)
 	}
 	res[ERRORS] = errors
 
