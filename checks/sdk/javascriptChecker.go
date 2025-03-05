@@ -87,7 +87,7 @@ func checkJSCodeBasedInstrumentation(
 	instrumentationFile string,
 ) {
 	if os.Getenv("NODE_OPTIONS") == "--require @opentelemetry/auto-instrumentations-node/register" {
-		reporter.AddError(`The flag "-auto-instrumentation" was not passed to otel-checker, but the value of NODE_OPTIONS is set to require auto-instrumentation. Run "unset NODE_OPTIONS" to remove the requirement that can cause a conflict with manual instrumentations`)
+		reporter.AddError(`The flag "-manual-instrumentation" was set, but the value of NODE_OPTIONS is set to require auto-instrumentation. Run "unset NODE_OPTIONS" to remove the requirement that can cause a conflict with manual instrumentations`)
 	}
 
 	// Dependencies for auto instrumentation on package.json

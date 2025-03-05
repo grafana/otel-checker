@@ -23,14 +23,14 @@ The available flags:
 ```
 ❯ otel-checker -h
 Usage of otel-checker:
-  -auto-instrumentation
-    	Provide if your application is using auto instrumentation
+  -manual-instrumentation
+    	Provide if your application is using manual instrumentation (auto instrumentation as default)
   -collector-config-path string
     	Path to collector's config.yaml file. Required if using Collector and the config file is not in the same location as the otel-checker is being executed from. E.g. "-collector-config-path=src/inst/"
   -components string
     	Instrumentation components to test, separated by ',' (required). Possible values: sdk, collector, beyla, alloy
   -instrumentation-file string
-    	Name (including path) to instrumentation file. Required if not using auto-instrumentation. E.g."-instrumentation-file=src/inst/instrumentation.js"
+    	Name (including path) to instrumentation file. Required if using manual-instrumentation. E.g."-instrumentation-file=src/inst/instrumentation.js"
   -language string
     	Language used for instrumentation (required). Possible values: dotnet, go, java, js, python
   -package-json-path string
@@ -65,8 +65,8 @@ TBD
 
 - Java version
 - Prints which libraries (as discovered from a locally running maven or gradle) are supported:
-  - Use `-auto-instrumentation` to print libraries supported by the [Java Agent](https://github.com/open-telemetry/opentelemetry-java-instrumentation/).
-  - Without `-auto-instrumentation`, the libraries for manual instrumentation are printed.
+  - With `-manual-instrumentation`, the libraries for manual instrumentation are printed.
+  - Without `-manual-instrumentation`, it will print the libraries supported by the [Java Agent](https://github.com/open-telemetry/opentelemetry-java-instrumentation/).
   - A maven or gradle wrapper will be used if found in the current directory or a parent directory.
 
 #### Go
@@ -134,7 +134,6 @@ otel-checker
 ```
 otel-checker \
 	-language=js \
-	-auto-instrumentation \
 	-components=sdk
 ```
 
@@ -142,6 +141,5 @@ Or start directly from the source code:
 ```
 go run otel-checker \
 	-language=js \
-	-auto-instrumentation \
 	-components=sdk
 ```

@@ -40,7 +40,7 @@ func GetArguments() Commands {
 	webServer := flag.Bool("web-server", false, "Set if you would like the results served in a web server in addition to console output")
 
 	// javascript
-	instrumentationFile := flag.String("instrumentation-file", "", `Name (including path) to instrumentation file. Required if not using auto-instrumentation. E.g."-instrumentation-file=src/inst/instrumentation.js"`)
+	instrumentationFile := flag.String("instrumentation-file", "", `Name (including path) to instrumentation file. Required if using manual-instrumentation. E.g."-instrumentation-file=src/inst/instrumentation.js"`)
 	packageJsonPath := flag.String("package-json-path", "", `Path to package.json file. Required if instrumentation is in JavaScript and the file is not in the same location as the otel-checker is being executed from. E.g. "-package-json-path=src/inst/"`)
 
 	// collector
@@ -69,7 +69,7 @@ func GetArguments() Commands {
 
 	// javascript
 	if *languageValue == "js" && *instrumentationFile == "" && *manualInstrumentation {
-		fmt.Println(color.RedString(`When auto-instrumentation is not being used, a instrumentation file is required. Add "-auto-instrumentation" or "-instrumentation-file=path/to/file/file.js"`))
+		fmt.Println(color.RedString(`When manual-instrumentation is being used, a instrumentation file is required. Remove "-manual-instrumentation" or "-instrumentation-file=path/to/file/file.js"`))
 		os.Exit(1)
 	}
 	if *packageJsonPath != "" && !strings.HasSuffix(*packageJsonPath, "/") {
