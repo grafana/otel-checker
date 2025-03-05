@@ -8,6 +8,7 @@ import (
 	"gopkg.in/yaml.v3"
 	"os/exec"
 	"otel-checker/checks/utils"
+	"path/filepath"
 	"slices"
 	"strings"
 )
@@ -93,22 +94,47 @@ func readDependencies(reporter *utils.ComponentReporter) []JavaLibrary {
 func checkMaven(reporter *utils.ComponentReporter) []JavaLibrary {
 	println("Reading Maven dependencies")
 
-	tool := "mvn"
-	if utils.FileExists("mvnw") {
-		tool = "./mvnw"
+	out := runCommand(reporter, exec.Command(searchWrapper("mvn", "mvnw"),
+		"dependency:tree", "-Dscope=runtime", "-DoutputType=json"))
+	if out == "" {
+		return []JavaLibrary{}
 	}
-	// call maven to get dependencies
-	cmd := exec.Command(tool, "dependency:tree", "-Dscope=runtime", "-DoutputType=json")
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		reporter.AddError(fmt.Sprintf("Error running maven dependency:tree:\n%v\n%s", err, output))
-	}
-	out := string(output)
 	deps := parseMavenDeps(out)
 	if len(deps) == 0 {
 		reporter.AddWarning("No Maven dependencies found")
 	}
 	return deps
+}
+
+func searchWrapper(base string, wrapper string) string {
+	tool := getWrapper(wrapper, []string{"."})
+	if tool == "" {
+		return base
+	}
+	return tool
+}
+
+func getWrapper(wrapper string, level []string) string {
+	if len(level) > 10 {
+		return ""
+	}
+	p := filepath.Join(filepath.Join(level...), wrapper)
+	if utils.FileExists(p) {
+		// the . is needed to run the wrapper in the current directory
+		return fmt.Sprintf(".%c%s", filepath.Separator, p)
+	}
+	return getWrapper(wrapper, append(level, ".."))
+}
+
+func runCommand(reporter *utils.ComponentReporter, cmd *exec.Cmd) string {
+	println("Running command:", cmd.String())
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		reporter.AddError(fmt.Sprintf("Error running %s:\n%v\n%s", cmd.String(), err, output))
+		return ""
+	}
+	out := string(output)
+	return out
 }
 
 func outputSupportedLibraries(
@@ -185,18 +211,13 @@ func parseMavenDeps(out string) []JavaLibrary {
 }
 
 func checkGradle(file string, reporter *utils.ComponentReporter) []JavaLibrary {
-	println(fmt.Sprintf("Reading Gradle dependencies from %s", file))
+	println("Reading Gradle dependencies")
 
-	tool := "gradle"
-	if utils.FileExists("gradlew") {
-		tool = "./gradlew"
+	out := runCommand(reporter, exec.Command(searchWrapper("gradle", "gradlew"),
+		fmt.Sprintf("--build-file=%s", file), "dependencies", "--configuration=runtimeClasspath"))
+	if out == "" {
+		return []JavaLibrary{}
 	}
-	cmd := exec.Command(tool, fmt.Sprintf("--build-file=%s", file), "dependencies", "--configuration=runtimeClasspath")
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		reporter.AddError(fmt.Sprintf("Error running '%s':\n%v\n%s", cmd.String(), err, output))
-	}
-	out := string(output)
 	deps := parseGradleDeps(out)
 	if len(deps) == 0 {
 		reporter.AddWarning("No Gradle dependencies found")
