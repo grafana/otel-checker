@@ -101,27 +101,19 @@ func FixVersion(version string) string {
 	return version
 }
 
-func (r *VersionRange) matches(v string) bool {
-	if r.lower != "" {
-		compare := semver.Compare(v, r.lower)
-		if r.lowerInclusive {
-			if compare < 0 {
-				return false
-			}
-		} else {
-			if compare <= 0 {
-				return false
-			}
-		}
-	}
-	if r.upper == "" {
+func (r *VersionRange) matches(version string) bool {
+	return checkBound(r.lower, r.lowerInclusive, version, -1) && checkBound(r.upper, r.upperInclusive, version, 1)
+}
+
+func checkBound(bound string, inclusive bool, version string, sgn int) bool {
+	if bound == "" {
 		return true
 	}
-	compare := semver.Compare(v, r.upper)
-	if r.upperInclusive {
-		return compare >= 0
+	cmp := semver.Compare(bound, version)
+	if cmp == 0 {
+		return inclusive
 	}
-	return compare < 0
+	return cmp == sgn
 }
 
 func CheckSDKSetup(messages *map[string][]string, language string, autoInstrumentation bool, packageJsonPath string, instrumentationFile string, debug bool) {

@@ -35,10 +35,9 @@ type SupportedModule struct {
 }
 
 type Instrumentation struct {
-	Name           string                `yaml:"name"`
-	SrcPath        string                `yaml:"srcPath"`
-	Types          []InstrumentationType `yaml:"types"`
-	TargetVersions []string              `yaml:"target_versions"`
+	Name           string                           `yaml:"name"`
+	SrcPath        string                           `yaml:"srcPath"`
+	TargetVersions map[InstrumentationType][]string `yaml:"target_versions"`
 }
 
 type InstrumentationType string
@@ -124,8 +123,7 @@ func findSupportedLibraries(library JavaLibrary, supported SupportedModules) []s
 	var links []string
 	for moduleName, module := range supported {
 		for _, instrumentation := range module.Instrumentations {
-			// todo check type (agent or library)
-			for _, version := range instrumentation.TargetVersions {
+			for _, version := range instrumentation.TargetVersions[Javaagent] {
 				// e.g. com.amazonaws:aws-lambda-java-core:[1.0.0,)
 				split := strings.Split(version, ":")
 				if len(split) != 3 {
@@ -202,7 +200,7 @@ func checkGradle(file string, messages *map[string][]string) []JavaLibrary {
 // see https://cloud-native.slack.com/archives/C014L2KCTE3/p1741003980069869
 // CNCF slack channel #otel-java
 //
-//go:embed supported-java-libraries.yaml
+//go:embed instrumentation-list.yaml
 var supportedModules []byte
 
 func supportedLibraries() (SupportedModules, error) {
