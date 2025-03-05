@@ -2,9 +2,9 @@ package sdk
 
 import "otel-checker/checks/utils"
 
-func CheckGoSetup(reporter *utils.ComponentReporter, autoInstrumentation bool) {
+func CheckGoSetup(reporter *utils.ComponentReporter, manualInstrumentation bool) {
 	checkGoVersion(reporter)
-	if autoInstrumentation {
+	if !manualInstrumentation {
 		checkGoAutoInstrumentation(reporter)
 	} else {
 		checkGoCodeBasedInstrumentation(reporter)

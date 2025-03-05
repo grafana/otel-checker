@@ -35,7 +35,7 @@ func RunAllChecks(commands utils.Commands) map[string][]string {
 			sdk.CheckSDKSetup(
 				reporter.Component("SDK"),
 				commands.Language,
-				commands.AutoInstrumentation,
+				commands.ManualInstrumentation,
 				commands.PackageJsonPath,
 				commands.InstrumentationFile,
 				commands.Debug,

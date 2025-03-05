@@ -9,10 +9,10 @@ import (
 	"strings"
 )
 
-func CheckJSSetup(reporter *utils.ComponentReporter, autoInstrumentation bool, packageJsonPath string, instrumentationFile string) {
+func CheckJSSetup(reporter *utils.ComponentReporter, manualInstrumentation bool, packageJsonPath string, instrumentationFile string) {
 	checkEnvVars(reporter)
 	checkNodeVersion(reporter)
-	if autoInstrumentation {
+	if !manualInstrumentation {
 		checkJSAutoInstrumentation(reporter, packageJsonPath)
 	} else {
 		checkJSCodeBasedInstrumentation(reporter, packageJsonPath, instrumentationFile)

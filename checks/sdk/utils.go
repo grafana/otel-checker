@@ -2,10 +2,11 @@ package sdk
 
 import (
 	"fmt"
-	"golang.org/x/mod/semver"
 	"os/exec"
 	"otel-checker/checks/utils"
 	"strings"
+
+	"golang.org/x/mod/semver"
 )
 
 type VersionRange struct {
@@ -116,20 +117,20 @@ func checkBound(bound string, inclusive bool, version string, sgn int) bool {
 	return cmp == sgn
 }
 
-func CheckSDKSetup(reporter *utils.ComponentReporter, language string, autoInstrumentation bool, packageJsonPath string, instrumentationFile string, debug bool) {
+func CheckSDKSetup(reporter *utils.ComponentReporter, language string, manualInstrumentation bool, packageJsonPath string, instrumentationFile string, debug bool) {
 	switch language {
 	case "dotnet":
-		CheckDotNetSetup(reporter, autoInstrumentation)
+		CheckDotNetSetup(reporter, manualInstrumentation)
 	case "go":
-		CheckGoSetup(reporter, autoInstrumentation)
+		CheckGoSetup(reporter, manualInstrumentation)
 	case "java":
-		CheckJavaSetup(reporter, autoInstrumentation, debug)
+		CheckJavaSetup(reporter, manualInstrumentation, debug)
 	case "js":
-		CheckJSSetup(reporter, autoInstrumentation, packageJsonPath, instrumentationFile)
+		CheckJSSetup(reporter, manualInstrumentation, packageJsonPath, instrumentationFile)
 	case "python":
-		CheckPythonSetup(reporter, autoInstrumentation)
+		CheckPythonSetup(reporter, manualInstrumentation)
 	case "ruby":
-		CheckRubySetup(reporter, autoInstrumentation)
+		CheckRubySetup(reporter, manualInstrumentation)
 	}
 }
 

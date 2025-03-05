@@ -2,9 +2,9 @@ package sdk
 
 import "otel-checker/checks/utils"
 
-func CheckPythonSetup(reporter *utils.ComponentReporter, autoInstrumentation bool) {
+func CheckPythonSetup(reporter *utils.ComponentReporter, manualInstrumentation bool) {
 	checkPythonVersion(reporter)
-	if autoInstrumentation {
+	if !manualInstrumentation {
 		checkPythonAutoInstrumentation(reporter)
 	} else {
 		checkPythonCodeBasedInstrumentation(reporter)

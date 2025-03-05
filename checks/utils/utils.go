@@ -15,14 +15,14 @@ const WARNINGS = "warnings"
 const CHECKS = "checks"
 
 type Commands struct {
-	Language            string
-	Components          []string
-	AutoInstrumentation bool
-	WebServer           bool
-	InstrumentationFile string
-	PackageJsonPath     string
-	CollectorConfigPath string
-	Debug               bool
+	Language              string
+	Components            []string
+	ManualInstrumentation bool
+	WebServer             bool
+	InstrumentationFile   string
+	PackageJsonPath       string
+	CollectorConfigPath   string
+	Debug                 bool
 }
 
 func GetArguments() Commands {
@@ -35,9 +35,9 @@ func GetArguments() Commands {
 
 	languageValue := flag.String("language", "", "Language used for instrumentation (required). Possible values: dotnet, go, java, js, python")
 	componentsString := flag.String("components", "", "Instrumentation components to test, separated by ',' (required). Possible values: sdk, collector, beyla, alloy")
-	autoInstrumentation := flag.Bool("auto-instrumentation", false, "Provide if your application is using auto instrumentation")
+	manualInstrumentation := flag.Bool("manual-instrumentation", false, "Provide if your application is using manual instrumentation")
 	debug := flag.Bool("debug", false, "Output debug information")
-	webServer := flag.Bool("web-server", false, "Set if you would like the results served in a web server in additon to console output")
+	webServer := flag.Bool("web-server", false, "Set if you would like the results served in a web server in addition to console output")
 
 	// javascript
 	instrumentationFile := flag.String("instrumentation-file", "", `Name (including path) to instrumentation file. Required if not using auto-instrumentation. E.g."-instrumentation-file=src/inst/instrumentation.js"`)
@@ -68,7 +68,7 @@ func GetArguments() Commands {
 	}
 
 	// javascript
-	if *languageValue == "js" && *instrumentationFile == "" && !*autoInstrumentation {
+	if *languageValue == "js" && *instrumentationFile == "" && *manualInstrumentation {
 		fmt.Println(color.RedString(`When auto-instrumentation is not being used, a instrumentation file is required. Add "-auto-instrumentation" or "-instrumentation-file=path/to/file/file.js"`))
 		os.Exit(1)
 	}
@@ -84,7 +84,7 @@ func GetArguments() Commands {
 	command.Language = *languageValue
 	command.Components = components
 	command.WebServer = *webServer
-	command.AutoInstrumentation = *autoInstrumentation
+	command.ManualInstrumentation = *manualInstrumentation
 	command.InstrumentationFile = *instrumentationFile
 	command.PackageJsonPath = *packageJsonPath
 	command.CollectorConfigPath = *collectorConfigPath

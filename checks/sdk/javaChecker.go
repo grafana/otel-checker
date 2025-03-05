@@ -4,14 +4,15 @@ import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
-	"golang.org/x/mod/semver"
-	"gopkg.in/yaml.v3"
 	"os/exec"
 	"otel-checker/checks/utils"
 	"path/filepath"
 	"slices"
 	"strconv"
 	"strings"
+
+	"golang.org/x/mod/semver"
+	"gopkg.in/yaml.v3"
 )
 
 var gradleFiles = []string{
@@ -49,9 +50,9 @@ const (
 	Library   InstrumentationType = "LIBRARY"
 )
 
-func CheckJavaSetup(reporter *utils.ComponentReporter, autoInstrumentation bool, debug bool) {
+func CheckJavaSetup(reporter *utils.ComponentReporter, manualInstrumentation bool, debug bool) {
 	checkJavaVersion(reporter)
-	if autoInstrumentation {
+	if !manualInstrumentation {
 		checkJavaAutoInstrumentation(reporter, debug)
 	} else {
 		checkJavaCodeBasedInstrumentation(reporter, debug)
