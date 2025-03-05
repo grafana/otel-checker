@@ -52,7 +52,7 @@ func CheckJavaSetup(messages *map[string][]string, autoInstrumentation bool, deb
 	if autoInstrumentation {
 		checkJavaAutoInstrumentation(messages, debug)
 	} else {
-		checkJavaCodeBasedInstrumentation(messages)
+		checkJavaCodeBasedInstrumentation(messages, debug)
 	}
 }
 
@@ -61,13 +61,21 @@ func checkJavaVersion(messages *map[string][]string) {
 }
 
 func checkJavaAutoInstrumentation(messages *map[string][]string, debug bool) {
+	reportSupportedInstrumentations(messages, debug, Javaagent)
+}
+
+func checkJavaCodeBasedInstrumentation(messages *map[string][]string, debug bool) {
+	reportSupportedInstrumentations(messages, debug, Library)
+}
+
+func reportSupportedInstrumentations(messages *map[string][]string, debug bool, instrumentationType InstrumentationType) {
 	supported, err := supportedLibraries()
 	if err != nil {
 		utils.AddError(messages, "SDK", fmt.Sprintf("Error reading supported libraries: %v", err))
 	}
 
 	deps := readDependencies(messages)
-	outputSupportedLibraries(deps, supported, messages, debug)
+	outputSupportedLibraries(deps, supported, messages, debug, instrumentationType)
 }
 
 func readDependencies(messages *map[string][]string) []JavaLibrary {
@@ -81,8 +89,6 @@ func readDependencies(messages *map[string][]string) []JavaLibrary {
 	}
 	return nil
 }
-
-func checkJavaCodeBasedInstrumentation(messages *map[string][]string) {}
 
 func checkMaven(messages *map[string][]string) []JavaLibrary {
 	println("Reading Maven dependencies")
@@ -105,9 +111,11 @@ func checkMaven(messages *map[string][]string) []JavaLibrary {
 	return deps
 }
 
-func outputSupportedLibraries(deps []JavaLibrary, supported SupportedModules, messages *map[string][]string, debug bool) {
+func outputSupportedLibraries(
+	deps []JavaLibrary, supported SupportedModules, messages *map[string][]string,
+	debug bool, instrumentationType InstrumentationType) {
 	for _, dep := range deps {
-		links := findSupportedLibraries(dep, supported)
+		links := findSupportedLibraries(dep, supported, instrumentationType)
 		if len(links) > 0 {
 			utils.AddSuccessfulCheck(messages, "SDK",
 				fmt.Sprintf("Found supported library: %s:%s:%s at %s",
@@ -115,15 +123,15 @@ func outputSupportedLibraries(deps []JavaLibrary, supported SupportedModules, me
 		} else if debug {
 			utils.AddWarning(messages, "SDK", fmt.Sprintf("Found unsupported library: %s:%s:%s", dep.Group, dep.Artifact, dep.Version))
 		}
-		outputSupportedLibraries(dep.Children, supported, messages, false)
+		outputSupportedLibraries(dep.Children, supported, messages, false, instrumentationType)
 	}
 }
 
-func findSupportedLibraries(library JavaLibrary, supported SupportedModules) []string {
+func findSupportedLibraries(library JavaLibrary, supported SupportedModules, instrumentationType InstrumentationType) []string {
 	var links []string
 	for moduleName, module := range supported {
 		for _, instrumentation := range module.Instrumentations {
-			for _, version := range instrumentation.TargetVersions[Javaagent] {
+			for _, version := range instrumentation.TargetVersions[instrumentationType] {
 				// e.g. com.amazonaws:aws-lambda-java-core:[1.0.0,)
 				split := strings.Split(version, ":")
 				if len(split) != 3 {

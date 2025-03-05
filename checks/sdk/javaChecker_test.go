@@ -15,7 +15,7 @@ func TestFindSupportedLibrary(t *testing.T) {
 			Group:    "ch.qos.logback",
 			Artifact: "logback-classic",
 			Version:  "1.5.16",
-		}, modules))
+		}, modules, ""))
 }
 
 func TestParseGradleDependencies(t *testing.T) {
