@@ -3,6 +3,7 @@ package sdk
 import (
 	"fmt"
 	"golang.org/x/mod/semver"
+	"os/exec"
 	"otel-checker/checks/utils"
 	"strings"
 )
@@ -14,7 +15,7 @@ type VersionRange struct {
 	upperInclusive bool
 }
 
-var suffixes = []string{
+var ignoreVersionSuffixes = []string{
 	".Final",
 	".RELEASE",
 	".GA",
@@ -80,7 +81,7 @@ func FixVersion(version string) string {
 	if version == "" {
 		return version
 	}
-	for _, suffix := range suffixes {
+	for _, suffix := range ignoreVersionSuffixes {
 		version = strings.TrimSuffix(version, suffix)
 	}
 
@@ -130,4 +131,14 @@ func CheckSDKSetup(reporter *utils.ComponentReporter, language string, autoInstr
 	case "ruby":
 		CheckRubySetup(reporter, autoInstrumentation)
 	}
+}
+
+func RunCommand(reporter *utils.ComponentReporter, cmd *exec.Cmd) string {
+	println("Running command:", cmd.String())
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		reporter.AddError(fmt.Sprintf("Error running %s:\n%v\n%s", cmd.String(), err, output))
+		return ""
+	}
+	return string(output)
 }

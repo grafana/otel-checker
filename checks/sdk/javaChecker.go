@@ -10,6 +10,7 @@ import (
 	"otel-checker/checks/utils"
 	"path/filepath"
 	"slices"
+	"strconv"
 	"strings"
 )
 
@@ -58,7 +59,25 @@ func CheckJavaSetup(reporter *utils.ComponentReporter, autoInstrumentation bool,
 }
 
 func checkJavaVersion(reporter *utils.ComponentReporter) {
-	// check for java 8
+	out := RunCommand(reporter, exec.Command("java", "-version"))
+	if out != "" {
+		//openjdk version "21.0.2" 2024-01-16 LTS
+		line := strings.Split(out, "\n")[0]
+		field := strings.Split(line, " ")[2]
+		version := strings.Trim(field, "\"")
+		major, err := strconv.Atoi(strings.Split(version, ".")[0])
+		if err != nil {
+			reporter.AddError(fmt.Sprintf("Error parsing Java version %s: %v", out, err))
+		}
+		if strings.HasPrefix(version, "1.8") {
+			major = 8
+		}
+		if major < 8 {
+			reporter.AddError(fmt.Sprintf("Java version %s is not supported. Please use Java 8 or higher", version))
+		} else {
+			reporter.AddSuccessfulCheck(fmt.Sprintf("Java version %s is supported", version))
+		}
+	}
 }
 
 func checkJavaAutoInstrumentation(reporter *utils.ComponentReporter, debug bool) {
@@ -94,7 +113,7 @@ func readDependencies(reporter *utils.ComponentReporter) []JavaLibrary {
 func checkMaven(reporter *utils.ComponentReporter) []JavaLibrary {
 	println("Reading Maven dependencies")
 
-	out := runCommand(reporter, exec.Command(searchWrapper("mvn", "mvnw"),
+	out := RunCommand(reporter, exec.Command(searchWrapper("mvn", "mvnw"),
 		"dependency:tree", "-Dscope=runtime", "-DoutputType=json"))
 	if out == "" {
 		return []JavaLibrary{}
@@ -124,17 +143,6 @@ func getWrapper(wrapper string, level []string) string {
 		return fmt.Sprintf(".%c%s", filepath.Separator, p)
 	}
 	return getWrapper(wrapper, append(level, ".."))
-}
-
-func runCommand(reporter *utils.ComponentReporter, cmd *exec.Cmd) string {
-	println("Running command:", cmd.String())
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		reporter.AddError(fmt.Sprintf("Error running %s:\n%v\n%s", cmd.String(), err, output))
-		return ""
-	}
-	out := string(output)
-	return out
 }
 
 func outputSupportedLibraries(
@@ -213,7 +221,7 @@ func parseMavenDeps(out string) []JavaLibrary {
 func checkGradle(file string, reporter *utils.ComponentReporter) []JavaLibrary {
 	println("Reading Gradle dependencies")
 
-	out := runCommand(reporter, exec.Command(searchWrapper("gradle", "gradlew"),
+	out := RunCommand(reporter, exec.Command(searchWrapper("gradle", "gradlew"),
 		fmt.Sprintf("--build-file=%s", file), "dependencies", "--configuration=runtimeClasspath"))
 	if out == "" {
 		return []JavaLibrary{}

@@ -63,6 +63,7 @@ TBD
 
 #### Java
 
+- Java version
 - Prints which libraries (as discovered from a locally running maven or gradle) are supported:
   - Use `-auto-instrumentation` to print libraries supported by the [Java Agent](https://github.com/open-telemetry/opentelemetry-java-instrumentation/).
   - Without `-auto-instrumentation`, the libraries for manual instrumentation are printed.
