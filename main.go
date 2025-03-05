@@ -2,7 +2,6 @@ package main
 
 import (
 	"embed"
-	_ "embed"
 	"html/template"
 	"log"
 	"net/http"
@@ -27,15 +26,13 @@ func main() {
 		return
 	}
 
-	mux := http.NewServeMux()
-
 	t, err := template.ParseFS(tmpls, "tmpl/*.tmpl")
 	if err != nil {
 		panic(err)
 	}
 
-	mux.Handle("/static/", http.FileServer(http.FS(static)))
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	http.Handle("/static/", http.FileServer(http.FS(static)))
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		err = t.ExecuteTemplate(w, "index.html.tmpl", struct {
 			Messages map[string][]string
 		}{
@@ -48,7 +45,5 @@ func main() {
 	})
 
 	log.Println("Application available on http://localhost:8080")
-	if err := http.ListenAndServe(":8080", mux); err != nil {
-		log.Println("server failed:", err)
-	}
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
