@@ -1,4 +1,4 @@
-package sdk
+package java
 
 import (
 	"github.com/stretchr/testify/assert"
@@ -7,15 +7,15 @@ import (
 )
 
 func TestFindSupportedLibrary(t *testing.T) {
-	modules, err := supportedJavaLibraries()
+	modules, err := supportedLibraries()
 	require.NoError(t, err)
 	assert.Equal(t,
 		[]string{"https://github.com/open-telemetry/opentelemetry-java-instrumentation/tree/main/instrumentation/logback/logback-appender-1.0"},
-		findSupportedJavaLibraries(JavaLibrary{
+		findSupportedLibraries(Library{
 			Group:    "ch.qos.logback",
 			Artifact: "logback-classic",
 			Version:  "1.5.16",
-		}, modules, Javaagent))
+		}, modules, TypeJavaagent))
 }
 
 func TestParseGradleDependencies(t *testing.T) {
@@ -40,7 +40,7 @@ BUILD SUCCESSFUL in 1s
 1 actionable task: 1 executed
 `
 	deps := parseGradleDeps(out)
-	assert.ElementsMatch(t, []JavaLibrary{
+	assert.ElementsMatch(t, []Library{
 		{
 			Group:    "io.opentelemetry",
 			Artifact: "opentelemetry-bom",

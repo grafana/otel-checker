@@ -1,10 +1,11 @@
-package sdk
+package java
 
 import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
 	"os/exec"
+	"otel-checker/checks/sdk"
 	"otel-checker/checks/utils"
 	"path/filepath"
 	"slices"
@@ -20,47 +21,47 @@ var gradleFiles = []string{
 	"build.gradle.kts",
 }
 
-type JavaLibrary struct {
-	Group    string        `json:"groupId"`
-	Artifact string        `json:"artifactId"`
-	Version  string        `json:"version"`
-	Children []JavaLibrary `json:"children"`
+type Library struct {
+	Group    string    `json:"groupId"`
+	Artifact string    `json:"artifactId"`
+	Version  string    `json:"version"`
+	Children []Library `json:"children"`
 }
 
-func (l *JavaLibrary) String() string {
+func (l *Library) String() string {
 	return fmt.Sprintf("%s:%s:%s", l.Group, l.Artifact, l.Version)
 }
 
-type SupportedJavaModules map[string]SupportedJavaModule
+type SupportedModules map[string]SupportedModule
 
-type SupportedJavaModule struct {
-	Instrumentations []JavaInstrumentation `yaml:"instrumentations"`
+type SupportedModule struct {
+	Instrumentations []Instrumentation `yaml:"instrumentations"`
 }
 
-type JavaInstrumentation struct {
-	Name           string                               `yaml:"name"`
-	SrcPath        string                               `yaml:"srcPath"`
-	TargetVersions map[JavaInstrumentationType][]string `yaml:"target_versions"`
+type Instrumentation struct {
+	Name           string                           `yaml:"name"`
+	SrcPath        string                           `yaml:"srcPath"`
+	TargetVersions map[InstrumentationType][]string `yaml:"target_versions"`
 }
 
-type JavaInstrumentationType string
+type InstrumentationType string
 
 const (
-	Javaagent JavaInstrumentationType = "JAVAAGENT"
-	Library   JavaInstrumentationType = "LIBRARY"
+	TypeJavaagent InstrumentationType = "JAVAAGENT"
+	TypeLibrary   InstrumentationType = "LIBRARY"
 )
 
-func CheckJavaSetup(reporter *utils.ComponentReporter, manualInstrumentation bool, debug bool) {
+func CheckSetup(reporter *utils.ComponentReporter, manualInstrumentation bool, debug bool) {
 	checkJavaVersion(reporter)
 	if !manualInstrumentation {
-		checkJavaAutoInstrumentation(reporter, debug)
+		checkAutoInstrumentation(reporter, debug)
 	} else {
-		checkJavaCodeBasedInstrumentation(reporter, debug)
+		checkCodeBasedInstrumentation(reporter, debug)
 	}
 }
 
 func checkJavaVersion(reporter *utils.ComponentReporter) {
-	out := RunCommand(reporter, exec.Command("java", "-version"))
+	out := sdk.RunCommand(reporter, exec.Command("java", "-version"))
 	if out != "" {
 		//openjdk version "21.0.2" 2024-01-16 LTS
 		line := strings.Split(out, "\n")[0]
@@ -81,16 +82,16 @@ func checkJavaVersion(reporter *utils.ComponentReporter) {
 	}
 }
 
-func checkJavaAutoInstrumentation(reporter *utils.ComponentReporter, debug bool) {
-	reportSupportedInstrumentations(reporter, debug, Javaagent)
+func checkAutoInstrumentation(reporter *utils.ComponentReporter, debug bool) {
+	reportSupportedInstrumentations(reporter, debug, TypeJavaagent)
 }
 
-func checkJavaCodeBasedInstrumentation(reporter *utils.ComponentReporter, debug bool) {
-	reportSupportedInstrumentations(reporter, debug, Library)
+func checkCodeBasedInstrumentation(reporter *utils.ComponentReporter, debug bool) {
+	reportSupportedInstrumentations(reporter, debug, TypeLibrary)
 }
 
-func reportSupportedInstrumentations(reporter *utils.ComponentReporter, debug bool, instrumentationType JavaInstrumentationType) {
-	supported, err := supportedJavaLibraries()
+func reportSupportedInstrumentations(reporter *utils.ComponentReporter, debug bool, instrumentationType InstrumentationType) {
+	supported, err := supportedLibraries()
 	if err != nil {
 		reporter.AddError(fmt.Sprintf("Error reading supported libraries: %v", err))
 	}
@@ -99,7 +100,7 @@ func reportSupportedInstrumentations(reporter *utils.ComponentReporter, debug bo
 	outputSupportedLibraries(deps, supported, reporter, debug, instrumentationType)
 }
 
-func readDependencies(reporter *utils.ComponentReporter) []JavaLibrary {
+func readDependencies(reporter *utils.ComponentReporter) []Library {
 	if utils.FileExists("pom.xml") {
 		return checkMaven(reporter)
 	}
@@ -111,13 +112,13 @@ func readDependencies(reporter *utils.ComponentReporter) []JavaLibrary {
 	return nil
 }
 
-func checkMaven(reporter *utils.ComponentReporter) []JavaLibrary {
+func checkMaven(reporter *utils.ComponentReporter) []Library {
 	println("Reading Maven dependencies")
 
-	out := RunCommand(reporter, exec.Command(searchWrapper("mvn", "mvnw"),
+	out := sdk.RunCommand(reporter, exec.Command(searchWrapper("mvn", "mvnw"),
 		"dependency:tree", "-Dscope=runtime", "-DoutputType=json"))
 	if out == "" {
-		return []JavaLibrary{}
+		return []Library{}
 	}
 	deps := parseMavenDeps(out)
 	if len(deps) == 0 {
@@ -147,10 +148,10 @@ func getWrapper(wrapper string, level []string) string {
 }
 
 func outputSupportedLibraries(
-	deps []JavaLibrary, supported SupportedJavaModules, reporter *utils.ComponentReporter,
-	debug bool, instrumentationType JavaInstrumentationType) {
+	deps []Library, supported SupportedModules, reporter *utils.ComponentReporter,
+	debug bool, instrumentationType InstrumentationType) {
 	for _, dep := range deps {
-		links := findSupportedJavaLibraries(dep, supported, instrumentationType)
+		links := findSupportedLibraries(dep, supported, instrumentationType)
 		if len(links) > 0 {
 			reporter.AddSuccessfulCheck(
 				fmt.Sprintf("Found supported library: %s:%s:%s at %s",
@@ -162,7 +163,7 @@ func outputSupportedLibraries(
 	}
 }
 
-func findSupportedJavaLibraries(library JavaLibrary, supported SupportedJavaModules, instrumentationType JavaInstrumentationType) []string {
+func findSupportedLibraries(library Library, supported SupportedModules, instrumentationType InstrumentationType) []string {
 	var links []string
 	for moduleName, module := range supported {
 		for _, instrumentation := range module.Instrumentations {
@@ -172,15 +173,15 @@ func findSupportedJavaLibraries(library JavaLibrary, supported SupportedJavaModu
 				if len(split) != 3 {
 					panic(fmt.Sprintf("invalid version range: %s", version))
 				}
-				versionRange, err := ParseVersionRange(split[2])
+				versionRange, err := sdk.ParseVersionRange(split[2])
 				if err != nil {
 					panic(fmt.Sprintf("error parsing version range in module %s: %v", moduleName, err))
 				}
 				if library.Group == split[0] && library.Artifact == split[1] {
-					v := FixVersion(library.Version)
+					v := sdk.FixVersion(library.Version)
 					if semver.IsValid(v) {
 						// ignore invalid versions from applications
-						if versionRange.matches(v) {
+						if versionRange.Matches(v) {
 							l := fmt.Sprintf("https://github.com/open-telemetry/opentelemetry-java-instrumentation/tree/main/%s", instrumentation.SrcPath)
 							if !slices.Contains(links, l) {
 								links = append(links, l)
@@ -194,7 +195,7 @@ func findSupportedJavaLibraries(library JavaLibrary, supported SupportedJavaModu
 	return links
 }
 
-func parseMavenDeps(out string) []JavaLibrary {
+func parseMavenDeps(out string) []Library {
 	c := ""
 	isJson := false
 	for l := range strings.Lines(out) {
@@ -209,23 +210,23 @@ func parseMavenDeps(out string) []JavaLibrary {
 		}
 	}
 
-	var deps JavaLibrary
+	var deps Library
 	err := json.Unmarshal([]byte(c), &deps)
 	if err != nil {
 		fmt.Printf("Error parsing JSON: %v\n", err)
 		return nil
 	}
 
-	return []JavaLibrary{deps}
+	return []Library{deps}
 }
 
-func checkGradle(file string, reporter *utils.ComponentReporter) []JavaLibrary {
+func checkGradle(file string, reporter *utils.ComponentReporter) []Library {
 	println("Reading Gradle dependencies")
 
-	out := RunCommand(reporter, exec.Command(searchWrapper("gradle", "gradlew"),
+	out := sdk.RunCommand(reporter, exec.Command(searchWrapper("gradle", "gradlew"),
 		fmt.Sprintf("--build-file=%s", file), "dependencies", "--configuration=runtimeClasspath"))
 	if out == "" {
-		return []JavaLibrary{}
+		return []Library{}
 	}
 	deps := parseGradleDeps(out)
 	if len(deps) == 0 {
@@ -239,11 +240,11 @@ func checkGradle(file string, reporter *utils.ComponentReporter) []JavaLibrary {
 // CNCF slack channel #otel-java
 //
 //go:embed instrumentation-list.yaml
-var supportedModules []byte
+var file []byte
 
-func supportedJavaLibraries() (SupportedJavaModules, error) {
-	modules := SupportedJavaModules{}
-	err := yaml.Unmarshal(supportedModules, &modules)
+func supportedLibraries() (SupportedModules, error) {
+	modules := SupportedModules{}
+	err := yaml.Unmarshal(file, &modules)
 	if err != nil {
 		return nil, err
 	}
@@ -251,16 +252,16 @@ func supportedJavaLibraries() (SupportedJavaModules, error) {
 	return modules, nil
 }
 
-func parseGradleDeps(out string) []JavaLibrary {
+func parseGradleDeps(out string) []Library {
 	lines := strings.Split(out, "\n")
-	var deps []JavaLibrary
+	var deps []Library
 	for _, l := range lines {
 		if strings.Contains(l, "---") {
 			index := strings.Index(l, "---")
 			dep := strings.TrimSpace(l[index+4:])
 			split := strings.Split(dep, ":")
 			if len(split) == 3 {
-				d := JavaLibrary{
+				d := Library{
 					Group:    split[0],
 					Artifact: split[1],
 					Version:  split[2],
@@ -268,7 +269,7 @@ func parseGradleDeps(out string) []JavaLibrary {
 				s := d.String()
 				if !slices.ContainsFunc(
 					deps,
-					func(l JavaLibrary) bool {
+					func(l Library) bool {
 						return l.String() == s
 					}) {
 					deps = append(deps, d)

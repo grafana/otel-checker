@@ -56,7 +56,7 @@ func TestParseVersionRange(t *testing.T) {
 				t.Errorf("ParseVersionRange() error = %v", err)
 				return
 			}
-			assert.Equal(t, tt.want, got.matches(FixVersion(tt.giveVersion)))
+			assert.Equal(t, tt.want, got.Matches(FixVersion(tt.giveVersion)))
 		})
 	}
 }
