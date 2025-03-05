@@ -45,6 +45,7 @@ func readDependencies(reporter *utils.ComponentReporter) []Library {
 	if utils.FileExists(path) {
 		return readRequirementsTxt(reporter, path)
 	}
+	// also https://github.com/fpgmaas/cookiecutter-poetry-example/blob/main/poetry.lock
 	return nil
 }
 
@@ -78,6 +79,9 @@ func outputSupportedLibraries(deps []Library, supported []SupportedLibrary, repo
 func parseRequirementsTxt(reporter *utils.ComponentReporter, lines string) []Library {
 	var deps []Library
 	for _, line := range strings.Split(lines, "\n") {
+		if line == "" {
+			continue
+		}
 		// e.g. blinker==1.9.0
 		split := strings.Split(line, "==")
 		if len(split) != 2 {
@@ -85,7 +89,7 @@ func parseRequirementsTxt(reporter *utils.ComponentReporter, lines string) []Lib
 			continue
 		}
 		deps = append(deps, Library{
-			Name:    strings.TrimSpace(split[0]),
+			Name:    strings.ToLower(strings.TrimSpace(split[0])),
 			Version: strings.TrimSpace(split[1]),
 		})
 	}

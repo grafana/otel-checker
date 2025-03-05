@@ -56,7 +56,9 @@ Usage of otel-checker:
 - Usage of Console Exporter
 
 #### Python
-TBD
+
+- Prints which libraries are supported:
+  - The used libraries are discovered from `requirements.txt` in the current directory.
 
 #### .NET
 TBD
