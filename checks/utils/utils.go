@@ -67,13 +67,16 @@ func GetArguments() Commands {
 		}
 	}
 
-	if *instrumentationFile == "" && !*autoInstrumentation {
+	// javascript
+	if *languageValue == "js" && *instrumentationFile == "" && !*autoInstrumentation {
 		fmt.Println(color.RedString(`When auto-instrumentation is not being used, a instrumentation file is required. Add "-auto-instrumentation" or "-instrumentation-file=path/to/file/file.js"`))
 		os.Exit(1)
 	}
 	if *packageJsonPath != "" && !strings.HasSuffix(*packageJsonPath, "/") {
 		*packageJsonPath = *packageJsonPath + "/"
 	}
+
+	// collector
 	if *collectorConfigPath != "" && !strings.HasSuffix(*collectorConfigPath, "/") {
 		*collectorConfigPath = *collectorConfigPath + "/"
 	}
