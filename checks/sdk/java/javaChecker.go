@@ -14,7 +14,6 @@ import (
 	"strings"
 
 	"golang.org/x/mod/semver"
-	"gopkg.in/yaml.v3"
 )
 
 var gradleFiles = []string{

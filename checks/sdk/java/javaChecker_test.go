@@ -3,6 +3,7 @@ package java
 import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"otel-checker/checks/sdk/supported"
 	"testing"
 )
 
@@ -15,7 +16,7 @@ func TestFindSupportedLibrary(t *testing.T) {
 			Group:    "ch.qos.logback",
 			Artifact: "logback-classic",
 			Version:  "1.5.16",
-		}, modules, TypeJavaagent))
+		}, modules, supported.TypeJavaagent))
 }
 
 func TestParseGradleDependencies(t *testing.T) {
