@@ -133,22 +133,6 @@ func checkDotNetAutoInstrumentation(reporter *utils.ComponentReporter) {
 
 func checkDotNetCodeBasedInstrumentation(reporter *utils.ComponentReporter) {}
 
-func readDotNetDependenciesFromCli() (*NuGetPackageList, error) {
-	cmd := exec.Command("dotnet", "list", "package", "--format", "json", "--include-transitive")
-	stdout, err := cmd.Output()
-
-	if err != nil {
-		return nil, fmt.Errorf("failed to run dotnet list package: %w", err)
-	}
-
-	var deps NuGetPackageList
-	if err := json.Unmarshal(stdout, &deps); err != nil {
-		return nil, fmt.Errorf("failed to parse dependencies JSON: %w", err)
-	}
-
-	return &deps, nil
-}
-
 func findAndLoadProject() (*CSharpProject, error) {
 	projectPath, err := FindCSharpProject(".")
 	if err != nil {
@@ -165,7 +149,7 @@ func findAndLoadProject() (*CSharpProject, error) {
 }
 
 func reportDotNetSupportedInstrumentations(reporter *utils.ComponentReporter, sdk string) {
-	deps, err := readDotNetDependenciesFromCli()
+	deps, err := ReadDependenciesFromCli()
 
 	if err != nil {
 		reporter.AddError(fmt.Sprintf("Failed to read dependencies: %s", err))
