@@ -74,12 +74,38 @@ func TestReadPackageJson(t *testing.T) {
 func TestReadPackageLock(t *testing.T) {
 	// Create a temporary package-lock.json
 	content := `{
-		"dependencies": {
-			"express": {
-				"version": "4.18.2"
+		"name": "example-fastify",
+		"version": "0.26.0",
+		"lockfileVersion": 2,
+		"requires": true,
+		"packages": {
+			"node_modules/@fastify/ajv-compiler": {
+			 	"version": "3.5.0",
+				"resolved": "https://registry.npmjs.org/@fastify/ajv-compiler/-/ajv-compiler-3.5.0.tgz",
+				"integrity": "sha512-ebbEtlI7dxXF5ziNdr05mOY8NnDiPB1XvAlLHctRt/Rc+C3LCOVW5imUVX+mhvUhnNzmPBHewUkOFgGlCxgdAA==",
+				"dependencies": {
+					"ajv": "^8.11.0",
+					"ajv-formats": "^2.1.1",
+					"fast-uri": "^2.0.0"
+				}
 			},
-			"@opentelemetry/instrumentation-express": {
-				"version": "0.35.0"
+			"node_modules/express": {
+				"version": "4.18.2",
+				"resolved": "https://registry.npmjs.org/express/-/express-4.18.2.tgz",
+				"integrity": "sha512-5/PsL9iGiiH9nMG2WLbQJCszTs+AwHom0DPv8O3dsdrbXuuP9PWUJ5RhdleT3f1wOTn7d2x4mO1Qw8OHtZHwINg==",
+				"dependencies": {
+					"accepts": "~1.3.8",
+					"body-parser": "1.20.2"
+				}
+			},
+			"node_modules/@opentelemetry/instrumentation-express": {
+				"version": "0.35.0",
+				"resolved": "https://registry.npmjs.org/@opentelemetry/instrumentation-express/-/instrumentation-express-0.35.0.tgz",
+				"integrity": "sha512-xyz123",
+				"dependencies": {
+					"@opentelemetry/api": "^1.7.0",
+					"@opentelemetry/semantic-conventions": "^1.21.0"
+				}
 			}
 		}
 	}`
@@ -108,8 +134,8 @@ func TestReadPackageLock(t *testing.T) {
 
 	// Test reading dependencies
 	deps := readPackageLock(nil)
-	if len(deps) != 2 {
-		t.Errorf("Expected 2 dependencies, got %d", len(deps))
+	if len(deps) != 3 {
+		t.Errorf("Expected 3 dependencies, got %d", len(deps))
 	}
 
 	// Check express dependency
@@ -126,6 +152,14 @@ func TestReadPackageLock(t *testing.T) {
 		t.Error("@opentelemetry/instrumentation-express dependency not found")
 	} else if otel.Version != "0.35.0" {
 		t.Errorf("Expected @opentelemetry/instrumentation-express version 0.35.0, got %s", otel.Version)
+	}
+
+	// Check @fastify/ajv-compiler dependency
+	ajv := findDep(deps, "@fastify/ajv-compiler")
+	if ajv == nil {
+		t.Error("@fastify/ajv-compiler dependency not found")
+	} else if ajv.Version != "3.5.0" {
+		t.Errorf("Expected @fastify/ajv-compiler version 3.5.0, got %s", ajv.Version)
 	}
 }
 
