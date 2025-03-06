@@ -1,10 +1,9 @@
-package sdk
+package js
 
 import (
 	"fmt"
 	"os"
 	"os/exec"
-	"otel-checker/checks/sdk/js"
 	"otel-checker/checks/utils"
 	"strconv"
 	"strings"
@@ -124,19 +123,19 @@ func checkJSCodeBasedInstrumentation(
 }
 
 func checkSupportedLibraries(reporter *utils.ComponentReporter) {
-	supported, err := js.supportedLibraries()
+	supported, err := supportedLibraries()
 	if err != nil {
 		reporter.AddError(fmt.Sprintf("Error reading supported libraries: %v", err))
 		return
 	}
 
-	deps := js.readDependencies(reporter)
+	deps := readDependencies(reporter)
 	if len(deps) == 0 {
 		return
 	}
 
 	for _, dep := range deps {
-		links := js.findSupportedLibraries(dep, supported)
+		links := findSupportedLibraries(dep, supported)
 		if len(links) > 0 {
 			reporter.AddSuccessfulCheck(
 				fmt.Sprintf("Found supported library: %s:%s at %s",

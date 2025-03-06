@@ -1,4 +1,4 @@
-package sdk
+package dotnet
 
 import (
 	"encoding/json"
@@ -11,7 +11,6 @@ import (
 	"strings"
 	"syscall"
 
-	"otel-checker/checks/sdk/dotnet"
 	"otel-checker/checks/utils"
 )
 
@@ -122,7 +121,7 @@ func checkDotNetAutoInstrumentation(reporter *utils.ComponentReporter) {
 
 func checkDotNetCodeBasedInstrumentation(reporter *utils.ComponentReporter) {}
 
-func readDotNetDependenciesFromCli() (*dotnet.NuGetPackageList, error) {
+func readDotNetDependenciesFromCli() (*NuGetPackageList, error) {
 	cmd := exec.Command("dotnet", "list", "package", "--format", "json", "--include-transitive")
 	stdout, err := cmd.Output()
 
@@ -130,7 +129,7 @@ func readDotNetDependenciesFromCli() (*dotnet.NuGetPackageList, error) {
 		return nil, fmt.Errorf("failed to run dotnet list package: %w", err)
 	}
 
-	var deps dotnet.NuGetPackageList
+	var deps NuGetPackageList
 	if err := json.Unmarshal(stdout, &deps); err != nil {
 		return nil, fmt.Errorf("failed to parse dependencies JSON: %w", err)
 	}
@@ -169,7 +168,7 @@ func findProject() (string, error) {
 	}
 }
 
-func checkProject(reporter *utils.ComponentReporter) (*dotnet.CSharpProject, error) {
+func checkProject(reporter *utils.ComponentReporter) (*CSharpProject, error) {
 	project, err := findProject()
 
 	if err != nil {
@@ -185,7 +184,7 @@ func checkProject(reporter *utils.ComponentReporter) (*dotnet.CSharpProject, err
 		return nil, err
 	}
 
-	var csProj dotnet.CSharpProject
+	var csProj CSharpProject
 	if err := xml.Unmarshal(content, &csProj); err != nil {
 		reporter.AddError(fmt.Sprintf("Failed to parse project file: %s", err))
 		return nil, err
@@ -202,9 +201,9 @@ func reportDotNetSupportedInstrumentations(reporter *utils.ComponentReporter, sd
 		return
 	}
 
-	instr := dotnet.ReadAvailableInstrumentations()
+	instr := ReadAvailableInstrumentations()
 
-	implicit, err := dotnet.ImplicitPackagesForSdk(sdk)
+	implicit, err := ImplicitPackagesForSdk(sdk)
 
 	if err != nil {
 		reporter.AddError(fmt.Sprintf("Unrecognized SDK: %s", sdk))

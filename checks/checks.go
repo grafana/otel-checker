@@ -6,7 +6,9 @@ import (
 	"otel-checker/checks/collector"
 	"otel-checker/checks/grafana"
 	"otel-checker/checks/sdk"
+	"otel-checker/checks/sdk/dotnet"
 	"otel-checker/checks/sdk/java"
+	"otel-checker/checks/sdk/js"
 	"otel-checker/checks/sdk/python"
 	"otel-checker/checks/utils"
 )
@@ -44,13 +46,13 @@ func RunAllChecks(commands utils.Commands) map[string][]string {
 func SDKSetup(reporter *utils.ComponentReporter, commands utils.Commands) {
 	switch commands.Language {
 	case "dotnet":
-		sdk.CheckDotNetSetup(reporter, commands)
+		dotnet.CheckDotNetSetup(reporter, commands)
 	case "go":
 		sdk.CheckGoSetup(reporter, commands)
 	case "java":
 		java.CheckSetup(reporter, commands)
 	case "js":
-		sdk.CheckJSSetup(reporter, commands)
+		js.CheckJSSetup(reporter, commands)
 	case "python":
 		python.CheckSetup(reporter, commands)
 	case "ruby":
