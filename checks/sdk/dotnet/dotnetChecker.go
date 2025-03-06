@@ -1,9 +1,7 @@
 package dotnet
 
 import (
-	"encoding/json"
 	"fmt"
-	"os/exec"
 	"strconv"
 	"strings"
 	"syscall"
