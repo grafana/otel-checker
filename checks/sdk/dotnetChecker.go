@@ -1,10 +1,16 @@
 package sdk
 
 import (
+	"encoding/xml"
+	"fmt"
+	"os"
 	"os/exec"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"syscall"
+
+	"otel-checker/checks/sdk/dotnet"
 	"otel-checker/checks/utils"
 )
 
@@ -12,6 +18,12 @@ const minDotNetVersion = 8
 
 func CheckDotNetSetup(reporter *utils.ComponentReporter, commands utils.Commands) {
 	checkDotNetVersion(reporter)
+
+	project, err := checkProject(reporter)
+
+	if err != nil {
+		return
+	}
 	if commands.ManualInstrumentation {
 		checkDotNetCodeBasedInstrumentation(reporter)
 	} else {
@@ -81,3 +93,58 @@ func checkDotNetAutoInstrumentation(reporter *utils.ComponentReporter) {
 }
 
 func checkDotNetCodeBasedInstrumentation(reporter *utils.ComponentReporter) {}
+func findProject() (string, error) {
+	var csprojFiles []string
+
+	err := filepath.WalkDir(".", func(path string, d os.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if d.IsDir() && path != "." {
+			return filepath.SkipDir
+		}
+		if filepath.Ext(d.Name()) == ".csproj" {
+			csprojFiles = append(csprojFiles, path)
+		}
+		return nil
+	})
+
+	if err != nil {
+		return "", fmt.Errorf("failed to search for .csproj files: %w", err)
+	}
+
+	switch len(csprojFiles) {
+	case 0:
+		return "", fmt.Errorf("no .csproj files found in current directory")
+	case 1:
+		return csprojFiles[0], nil
+	default:
+		return "", fmt.Errorf("multiple .csproj files found: %s", strings.Join(csprojFiles, ", "))
+	}
+}
+
+func checkProject(reporter *utils.ComponentReporter) (*dotnet.CSharpProject, error) {
+	project, err := findProject()
+
+	if err != nil {
+		reporter.AddError(fmt.Sprintf("Failed to find project file: %s", err))
+		return nil, err
+	}
+
+	reporter.AddSuccessfulCheck(fmt.Sprintf("Found project file: %s", project))
+	content, err := os.ReadFile(project)
+
+	if err != nil {
+		reporter.AddError(fmt.Sprintf("Failed to read project file: %s", err))
+		return nil, err
+	}
+
+	var csProj dotnet.CSharpProject
+	if err := xml.Unmarshal(content, &csProj); err != nil {
+		reporter.AddError(fmt.Sprintf("Failed to parse project file: %s", err))
+		return nil, err
+	}
+
+	return &csProj, nil
+}
