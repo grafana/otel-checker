@@ -77,7 +77,20 @@ def extract_supported_versions(readme_path):
                 'src_path': f"plugins/node/{dir_name}"
             }
 
-        # Pattern 5: "regardless of versions" or similar
+        # Pattern 5: - [library](link) `>=1.0.0`
+        link_list_match = re.search(r'-\s+\[(.*?)\]\((.*?)\)\s+`(.*?)`', versions_text)
+        if link_list_match:
+            library_name = link_list_match.group(1)
+            link = link_list_match.group(2)
+            version_range = link_list_match.group(3)
+            return {
+                'name': library_name,
+                'link': link,
+                'version_range': version_range,
+                'src_path': f"plugins/node/{dir_name}"
+            }
+
+        # Pattern 6: "regardless of versions" or similar
         all_versions_match = re.search(r'(?:\[`(.*?)`\]\((.*?)\)\s+)?(?:regardless of versions|all versions|any version)', versions_text, re.IGNORECASE)
         if all_versions_match:
             # If we have a library name and link, use them, otherwise use the directory name
