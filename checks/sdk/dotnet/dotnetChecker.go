@@ -16,11 +16,14 @@ const minDotNetVersion = 8
 func CheckDotNetSetup(reporter *utils.ComponentReporter, commands utils.Commands) {
 	checkDotNetVersion(reporter)
 
-	project, err := checkProject(reporter)
+	project, err := findAndLoadProject()
 
 	if err != nil {
+		reporter.AddError(fmt.Sprintf("Failed to find and load project: %s", err))
 		return
 	}
+
+	reporter.AddSuccessfulCheck(fmt.Sprintf("Found project: %s", project.path))
 
 	reportDotNetSupportedInstrumentations(reporter, project.SDK)
 
@@ -149,17 +152,15 @@ func readDotNetDependenciesFromCli() (*NuGetPackageList, error) {
 	return &deps, nil
 }
 
-func checkProject(reporter *utils.ComponentReporter) (*CSharpProject, error) {
+func findAndLoadProject() (*CSharpProject, error) {
 	projectPath, err := FindCSharpProject(".")
 	if err != nil {
-		reporter.AddError(fmt.Sprintf("Failed to find project file: %s", err))
 		return nil, err
 	}
 
 	project, err := LoadCSharpProject(projectPath)
 
 	if err != nil {
-		reporter.AddError(fmt.Sprintf("Failed to load project file: %s", err))
 		return nil, err
 	}
 

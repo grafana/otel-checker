@@ -14,6 +14,7 @@ type CSharpProject struct {
 	ItemGroups     []CSharpItemGroup  `xml:"ItemGroup"`
 	PropertyGroups []CSharpProperties `xml:"PropertyGroup"`
 	SDK            string             `xml:"Sdk,attr"`
+	path           string
 }
 
 // CSharpItemGroup represents a group of items in the .NET project file
@@ -30,20 +31,6 @@ type CSharpProperties struct {
 type CSharpPackageReference struct {
 	Include string `xml:"Include,attr"`
 	Version string `xml:"Version,attr"`
-}
-
-func FindAndLoadProjectInCurrentDir() (*CSharpProject, error) {
-	dir, err := os.Getwd()
-	if err != nil {
-		return nil, fmt.Errorf("failed to get current directory: %w", err)
-	}
-
-	path, err := findInDir(dir)
-	if err != nil {
-		return nil, fmt.Errorf("failed to find project in current directory: %w", err)
-	}
-
-	return LoadCSharpProject(path)
 }
 
 // searches for a .csproj file in the specified directory and returns the path.
@@ -82,6 +69,7 @@ func LoadCSharpProject(path string) (*CSharpProject, error) {
 	if err := xml.Unmarshal(content, &proj); err != nil {
 		return nil, fmt.Errorf("failed to parse project file: %w", err)
 	}
+	proj.path = path
 
 	return &proj, nil
 }
