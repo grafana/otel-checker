@@ -6,119 +6,78 @@ import sys
 import yaml
 import argparse
 from pathlib import Path
+from typing import Optional, Dict, Any
 
-def extract_supported_versions(readme_path):
+def create_result(library_name: str, link: str, version_range: str, dir_name: str) -> Dict[str, Any]:
+    """Create a standardized result dictionary."""
+    return {
+        'name': library_name,
+        'link': link,
+        'version_range': version_range,
+        'src_path': f"plugins/node/{dir_name}"
+    }
+
+def get_repo_link(dir_name: str) -> str:
+    """Generate a link to the repository for a given directory."""
+    return f"https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/{dir_name}"
+
+def extract_supported_versions(readme_path: Path) -> Optional[Dict[str, Any]]:
     """Extract supported versions from a README.md file."""
     try:
         with open(readme_path, 'r') as f:
             content = f.read()
 
         # Look for the Supported Versions section (case insensitive)
-        # Handle both ## and ### headers, and allow for different spacing
         versions_match = re.search(r'#{2,3}\s+Supported\s+Versions\n\n(.*?)(?:\n\n|$)', content, re.DOTALL | re.IGNORECASE)
         if not versions_match:
             print(f"Warning: No Supported Versions section found in {readme_path}", file=sys.stderr)
             return None
 
         versions_text = versions_match.group(1)
-
-        # Get the directory name for srcPath
         dir_name = readme_path.parent.name
-
-        # Try to extract library name from directory name
-        # e.g., instrumentation-fs -> fs
         library_name = dir_name.replace('instrumentation-', '')
 
-        # Pattern 1: [`library`](link) version(s) `>=0.5.5 <1`
-        version_match = re.search(r'\[`(.*?)`\]\((.*?)\)\s+version[s]?\s+`(.*?)`', versions_text)
-        if version_match:
-            library_name = version_match.group(1)
-            link = version_match.group(2)
-            version_range = version_match.group(3)
-            return {
-                'name': library_name,
-                'link': link,
-                'version_range': version_range,
-                'src_path': f"plugins/node/{dir_name}"
-            }
-
-        # Pattern 2: Node.js `>=14`
-        node_match = re.search(r'Node\.js\s+`(.*?)`', versions_text)
-        if node_match:
-            version_range = node_match.group(1)
-            return {
-                'name': library_name,
-                'link': f"https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/{dir_name}",
-                'version_range': version_range,
-                'src_path': f"plugins/node/{dir_name}"
-            }
-
-        # Pattern 3: Library `>=1.0.0`
-        lib_match = re.search(r'`(.*?)`\s+`(.*?)`', versions_text)
-        if lib_match:
-            library_name = lib_match.group(1)
-            version_range = lib_match.group(2)
-            return {
-                'name': library_name,
-                'link': f"https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/{dir_name}",
-                'version_range': version_range,
-                'src_path': f"plugins/node/{dir_name}"
-            }
-
-        # Pattern 4: - Library `>=1.0.0`
-        list_match = re.search(r'-\s+`(.*?)`\s+`(.*?)`', versions_text)
-        if list_match:
-            library_name = list_match.group(1)
-            version_range = list_match.group(2)
-            return {
-                'name': library_name,
-                'link': f"https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/{dir_name}",
-                'version_range': version_range,
-                'src_path': f"plugins/node/{dir_name}"
-            }
-
-        # Pattern 5: - [library](link) version(s) `>=1.0.0`
-        link_list_match = re.search(r'-\s+\[(.*?)\]\((.*?)\)\s+version[s]?\s+`(.*?)`', versions_text)
-        if link_list_match:
-            library_name = link_list_match.group(1)
-            link = link_list_match.group(2)
-            version_range = link_list_match.group(3)
-            return {
-                'name': library_name,
-                'link': link,
-                'version_range': version_range,
-                'src_path': f"plugins/node/{dir_name}"
-            }
-
-        # Pattern 6: - [library](link) `>=1.0.0` (without "versions" word)
-        link_list_match_no_versions = re.search(r'-\s+\[(.*?)\]\((.*?)\)\s+`(.*?)`', versions_text)
-        if link_list_match_no_versions:
-            library_name = link_list_match_no_versions.group(1)
-            link = link_list_match_no_versions.group(2)
-            version_range = link_list_match_no_versions.group(3)
-            return {
-                'name': library_name,
-                'link': link,
-                'version_range': version_range,
-                'src_path': f"plugins/node/{dir_name}"
-            }
-
-        # Pattern 7: "regardless of versions" or similar
-        all_versions_match = re.search(r'(?:\[`(.*?)`\]\((.*?)\)\s+)?(?:regardless of versions|all versions|any version)', versions_text, re.IGNORECASE)
-        if all_versions_match:
-            # If we have a library name and link, use them, otherwise use the directory name
-            if all_versions_match.group(1):
-                library_name = all_versions_match.group(1)
-                link = all_versions_match.group(2)
-            else:
-                link = f"https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/{dir_name}"
+        # Define patterns to match different version formats
+        patterns = [
+            # Pattern 1: [`library`](link) version(s) `>=0.5.5 <1`
+            (r'\[`(.*?)`\]\((.*?)\)\s+version[s]?\s+`(.*?)`', 
+             lambda m: create_result(m.group(1), m.group(2), m.group(3), dir_name)),
             
-            return {
-                'name': library_name,
-                'link': link,
-                'version_range': '>=0.0.0',  # This will be converted to [0.0.0,) in convert_version_range
-                'src_path': f"plugins/node/{dir_name}"
-            }
+            # Pattern 2: Node.js `>=14`
+            (r'Node\.js\s+`(.*?)`',
+             lambda m: create_result(library_name, get_repo_link(dir_name), m.group(1), dir_name)),
+            
+            # Pattern 3: Library `>=1.0.0`
+            (r'`(.*?)`\s+`(.*?)`',
+             lambda m: create_result(m.group(1), get_repo_link(dir_name), m.group(2), dir_name)),
+            
+            # Pattern 4: - Library `>=1.0.0`
+            (r'-\s+`(.*?)`\s+`(.*?)`',
+             lambda m: create_result(m.group(1), get_repo_link(dir_name), m.group(2), dir_name)),
+            
+            # Pattern 5: - [library](link) version(s) `>=1.0.0`
+            (r'-\s+\[(.*?)\]\((.*?)\)\s+version[s]?\s+`(.*?)`',
+             lambda m: create_result(m.group(1), m.group(2), m.group(3), dir_name)),
+            
+            # Pattern 6: - [library](link) `>=1.0.0` (without "versions" word)
+            (r'-\s+\[(.*?)\]\((.*?)\)\s+`(.*?)`',
+             lambda m: create_result(m.group(1), m.group(2), m.group(3), dir_name)),
+            
+            # Pattern 7: "regardless of versions" or similar
+            (r'(?:\[`(.*?)`\]\((.*?)\)\s+)?(?:regardless of versions|all versions|any version)',
+             lambda m: create_result(
+                 m.group(1) if m.group(1) else library_name,
+                 m.group(2) if m.group(2) else get_repo_link(dir_name),
+                 '>=0.0.0',
+                 dir_name
+             ))
+        ]
+
+        # Try each pattern
+        for pattern, handler in patterns:
+            match = re.search(pattern, versions_text, re.IGNORECASE)
+            if match:
+                return handler(match)
 
         print(f"Warning: Could not parse version information in {readme_path}", file=sys.stderr)
         return None
@@ -126,22 +85,19 @@ def extract_supported_versions(readme_path):
         print(f"Error processing {readme_path}: {e}", file=sys.stderr)
         return None
 
-def convert_version_range(version_range):
+def convert_version_range(version_range: str) -> str:
     """Convert version range string to YAML format."""
-    # Example: ">=0.5.5 <1" -> [0.5.5,1)
     parts = version_range.split()
     if len(parts) == 2:
         min_version = parts[0].replace('>=', '')
         max_version = parts[1].replace('<', '')
         return f"[{min_version},{max_version})"
     elif len(parts) == 1:
-        # Handle single version constraints
         if parts[0].startswith('>='):
             return f"[{parts[0].replace('>=', '')},)"
         elif parts[0].startswith('<'):
             return f"[,{parts[0].replace('<', '')})"
         elif parts[0].startswith('~'):
-            # For tilde ranges, we'll use the same version for both bounds
             version = parts[0].replace('~', '')
             return f"[{version},{version})"
     return version_range
@@ -153,16 +109,12 @@ def main():
                       help='Output path for the YAML file (default: checks/sdk/js/supported-libraries.yaml)')
     args = parser.parse_args()
 
-    # Path to the plugins directory
     plugins_dir = Path(args.repo_dir) / "plugins/node"
     if not plugins_dir.exists():
         print(f"Error: {plugins_dir} does not exist", file=sys.stderr)
         sys.exit(1)
 
-    # Collect all supported libraries
     supported_libraries = {}
-
-    # Process each instrumentation directory
     for item in plugins_dir.iterdir():
         if not item.is_dir():
             continue
@@ -186,7 +138,6 @@ def main():
                 }]
             }
 
-    # Generate the supported-libraries.yaml file
     output_path = Path(args.output)
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
