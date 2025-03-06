@@ -1,0 +1,175 @@
+lru-memorizer:
+  instrumentations:
+  - name: lru-memorizer
+    srcPath: plugins/node/instrumentation-lru-memoizer
+    target_versions:
+      LIBRARY:
+      - '[1.3.0,3)'
+mongoose:
+  instrumentations:
+  - name: mongoose
+    srcPath: plugins/node/instrumentation-mongoose
+    target_versions:
+      LIBRARY:
+      - '[5.9.7,9)'
+ioredis:
+  instrumentations:
+  - name: ioredis
+    srcPath: plugins/node/opentelemetry-instrumentation-ioredis
+    target_versions:
+      LIBRARY:
+      - '[2.0.0,6)'
+'@cucumber/cucumber':
+  instrumentations:
+  - name: '@cucumber/cucumber'
+    srcPath: plugins/node/instrumentation-cucumber
+    target_versions:
+      LIBRARY:
+      - '[8.0.0,11)'
+restify:
+  instrumentations:
+  - name: restify
+    srcPath: plugins/node/opentelemetry-instrumentation-restify
+    target_versions:
+      LIBRARY:
+      - '[4.1.0,12)'
+fastify:
+  instrumentations:
+  - name: fastify
+    srcPath: plugins/node/opentelemetry-instrumentation-fastify
+    target_versions:
+      LIBRARY:
+      - '[3.0.0,5)'
+mysql2:
+  instrumentations:
+  - name: mysql2
+    srcPath: plugins/node/opentelemetry-instrumentation-mysql2
+    target_versions:
+      LIBRARY:
+      - '[1.4.2,4)'
+bunyan:
+  instrumentations:
+  - name: bunyan
+    srcPath: plugins/node/opentelemetry-instrumentation-bunyan
+    target_versions:
+      LIBRARY:
+      - '[1.0.0,2)'
+aws-sdk:
+  instrumentations:
+  - name: aws-sdk
+    srcPath: plugins/node/opentelemetry-instrumentation-aws-sdk
+    target_versions:
+      LIBRARY:
+      - '[2.308.0,3)'
+amqplib:
+  instrumentations:
+  - name: amqplib
+    srcPath: plugins/node/instrumentation-amqplib
+    target_versions:
+      LIBRARY:
+      - '[0.5.5,1)'
+router:
+  instrumentations:
+  - name: router
+    srcPath: plugins/node/opentelemetry-instrumentation-router
+    target_versions:
+      LIBRARY:
+      - '[1.0.0,2)'
+graphql:
+  instrumentations:
+  - name: graphql
+    srcPath: plugins/node/opentelemetry-instrumentation-graphql
+    target_versions:
+      LIBRARY:
+      - '[14.0.0,17)'
+knex:
+  instrumentations:
+  - name: knex
+    srcPath: plugins/node/opentelemetry-instrumentation-knex
+    target_versions:
+      LIBRARY:
+      - '[0.10.0,4)'
+cassandra-driver:
+  instrumentations:
+  - name: cassandra-driver
+    srcPath: plugins/node/opentelemetry-instrumentation-cassandra
+    target_versions:
+      LIBRARY:
+      - '[4.4.0,5)'
+memcached:
+  instrumentations:
+  - name: memcached
+    srcPath: plugins/node/opentelemetry-instrumentation-memcached
+    target_versions:
+      LIBRARY:
+      - '[2.2.0,3)'
+redis:
+  instrumentations:
+  - name: redis
+    srcPath: plugins/node/opentelemetry-instrumentation-redis
+    target_versions:
+      LIBRARY:
+      - '[2.6.0,4)'
+pino:
+  instrumentations:
+  - name: pino
+    srcPath: plugins/node/opentelemetry-instrumentation-pino
+    target_versions:
+      LIBRARY:
+      - '[5.14.0,10)'
+'@nestjs/core':
+  instrumentations:
+  - name: '@nestjs/core'
+    srcPath: plugins/node/opentelemetry-instrumentation-nestjs-core
+    target_versions:
+      LIBRARY:
+      - '[4.0.0,11)'
+'@hapi/hapi':
+  instrumentations:
+  - name: '@hapi/hapi'
+    srcPath: plugins/node/opentelemetry-instrumentation-hapi
+    target_versions:
+      LIBRARY:
+      - '[17.0.0,22)'
+winston:
+  instrumentations:
+  - name: winston
+    srcPath: plugins/node/opentelemetry-instrumentation-winston
+    target_versions:
+      LIBRARY:
+      - '[1.0.0,4)'
+connect:
+  instrumentations:
+  - name: connect
+    srcPath: plugins/node/opentelemetry-instrumentation-connect
+    target_versions:
+      LIBRARY:
+      - '[3.0.0,4)'
+pg:
+  instrumentations:
+  - name: pg
+    srcPath: plugins/node/opentelemetry-instrumentation-pg
+    target_versions:
+      LIBRARY:
+      - '[8.0.3,9)'
+koa:
+  instrumentations:
+  - name: koa
+    srcPath: plugins/node/opentelemetry-instrumentation-koa
+    target_versions:
+      LIBRARY:
+      - '[2.0.0,3)'
+dataloader:
+  instrumentations:
+  - name: dataloader
+    srcPath: plugins/node/instrumentation-dataloader
+    target_versions:
+      LIBRARY:
+      - '[2.0.0,3)'
+mysql:
+  instrumentations:
+  - name: mysql
+    srcPath: plugins/node/opentelemetry-instrumentation-mysql
+    target_versions:
+      LIBRARY:
+      - '[2.0.0,3)'
