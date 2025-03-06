@@ -9,7 +9,7 @@ import (
 	"golang.org/x/mod/semver"
 )
 
-func CheckRubySetup(reporter *utils.ComponentReporter, manualInstrumentation bool) {
+func CheckRubySetup(reporter *utils.ComponentReporter, commands utils.Commands) {
 	checkRubyVersion(reporter)
 	checkBundlerInstalled(reporter)
 
@@ -21,7 +21,7 @@ func CheckRubySetup(reporter *utils.ComponentReporter, manualInstrumentation boo
 	// shared instrumentation checks
 	checkRubyRequiredInstrumentation(reporter, &gemfile)
 
-	if !manualInstrumentation {
+	if !commands.ManualInstrumentation {
 		checkRubyAutoInstrumentation(reporter, &gemfile)
 	}
 
