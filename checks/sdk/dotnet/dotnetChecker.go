@@ -2,9 +2,12 @@ package dotnet
 
 import (
 	"fmt"
+	"maps"
+	"os"
+	"slices"
+	"sort"
 	"strconv"
 	"strings"
-	"syscall"
 
 	"otel-checker/checks/utils"
 )
@@ -70,7 +73,7 @@ func checkEnvironmentVariables(
 	// Check for missing required variables
 	missingVars := []string{}
 	for _, envVar := range requiredVars {
-		if _, exists := syscall.Getenv(envVar); !exists {
+		if _, exists := os.LookupEnv(envVar); !exists {
 			missingVars = append(missingVars, envVar)
 		}
 	}
@@ -83,7 +86,7 @@ func checkEnvironmentVariables(
 	// Check for incorrect values
 	wrongValues := make(map[string]string)
 	for envVar, expectedValue := range expectedValues {
-		envVarValue, _ := syscall.Getenv(envVar)
+		envVarValue := os.Getenv(envVar)
 		if envVarValue != expectedValue {
 			wrongValues[envVar] = envVarValue
 		}
@@ -91,7 +94,10 @@ func checkEnvironmentVariables(
 
 	if len(wrongValues) > 0 {
 		s := make([]string, 0, len(wrongValues))
-		for k := range wrongValues {
+		v := slices.Collect(maps.Keys(wrongValues))
+		// Sort keys to make the output deterministic
+		sort.Strings(v)
+		for _, k := range v {
 			s = append(s, fmt.Sprintf("%s: %s", k, wrongValues[k]))
 		}
 		reporter.AddError(fmt.Sprintf("Incorrect values for environment variables: %s", strings.Join(s, ", ")))
@@ -100,7 +106,7 @@ func checkEnvironmentVariables(
 
 	// Run custom validators
 	for envVar, validator := range customValidators {
-		if envVarValue, exists := syscall.Getenv(envVar); exists {
+		if envVarValue, exists := os.LookupEnv(envVar); exists {
 			if err := validator(envVar, envVarValue); err != nil {
 				reporter.AddError(fmt.Sprintf("Validation failed for %s: %s", envVar, err))
 				return false

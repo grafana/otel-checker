@@ -1,8 +1,6 @@
 package grafana
 
 import (
-	"github.com/stretchr/testify/require"
-	"os"
 	"testing"
 
 	"otel-checker/checks/utils"
@@ -10,23 +8,12 @@ import (
 
 func TestCheckEnvVarsGrafana(t *testing.T) {
 	correct := correctWith(map[string]string{})
-	tests := []struct {
-		name             string
-		envVars          map[string]string
-		language         string
-		components       []string
-		expectedErrors   []string
-		expectedChecks   []string
-		expectedWarnings []string
-		ignoreWarnings   bool
-		ignoreErrors     bool
-		ignoreChecks     bool
-	}{
+	tests := []utils.EnvVarTestCase{
 		{
-			name:     "all required env vars set correctly",
-			envVars:  correct,
-			language: "python",
-			expectedChecks: []string{
+			Name:     "all required env vars set correctly",
+			EnvVars:  correct,
+			Language: "python",
+			ExpectedChecks: []string{
 				"Grafana Cloud: OTEL_SERVICE_NAME is set",
 				"Grafana Cloud: OTEL_EXPORTER_OTLP_PROTOCOL set to 'http/protobuf'",
 				"Grafana Cloud: The value of OTEL_METRICS_EXPORTER is set to 'otlp'",
@@ -37,54 +24,54 @@ func TestCheckEnvVarsGrafana(t *testing.T) {
 			},
 		},
 		{
-			name: "missing service name",
-			envVars: correctWith(map[string]string{
+			Name: "missing service name",
+			EnvVars: correctWith(map[string]string{
 				"OTEL_SERVICE_NAME": "",
 			}),
-			language: "python",
-			expectedWarnings: []string{
+			Language: "python",
+			ExpectedWarnings: []string{
 				"Grafana Cloud: It's recommended the environment variable OTEL_SERVICE_NAME to be set to your service name, for easier identification",
 			},
-			ignoreChecks: true,
+			IgnoreChecks: true,
 		},
 		{
-			name: "incorrect protocol",
-			envVars: correctWith(map[string]string{
+			Name: "incorrect protocol",
+			EnvVars: correctWith(map[string]string{
 				"OTEL_EXPORTER_OTLP_PROTOCOL": "grpc",
 			}),
-			language: "python",
-			expectedErrors: []string{
+			Language: "python",
+			ExpectedErrors: []string{
 				"Grafana Cloud: OTEL_EXPORTER_OTLP_PROTOCOL is not set to 'http/protobuf'",
 			},
-			ignoreChecks: true,
+			IgnoreChecks: true,
 		},
 		{
-			name: "exporters set to none",
-			envVars: correctWith(map[string]string{
+			Name: "exporters set to none",
+			EnvVars: correctWith(map[string]string{
 				"OTEL_METRICS_EXPORTER": "none",
 				"OTEL_TRACES_EXPORTER":  "none",
 				"OTEL_LOGS_EXPORTER":    "none",
 			}),
-			language: "python",
-			expectedErrors: []string{
+			Language: "python",
+			ExpectedErrors: []string{
 				"Grafana Cloud: The value of OTEL_METRICS_EXPORTER cannot be 'none'. Change the value to 'otlp' or leave it unset",
 				"Grafana Cloud: The value of OTEL_TRACES_EXPORTER cannot be 'none'. Change the value to 'otlp' or leave it unset",
 				"Grafana Cloud: The value of OTEL_LOGS_EXPORTER cannot be 'none'. Change the value to 'otlp' or leave it unset",
 			},
-			ignoreChecks: true,
+			IgnoreChecks: true,
 		},
 		{
-			name: "beyla component with required env vars",
-			envVars: correctWith(map[string]string{
+			Name: "beyla component with required env vars",
+			EnvVars: correctWith(map[string]string{
 				"BEYLA_SERVICE_NAME":        "test-service",
 				"BEYLA_OPEN_PORT":           "8080",
 				"GRAFANA_CLOUD_SUBMIT":      "metrics,traces",
 				"GRAFANA_CLOUD_INSTANCE_ID": "test-instance",
 				"GRAFANA_CLOUD_API_KEY":     "test-key",
 			}),
-			language:   "python",
-			components: []string{"beyla"},
-			expectedChecks: []string{
+			Language:   "python",
+			Components: []string{"beyla"},
+			ExpectedChecks: []string{
 				"Grafana Cloud: OTEL_SERVICE_NAME is set",
 				"Grafana Cloud: OTEL_EXPORTER_OTLP_PROTOCOL set to 'http/protobuf'",
 				"Grafana Cloud: The value of OTEL_METRICS_EXPORTER is set to 'otlp'",
@@ -95,51 +82,27 @@ func TestCheckEnvVarsGrafana(t *testing.T) {
 			},
 		},
 		{
-			name:       "nothing set",
-			envVars:    map[string]string{},
-			language:   "python",
-			components: []string{"beyla"},
-			expectedErrors: []string{
+			Name:       "nothing set",
+			EnvVars:    map[string]string{},
+			Language:   "python",
+			Components: []string{"beyla"},
+			ExpectedErrors: []string{
 				"Grafana Cloud: OTEL_EXPORTER_OTLP_PROTOCOL is not set to 'http/protobuf'",
 				"Grafana Cloud: OTEL_EXPORTER_OTLP_ENDPOINT is not set in the format similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp",
 				"Grafana Cloud: OTEL_EXPORTER_OTLP_HEADERS is not set. Value should have 'Authorization=Basic%20...'"},
-			expectedWarnings: []string{
+			ExpectedWarnings: []string{
 				"Grafana Cloud: It's recommended the environment variable OTEL_SERVICE_NAME to be set to your service name, for easier identification"},
-			expectedChecks: []string{
+			ExpectedChecks: []string{
 				"Grafana Cloud: OTEL_METRICS_EXPORTER is unset, with a default value of 'otlp'",
-				"Grafana Cloud: OTEL_TRACES_EXPORTER is unset, with a default value of 'otlp'", "Grafana Cloud: OTEL_LOGS_EXPORTER is unset, with a default value of 'otlp'",
+				"Grafana Cloud: OTEL_TRACES_EXPORTER is unset, with a default value of 'otlp'",
+				"Grafana Cloud: OTEL_LOGS_EXPORTER is unset, with a default value of 'otlp'",
 			},
 		},
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// Set up environment variables for test
-			for k, v := range tt.envVars {
-				os.Setenv(k, v)
-			}
-			defer func() {
-				// Clean up environment variables after test
-				for k := range tt.envVars {
-					os.Unsetenv(k)
-				}
-			}()
-
-			reporter := utils.Reporter{}
-			component := reporter.Component("Grafana Cloud")
-			checkEnvVarsGrafana(reporter, component, tt.language, tt.components)
-
-			if !tt.ignoreErrors {
-				require.Equal(t, tt.expectedErrors, component.Errors, "errors mismatch")
-			}
-
-			if !tt.ignoreChecks {
-				require.Equal(t, tt.expectedChecks, component.Checks, "checks mismatch")
-			}
-
-			if !tt.ignoreWarnings {
-				require.Equal(t, tt.expectedWarnings, component.Warnings, "warnings mismatch")
-			}
+		t.Run(tt.Name, func(t *testing.T) {
+			utils.RunEnvVarComponentTest(t, tt, "Grafana Cloud", checkEnvVarsGrafana)
 		})
 	}
 }
