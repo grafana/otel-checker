@@ -17,7 +17,7 @@ func CheckJSSetup(reporter *utils.ComponentReporter, commands utils.Commands) {
 	} else {
 		checkJSAutoInstrumentation(reporter, commands.PackageJsonPath)
 	}
-	checkSupportedLibraries(reporter)
+	checkSupportedLibraries(reporter, commands)
 }
 
 func checkEnvVars(reporter *utils.ComponentReporter) {
@@ -122,7 +122,7 @@ func checkJSCodeBasedInstrumentation(
 	}
 }
 
-func checkSupportedLibraries(reporter *utils.ComponentReporter) {
+func checkSupportedLibraries(reporter *utils.ComponentReporter, commands utils.Commands) {
 	supported, err := supportedLibraries()
 	if err != nil {
 		reporter.AddError(fmt.Sprintf("Error reading supported libraries: %v", err))
@@ -140,6 +140,8 @@ func checkSupportedLibraries(reporter *utils.ComponentReporter) {
 			reporter.AddSuccessfulCheck(
 				fmt.Sprintf("Found supported library: %s:%s at %s",
 					dep.Name, dep.Version, strings.Join(links, ", ")))
+		} else if commands.Debug {
+			reporter.AddWarning(fmt.Sprintf("Found unsupported library: %s:%s", dep.Name, dep.Version))
 		}
 	}
 }
