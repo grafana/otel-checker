@@ -54,8 +54,8 @@ func readPackageLockFromContent(content []byte) []supported.Library {
 		if path == "" {
 			continue
 		}
-		// Extract package name from path (e.g. "node_modules/express" -> "express")
-		name := path[strings.LastIndex(path, "/")+1:]
+		// Extract package name from path (e.g. "node_modules/@fastify/ajv-compiler" -> "@fastify/ajv-compiler")
+		name := strings.TrimPrefix(path, "node_modules/")
 		deps = append(deps, supported.Library{
 			Name:    name,
 			Version: pkg.Version,
