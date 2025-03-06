@@ -73,6 +73,11 @@ func checkDotNetAutoInstrumentation(reporter *utils.ComponentReporter) {
 		"OTEL_DOTNET_AUTO_HOME",
 	}
 
+	constantValues := map[string]string{
+		"CORECLR_ENABLE_PROFILING": "1",
+		"CORECLR_PROFILER":         "{918728DD-259F-4A6A-AC2B-B85E1B658318}",
+	}
+
 	missingVars := []string{}
 	for _, envVar := range requiredEnvVars {
 		if _, exists := syscall.Getenv(envVar); !exists {
@@ -82,6 +87,25 @@ func checkDotNetAutoInstrumentation(reporter *utils.ComponentReporter) {
 
 	if len(missingVars) > 0 {
 		reporter.AddError(fmt.Sprintf("Missing required environment variables for .NET auto-instrumentation: %s", strings.Join(missingVars, ", ")))
+		return
+	}
+
+	wrongValues := make(map[string]string)
+
+	for envVar, value := range constantValues {
+		envVarValue, _ := syscall.Getenv(envVar)
+		if envVarValue != value {
+			wrongValues[envVar] = envVarValue
+		}
+	}
+
+	if len(wrongValues) > 0 {
+		s := make([]string, 0, len(wrongValues))
+		for k := range wrongValues {
+			s = append(s, fmt.Sprintf("%s: %s", k, wrongValues[k]))
+		}
+
+		reporter.AddError(fmt.Sprintf("Incorrect values for required environment variables for .NET auto-instrumentation: %s", strings.Join(s, ", ")))
 		return
 	}
 
