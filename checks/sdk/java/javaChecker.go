@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os/exec"
 	"otel-checker/checks/sdk"
+	"otel-checker/checks/sdk/supported"
 	"otel-checker/checks/utils"
 	"path/filepath"
 	"slices"
@@ -31,25 +32,6 @@ type Library struct {
 func (l *Library) String() string {
 	return fmt.Sprintf("%s:%s:%s", l.Group, l.Artifact, l.Version)
 }
-
-type SupportedModules map[string]SupportedModule
-
-type SupportedModule struct {
-	Instrumentations []Instrumentation `yaml:"instrumentations"`
-}
-
-type Instrumentation struct {
-	Name           string                           `yaml:"name"`
-	SrcPath        string                           `yaml:"srcPath"`
-	TargetVersions map[InstrumentationType][]string `yaml:"target_versions"`
-}
-
-type InstrumentationType string
-
-const (
-	TypeJavaagent InstrumentationType = "JAVAAGENT"
-	TypeLibrary   InstrumentationType = "LIBRARY"
-)
 
 func CheckSetup(reporter *utils.ComponentReporter, commands utils.Commands) {
 	checkJavaVersion(reporter)
@@ -83,14 +65,14 @@ func checkJavaVersion(reporter *utils.ComponentReporter) {
 }
 
 func checkAutoInstrumentation(reporter *utils.ComponentReporter, debug bool) {
-	reportSupportedInstrumentations(reporter, debug, TypeJavaagent)
+	reportSupportedInstrumentations(reporter, debug, supported.TypeJavaagent)
 }
 
 func checkCodeBasedInstrumentation(reporter *utils.ComponentReporter, debug bool) {
-	reportSupportedInstrumentations(reporter, debug, TypeLibrary)
+	reportSupportedInstrumentations(reporter, debug, supported.TypeLibrary)
 }
 
-func reportSupportedInstrumentations(reporter *utils.ComponentReporter, debug bool, instrumentationType InstrumentationType) {
+func reportSupportedInstrumentations(reporter *utils.ComponentReporter, debug bool, instrumentationType supported.InstrumentationType) {
 	supported, err := supportedLibraries()
 	if err != nil {
 		reporter.AddError(fmt.Sprintf("Error reading supported libraries: %v", err))
@@ -148,8 +130,8 @@ func getWrapper(wrapper string, level []string) string {
 }
 
 func outputSupportedLibraries(
-	deps []Library, supported SupportedModules, reporter *utils.ComponentReporter,
-	debug bool, instrumentationType InstrumentationType) {
+	deps []Library, supported supported.SupportedModules, reporter *utils.ComponentReporter,
+	debug bool, instrumentationType supported.InstrumentationType) {
 	for _, dep := range deps {
 		links := findSupportedLibraries(dep, supported, instrumentationType)
 		if len(links) > 0 {
@@ -163,7 +145,7 @@ func outputSupportedLibraries(
 	}
 }
 
-func findSupportedLibraries(library Library, supported SupportedModules, instrumentationType InstrumentationType) []string {
+func findSupportedLibraries(library Library, supported supported.SupportedModules, instrumentationType supported.InstrumentationType) []string {
 	var links []string
 	for moduleName, module := range supported {
 		for _, instrumentation := range module.Instrumentations {
@@ -242,14 +224,8 @@ func checkGradle(file string, reporter *utils.ComponentReporter) []Library {
 //go:embed instrumentation-list.yaml
 var file []byte
 
-func supportedLibraries() (SupportedModules, error) {
-	modules := SupportedModules{}
-	err := yaml.Unmarshal(file, &modules)
-	if err != nil {
-		return nil, err
-	}
-	delete(modules, "internal")
-	return modules, nil
+func supportedLibraries() (supported.SupportedModules, error) {
+	return supported.LoadSupportedLibraries(file)
 }
 
 func parseGradleDeps(out string) []Library {
