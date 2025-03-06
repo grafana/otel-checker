@@ -35,16 +35,13 @@ func CheckDotNetSetup(reporter *utils.ComponentReporter, commands utils.Commands
 }
 
 func checkDotNetVersion(reporter *utils.ComponentReporter) {
-	cmd := exec.Command("dotnet", "--version")
-	stdout, err := cmd.Output()
+	versionParts, err := readDotNetVersion()
 
 	if err != nil {
 		reporter.AddError(fmt.Sprintf("Could not check .NET version: %s", err))
 		return
 	}
 
-	version := strings.TrimSpace(string(stdout))
-	versionParts := strings.Split(version, ".")
 	if len(versionParts) == 0 {
 		reporter.AddError("Could not parse .NET version: version string is empty")
 		return
