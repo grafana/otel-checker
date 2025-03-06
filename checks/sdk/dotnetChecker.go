@@ -1,6 +1,7 @@
 package sdk
 
 import (
+	"encoding/json"
 	"encoding/xml"
 	"fmt"
 	"os"
@@ -24,6 +25,9 @@ func CheckDotNetSetup(reporter *utils.ComponentReporter, commands utils.Commands
 	if err != nil {
 		return
 	}
+
+	reportDotNetSupportedInstrumentations(reporter, project.SDK)
+
 	if commands.ManualInstrumentation {
 		checkDotNetCodeBasedInstrumentation(reporter)
 	} else {
@@ -93,6 +97,23 @@ func checkDotNetAutoInstrumentation(reporter *utils.ComponentReporter) {
 }
 
 func checkDotNetCodeBasedInstrumentation(reporter *utils.ComponentReporter) {}
+
+func readDotNetDependenciesFromCli() (*dotnet.NuGetPackageList, error) {
+	cmd := exec.Command("dotnet", "list", "package", "--format", "json", "--include-transitive")
+	stdout, err := cmd.Output()
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to run dotnet list package: %w", err)
+	}
+
+	var deps dotnet.NuGetPackageList
+	if err := json.Unmarshal(stdout, &deps); err != nil {
+		return nil, fmt.Errorf("failed to parse dependencies JSON: %w", err)
+	}
+
+	return &deps, nil
+}
+
 func findProject() (string, error) {
 	var csprojFiles []string
 
@@ -147,4 +168,55 @@ func checkProject(reporter *utils.ComponentReporter) (*dotnet.CSharpProject, err
 	}
 
 	return &csProj, nil
+}
+
+func reportDotNetSupportedInstrumentations(reporter *utils.ComponentReporter, sdk string) {
+	deps, err := readDotNetDependenciesFromCli()
+
+	if err != nil {
+		reporter.AddError(fmt.Sprintf("Failed to read dependencies: %s", err))
+		return
+	}
+
+	instr := dotnet.ReadAvailableInstrumentations()
+
+	implicit, err := dotnet.ImplicitPackagesForSdk(sdk)
+
+	if err != nil {
+		reporter.AddError(fmt.Sprintf("Unrecognized SDK: %s", sdk))
+		return
+	}
+
+	if len(implicit) == 0 {
+		reporter.AddWarning(fmt.Sprintf("No implicit packages found for SDK: %s", sdk))
+	} else {
+		for _, pkg := range implicit {
+			lib, ok := instr[pkg]
+
+			if !ok {
+				continue
+			}
+
+			reporter.AddSuccessfulCheck(fmt.Sprintf("Found supported instrumentation for %s: %s", pkg, lib))
+		}
+	}
+
+	for _, project := range deps.Projects {
+		for _, framework := range project.Frameworks {
+			for _, pkg := range framework.TopLevelPackages {
+				lib, ok := instr[pkg.ID]
+
+				if !ok {
+					continue
+				}
+
+				reporter.AddSuccessfulCheck(fmt.Sprintf("Found supported instrumentation for %s: %s", pkg.ID, lib))
+			}
+
+		}
+	}
+	if len(deps.Projects) == 0 {
+		reporter.AddError("No dependencies found in project")
+		return
+	}
 }
