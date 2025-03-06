@@ -72,13 +72,13 @@ func checkCodeBasedInstrumentation(reporter *utils.ComponentReporter, debug bool
 }
 
 func reportSupportedInstrumentations(reporter *utils.ComponentReporter, debug bool, instrumentationType supported.InstrumentationType) {
-	supported, err := supportedLibraries()
+	s, err := supportedLibraries()
 	if err != nil {
 		reporter.AddError(fmt.Sprintf("Error reading supported libraries: %v", err))
 	}
 
 	deps := readDependencies(reporter)
-	outputSupportedLibraries(deps, supported, reporter, debug, instrumentationType)
+	outputSupportedLibraries(deps, s, reporter, debug, instrumentationType)
 }
 
 func readDependencies(reporter *utils.ComponentReporter) []Library {
