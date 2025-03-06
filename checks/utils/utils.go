@@ -98,9 +98,9 @@ type Reporter struct {
 
 type ComponentReporter struct {
 	name     string
-	checks   []string
-	warnings []string
-	errors   []string
+	Checks   []string
+	Warnings []string
+	Errors   []string
 }
 
 func (r *Reporter) Component(name string) *ComponentReporter {
@@ -118,17 +118,17 @@ func (r *Reporter) PrintResults() map[string][]string {
 	res := make(map[string][]string)
 	var checks []string
 	for _, component := range r.components {
-		checks = append(checks, component.checks...)
+		checks = append(checks, component.Checks...)
 	}
 	res[CHECKS] = checks
 	var warnings []string
 	for _, component := range r.components {
-		warnings = append(warnings, component.warnings...)
+		warnings = append(warnings, component.Warnings...)
 	}
 	res[WARNINGS] = warnings
 	var errors []string
 	for _, component := range r.components {
-		errors = append(errors, component.errors...)
+		errors = append(errors, component.Errors...)
 	}
 	res[ERRORS] = errors
 
@@ -157,15 +157,15 @@ func (r *Reporter) PrintResults() map[string][]string {
 }
 
 func (r *ComponentReporter) AddSuccessfulCheck(message string) {
-	r.checks = append(r.checks, fmt.Sprintf(`%s: %s`, r.name, message))
+	r.Checks = append(r.Checks, fmt.Sprintf(`%s: %s`, r.name, message))
 }
 
 func (r *ComponentReporter) AddWarning(message string) {
-	r.warnings = append(r.warnings, fmt.Sprintf(`%s: %s`, r.name, message))
+	r.Warnings = append(r.Warnings, fmt.Sprintf(`%s: %s`, r.name, message))
 }
 
 func (r *ComponentReporter) AddError(message string) {
-	r.errors = append(r.errors, fmt.Sprintf(`%s: %s`, r.name, message))
+	r.Errors = append(r.Errors, fmt.Sprintf(`%s: %s`, r.name, message))
 }
 
 func FileExists(path string) bool {
