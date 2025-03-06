@@ -34,29 +34,34 @@ func readPackageLock(reporter *utils.ComponentReporter) []supported.Library {
 		reporter.AddError(fmt.Sprintf("Could not read package-lock.json: %v", err))
 		return nil
 	}
+	return readPackageLockFromContent(dat)
+}
 
+func readPackageLockFromContent(content []byte) []supported.Library {
 	var lock struct {
-		Dependencies map[string]struct {
+		Packages map[string]struct {
 			Version string `json:"version"`
-		} `json:"dependencies"`
+		} `json:"packages"`
 	}
 
-	if err := json.Unmarshal(dat, &lock); err != nil {
-		reporter.AddError(fmt.Sprintf("Could not parse package-lock.json: %v", err))
+	if err := json.Unmarshal(content, &lock); err != nil {
 		return nil
 	}
 
 	var deps []supported.Library
-	for name, dep := range lock.Dependencies {
+	for path, pkg := range lock.Packages {
+		// Skip the root package
+		if path == "" {
+			continue
+		}
+		// Extract package name from path (e.g. "node_modules/express" -> "express")
+		name := path[strings.LastIndex(path, "/")+1:]
 		deps = append(deps, supported.Library{
 			Name:    name,
-			Version: dep.Version,
+			Version: pkg.Version,
 		})
 	}
 
-	if len(deps) == 0 {
-		reporter.AddWarning("No dependencies found in package-lock.json")
-	}
 	return deps
 }
 
@@ -66,14 +71,16 @@ func readPackageJson(reporter *utils.ComponentReporter) []supported.Library {
 		reporter.AddError(fmt.Sprintf("Could not read package.json: %v", err))
 		return nil
 	}
+	return readPackageJsonFromContent(dat)
+}
 
+func readPackageJsonFromContent(content []byte) []supported.Library {
 	var pkg struct {
 		Dependencies    map[string]string `json:"dependencies"`
 		DevDependencies map[string]string `json:"devDependencies"`
 	}
 
-	if err := json.Unmarshal(dat, &pkg); err != nil {
-		reporter.AddError(fmt.Sprintf("Could not parse package.json: %v", err))
+	if err := json.Unmarshal(content, &pkg); err != nil {
 		return nil
 	}
 
@@ -97,9 +104,6 @@ func readPackageJson(reporter *utils.ComponentReporter) []supported.Library {
 		})
 	}
 
-	if len(deps) == 0 {
-		reporter.AddWarning("No dependencies found in package.json")
-	}
 	return deps
 }
 
