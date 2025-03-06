@@ -13,32 +13,72 @@ def extract_supported_versions(readme_path):
         with open(readme_path, 'r') as f:
             content = f.read()
             
-        # Look for the Supported Versions section
-        versions_match = re.search(r'## Supported Versions\n\n(.*?)(?:\n\n|$)', content, re.DOTALL)
+        # Look for the Supported Versions section (case insensitive)
+        # Handle both ## and ### headers, and allow for different spacing
+        versions_match = re.search(r'#{2,3}\s+Supported\s+Versions\n\n(.*?)(?:\n\n|$)', content, re.DOTALL | re.IGNORECASE)
         if not versions_match:
+            print(f"Warning: No Supported Versions section found in {readme_path}", file=sys.stderr)
             return None
             
         versions_text = versions_match.group(1)
         
-        # Extract library name and version range
-        # Format: [`library`](link) versions `>=0.5.5 <1`
-        version_match = re.search(r'\[`(.*?)`\]\((.*?)\)\s+versions\s+`(.*?)`', versions_text)
-        if not version_match:
-            return None
-            
-        library_name = version_match.group(1)
-        link = version_match.group(2)
-        version_range = version_match.group(3)
-        
         # Get the directory name for srcPath
         dir_name = readme_path.parent.name
         
-        return {
-            'name': library_name,
-            'link': link,
-            'version_range': version_range,
-            'src_path': f"plugins/node/{dir_name}"
-        }
+        # Try to extract library name from directory name
+        # e.g., instrumentation-fs -> fs
+        library_name = dir_name.replace('instrumentation-', '')
+        
+        # Pattern 1: [`library`](link) versions `>=0.5.5 <1`
+        version_match = re.search(r'\[`(.*?)`\]\((.*?)\)\s+versions\s+`(.*?)`', versions_text)
+        if version_match:
+            library_name = version_match.group(1)
+            link = version_match.group(2)
+            version_range = version_match.group(3)
+            return {
+                'name': library_name,
+                'link': link,
+                'version_range': version_range,
+                'src_path': f"plugins/node/{dir_name}"
+            }
+            
+        # Pattern 2: Node.js `>=14`
+        node_match = re.search(r'Node\.js\s+`(.*?)`', versions_text)
+        if node_match:
+            version_range = node_match.group(1)
+            return {
+                'name': library_name,
+                'link': f"https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/{dir_name}",
+                'version_range': version_range,
+                'src_path': f"plugins/node/{dir_name}"
+            }
+            
+        # Pattern 3: Library `>=1.0.0`
+        lib_match = re.search(r'`(.*?)`\s+`(.*?)`', versions_text)
+        if lib_match:
+            library_name = lib_match.group(1)
+            version_range = lib_match.group(2)
+            return {
+                'name': library_name,
+                'link': f"https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/{dir_name}",
+                'version_range': version_range,
+                'src_path': f"plugins/node/{dir_name}"
+            }
+            
+        # Pattern 4: - Library `>=1.0.0`
+        list_match = re.search(r'-\s+`(.*?)`\s+`(.*?)`', versions_text)
+        if list_match:
+            library_name = list_match.group(1)
+            version_range = list_match.group(2)
+            return {
+                'name': library_name,
+                'link': f"https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/{dir_name}",
+                'version_range': version_range,
+                'src_path': f"plugins/node/{dir_name}"
+            }
+            
+        print(f"Warning: Could not parse version information in {readme_path}", file=sys.stderr)
+        return None
     except Exception as e:
         print(f"Error processing {readme_path}: {e}", file=sys.stderr)
         return None
@@ -51,6 +91,16 @@ def convert_version_range(version_range):
         min_version = parts[0].replace('>=', '')
         max_version = parts[1].replace('<', '')
         return f"[{min_version},{max_version})"
+    elif len(parts) == 1:
+        # Handle single version constraints
+        if parts[0].startswith('>='):
+            return f"[{parts[0].replace('>=', '')},)"
+        elif parts[0].startswith('<'):
+            return f"[,{parts[0].replace('<', '')})"
+        elif parts[0].startswith('~'):
+            # For tilde ranges, we'll use the same version for both bounds
+            version = parts[0].replace('~', '')
+            return f"[{version},{version})"
     return version_range
 
 def main():
@@ -76,6 +126,7 @@ def main():
             
         readme_path = item / "README.md"
         if not readme_path.exists():
+            print(f"Warning: No README.md found in {item}", file=sys.stderr)
             continue
             
         result = extract_supported_versions(readme_path)
