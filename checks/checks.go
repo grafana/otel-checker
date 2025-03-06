@@ -57,5 +57,7 @@ func SDKSetup(reporter *utils.ComponentReporter, commands utils.Commands) {
 		python.CheckSetup(reporter, commands)
 	case "ruby":
 		sdk.CheckRubySetup(reporter, commands)
+	case "php":
+		sdk.CheckPHPSetup(reporter, commands)
 	}
 }

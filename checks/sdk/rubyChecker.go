@@ -53,7 +53,7 @@ func checkBundlerInstalled(reporter *utils.ComponentReporter) {
 }
 
 func checkGemfileExists(reporter *utils.ComponentReporter) (string, error) {
-	_, err := os.ReadFile("Gemfile.lock")
+	_, err := os.ReadFile("Gemfile")
 	if err != nil {
 		reporter.AddError("Could not find Gemfile, create one, add dependencies, and run 'bundle install'")
 		return "", err

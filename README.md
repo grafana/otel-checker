@@ -84,8 +84,16 @@ TBD
 - Ruby version
 - Bundler installation
 - `Gemfile` and `Gemfile.lock` exist
-- Required dependencies in `Gemfile.lock`
-- Optional auto-instrumentation dependencies
+- Required dependencies installed
+- Optional auto-instrumentation dependencies installed
+
+#### PHP
+
+- PHP version
+- Composer installation
+- `composer.json` and `composer.lock` exist
+- Required dependencies in `composer.lock`
+- Some auto-instrumentation dependencies installed
 
 #### Collector
 - Config receivers and exporters
