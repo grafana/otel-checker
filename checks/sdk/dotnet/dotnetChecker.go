@@ -218,7 +218,8 @@ func reportDotNetSupportedInstrumentations(reporter *utils.ComponentReporter, sd
 
 	for _, project := range deps.Projects {
 		for _, framework := range project.Frameworks {
-			for _, pkg := range framework.TopLevelPackages {
+			packages := append(framework.TopLevelPackages, framework.TransitivePackages...)
+			for _, pkg := range packages {
 				lib, ok := instr[pkg.ID]
 
 				if !ok {
@@ -227,7 +228,6 @@ func reportDotNetSupportedInstrumentations(reporter *utils.ComponentReporter, sd
 
 				reporter.AddSuccessfulCheck(fmt.Sprintf("Found supported instrumentation for %s: %s", pkg.ID, lib))
 			}
-
 		}
 	}
 	if len(deps.Projects) == 0 {
