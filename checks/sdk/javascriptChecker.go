@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"otel-checker/checks/sdk/js"
 	"otel-checker/checks/utils"
 	"strconv"
 	"strings"
@@ -17,6 +18,7 @@ func CheckJSSetup(reporter *utils.ComponentReporter, commands utils.Commands) {
 	} else {
 		checkJSAutoInstrumentation(reporter, commands.PackageJsonPath)
 	}
+	checkSupportedLibraries(reporter)
 }
 
 func checkEnvVars(reporter *utils.ComponentReporter) {
@@ -117,6 +119,28 @@ func checkJSCodeBasedInstrumentation(
 		}
 		if strings.Contains(string(instrumentationFileContent), "ConsoleMetricExporter") {
 			reporter.AddWarning("Instrumentation file is using ConsoleMetricExporter. This exporter is useful during debugging, but replace with OTLPMetricExporter to send to Grafana Cloud")
+		}
+	}
+}
+
+func checkSupportedLibraries(reporter *utils.ComponentReporter) {
+	supported, err := js.supportedLibraries()
+	if err != nil {
+		reporter.AddError(fmt.Sprintf("Error reading supported libraries: %v", err))
+		return
+	}
+
+	deps := js.readDependencies(reporter)
+	if len(deps) == 0 {
+		return
+	}
+
+	for _, dep := range deps {
+		links := js.findSupportedLibraries(dep, supported)
+		if len(links) > 0 {
+			reporter.AddSuccessfulCheck(
+				fmt.Sprintf("Found supported library: %s:%s at %s",
+					dep.Name, dep.Version, strings.Join(links, ", ")))
 		}
 	}
 }
