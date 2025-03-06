@@ -12,25 +12,25 @@ def extract_supported_versions(readme_path):
     try:
         with open(readme_path, 'r') as f:
             content = f.read()
-            
+
         # Look for the Supported Versions section (case insensitive)
         # Handle both ## and ### headers, and allow for different spacing
         versions_match = re.search(r'#{2,3}\s+Supported\s+Versions\n\n(.*?)(?:\n\n|$)', content, re.DOTALL | re.IGNORECASE)
         if not versions_match:
             print(f"Warning: No Supported Versions section found in {readme_path}", file=sys.stderr)
             return None
-            
+
         versions_text = versions_match.group(1)
-        
+
         # Get the directory name for srcPath
         dir_name = readme_path.parent.name
-        
+
         # Try to extract library name from directory name
         # e.g., instrumentation-fs -> fs
         library_name = dir_name.replace('instrumentation-', '')
-        
-        # Pattern 1: [`library`](link) versions `>=0.5.5 <1`
-        version_match = re.search(r'\[`(.*?)`\]\((.*?)\)\s+versions\s+`(.*?)`', versions_text)
+
+        # Pattern 1: [`library`](link) version(s) `>=0.5.5 <1`
+        version_match = re.search(r'\[`(.*?)`\]\((.*?)\)\s+version[s]?\s+`(.*?)`', versions_text)
         if version_match:
             library_name = version_match.group(1)
             link = version_match.group(2)
@@ -41,7 +41,7 @@ def extract_supported_versions(readme_path):
                 'version_range': version_range,
                 'src_path': f"plugins/node/{dir_name}"
             }
-            
+
         # Pattern 2: Node.js `>=14`
         node_match = re.search(r'Node\.js\s+`(.*?)`', versions_text)
         if node_match:
@@ -52,7 +52,7 @@ def extract_supported_versions(readme_path):
                 'version_range': version_range,
                 'src_path': f"plugins/node/{dir_name}"
             }
-            
+
         # Pattern 3: Library `>=1.0.0`
         lib_match = re.search(r'`(.*?)`\s+`(.*?)`', versions_text)
         if lib_match:
@@ -64,7 +64,7 @@ def extract_supported_versions(readme_path):
                 'version_range': version_range,
                 'src_path': f"plugins/node/{dir_name}"
             }
-            
+
         # Pattern 4: - Library `>=1.0.0`
         list_match = re.search(r'-\s+`(.*?)`\s+`(.*?)`', versions_text)
         if list_match:
@@ -76,7 +76,24 @@ def extract_supported_versions(readme_path):
                 'version_range': version_range,
                 'src_path': f"plugins/node/{dir_name}"
             }
+
+        # Pattern 5: "regardless of versions" or similar
+        all_versions_match = re.search(r'(?:\[`(.*?)`\]\((.*?)\)\s+)?(?:regardless of versions|all versions|any version)', versions_text, re.IGNORECASE)
+        if all_versions_match:
+            # If we have a library name and link, use them, otherwise use the directory name
+            if all_versions_match.group(1):
+                library_name = all_versions_match.group(1)
+                link = all_versions_match.group(2)
+            else:
+                link = f"https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/{dir_name}"
             
+            return {
+                'name': library_name,
+                'link': link,
+                'version_range': '>=0.0.0',  # This will be converted to [0.0.0,) in convert_version_range
+                'src_path': f"plugins/node/{dir_name}"
+            }
+
         print(f"Warning: Could not parse version information in {readme_path}", file=sys.stderr)
         return None
     except Exception as e:
@@ -109,26 +126,26 @@ def main():
     parser.add_argument('--output', '-o', default='checks/sdk/js/supported-libraries.yaml',
                       help='Output path for the YAML file (default: checks/sdk/js/supported-libraries.yaml)')
     args = parser.parse_args()
-    
+
     # Path to the plugins directory
     plugins_dir = Path(args.repo_dir) / "plugins/node"
     if not plugins_dir.exists():
         print(f"Error: {plugins_dir} does not exist", file=sys.stderr)
         sys.exit(1)
-    
+
     # Collect all supported libraries
     supported_libraries = {}
-    
+
     # Process each instrumentation directory
     for item in plugins_dir.iterdir():
         if not item.is_dir():
             continue
-            
+
         readme_path = item / "README.md"
         if not readme_path.exists():
             print(f"Warning: No README.md found in {item}", file=sys.stderr)
             continue
-            
+
         result = extract_supported_versions(readme_path)
         if result:
             library_name = result['name']
@@ -136,20 +153,21 @@ def main():
                 'instrumentations': [{
                     'name': library_name,
                     'srcPath': result['src_path'],
+                    'link': result['link'],
                     'target_versions': {
                         'LIBRARY': [convert_version_range(result['version_range'])]
                     }
                 }]
             }
-    
+
     # Generate the supported-libraries.yaml file
     output_path = Path(args.output)
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    
+
     with open(output_path, 'w') as f:
         yaml.dump(supported_libraries, f, sort_keys=False)
-    
+
     print(f"Generated {output_path} with {len(supported_libraries)} supported libraries")
 
 if __name__ == "__main__":
-    main() 
+    main()
