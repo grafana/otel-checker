@@ -108,14 +108,6 @@ func checkDotNetAutoInstrumentation(reporter *utils.ComponentReporter) {
 		return
 	}
 
-	profilerValue, _ := syscall.Getenv("CORECLR_PROFILER")
-	expectedProfilerValue := "{918728DD-259F-4A6A-AC2B-B85E1B658318}"
-
-	if profilerValue != expectedProfilerValue {
-		reporter.AddError(fmt.Sprintf("CORECLR_PROFILER has incorrect value. Expected: %s, Got: %s", expectedProfilerValue, profilerValue))
-		return
-	}
-
 	reporter.AddSuccessfulCheck("All required environment variables for .NET auto-instrumentation are set with correct values.")
 }
 
