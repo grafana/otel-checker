@@ -61,7 +61,12 @@ Usage of otel-checker:
   - The used libraries are discovered from `requirements.txt` in the current directory.
 
 #### .NET
-TBD
+
+- .NET version
+- Available instrumentation for .NET libraries and dependencies
+- Auto-instrumentation environment variables
+
+**Only .NET 8.0 and higher are supported**
 
 #### Java
 
