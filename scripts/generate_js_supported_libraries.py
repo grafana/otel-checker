@@ -18,7 +18,7 @@ def create_result(library_name: str, link: str, version_range: str, dir_name: st
     }
 
 def get_repo_link(dir_name: str) -> str:
-    """Generate a link to the repository for a given directory."""
+    """Get the repository link for a library."""
     return f"https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/{dir_name}"
 
 def extract_supported_versions(readme_path: Path) -> Optional[Dict[str, Any]]:
@@ -36,38 +36,39 @@ def extract_supported_versions(readme_path: Path) -> Optional[Dict[str, Any]]:
         versions_text = versions_match.group(1)
         dir_name = readme_path.parent.name
         library_name = dir_name.replace('instrumentation-', '')
+        repo_link = get_repo_link(dir_name)
 
         # Define patterns to match different version formats
         patterns = [
             # Pattern 1: [`library`](link) version(s) `>=0.5.5 <1`
             (r'\[`(.*?)`\]\((.*?)\)\s+version[s]?\s+`(.*?)`',
-             lambda m: create_result(m.group(1), m.group(2), m.group(3), dir_name)),
+             lambda m: create_result(m.group(1), repo_link, m.group(3), dir_name)),
 
             # Pattern 2: Node.js `>=14`
             (r'Node\.js\s+`(.*?)`',
-             lambda m: create_result(library_name, get_repo_link(dir_name), m.group(1), dir_name)),
+             lambda m: create_result(library_name, repo_link, m.group(1), dir_name)),
 
             # Pattern 3: Library `>=1.0.0`
             (r'`(.*?)`\s+`(.*?)`',
-             lambda m: create_result(m.group(1), get_repo_link(dir_name), m.group(2), dir_name)),
+             lambda m: create_result(m.group(1), repo_link, m.group(2), dir_name)),
 
             # Pattern 4: - Library `>=1.0.0`
             (r'-\s+`(.*?)`\s+`(.*?)`',
-             lambda m: create_result(m.group(1), get_repo_link(dir_name), m.group(2), dir_name)),
+             lambda m: create_result(m.group(1), repo_link, m.group(2), dir_name)),
 
             # Pattern 5: - [library](link) version(s) `>=1.0.0`
             (r'-\s+\[(.*?)\]\((.*?)\)\s+version[s]?\s+`(.*?)`',
-             lambda m: create_result(m.group(1), m.group(2), m.group(3), dir_name)),
+             lambda m: create_result(m.group(1), repo_link, m.group(3), dir_name)),
 
             # Pattern 6: - [library](link) `>=1.0.0` (without "versions" word)
             (r'-\s+\[(.*?)\]\((.*?)\)\s+`(.*?)`',
-             lambda m: create_result(m.group(1), m.group(2), m.group(3), dir_name)),
+             lambda m: create_result(m.group(1), repo_link, m.group(3), dir_name)),
 
             # Pattern 7: "regardless of versions" or similar
             (r'(?:\[`(.*?)`\]\((.*?)\)\s+)?(?:regardless of versions|all versions|any version)',
              lambda m: create_result(
                  m.group(1) if m.group(1) else library_name,
-                 m.group(2) if m.group(2) else get_repo_link(dir_name),
+                 repo_link,
                  '>=0.0.0',
                  dir_name
              ))
