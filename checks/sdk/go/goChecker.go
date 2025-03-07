@@ -1,4 +1,4 @@
-package sdk
+package _go
 
 import "otel-checker/checks/utils"
 

@@ -7,6 +7,7 @@ import (
 	"otel-checker/checks/grafana"
 	"otel-checker/checks/sdk"
 	"otel-checker/checks/sdk/dotnet"
+	_go "otel-checker/checks/sdk/go"
 	"otel-checker/checks/sdk/java"
 	"otel-checker/checks/sdk/js"
 	"otel-checker/checks/sdk/python"
@@ -48,7 +49,7 @@ func SDKSetup(reporter *utils.ComponentReporter, commands utils.Commands) {
 	case "dotnet":
 		dotnet.CheckDotNetSetup(reporter, commands)
 	case "go":
-		sdk.CheckGoSetup(reporter, commands)
+		_go.CheckGoSetup(reporter, commands)
 	case "java":
 		java.CheckSetup(reporter, commands)
 	case "js":
