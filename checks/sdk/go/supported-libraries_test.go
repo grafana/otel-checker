@@ -144,7 +144,7 @@ func TestFindSupportedLibraries(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := findSupportedLibraries(tt.library, s)
+			got := findSupportedLibraries(tt.library, s, supported.TypeLibrary)
 			if (got == nil && tt.expected != nil) || (got != nil && tt.expected == nil) {
 				t.Errorf("Expected %v, got %v", tt.expected, got)
 			}

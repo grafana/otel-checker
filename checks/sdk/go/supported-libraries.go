@@ -67,11 +67,11 @@ func supportedLibraries() (supported.SupportedModules, error) {
 	return supported.LoadSupportedLibraries(file)
 }
 
-func findSupportedLibraries(library supported.Library, s supported.SupportedModules) []string {
+func findSupportedLibraries(library supported.Library, s supported.SupportedModules, t supported.InstrumentationType) []string {
 	var links []string
 	for _, module := range s {
 		for _, instrumentation := range module.Instrumentations {
-			for _, version := range instrumentation.TargetVersions[supported.TypeLibrary] {
+			for _, version := range instrumentation.TargetVersions[t] {
 				versionRange, err := sdk.ParseVersionRange(version)
 				if err != nil {
 					panic(fmt.Sprintf("error parsing version range: %v", err))
@@ -90,7 +90,7 @@ func findSupportedLibraries(library supported.Library, s supported.SupportedModu
 	return links
 }
 
-func CheckSupportedLibraries(reporter *utils.ComponentReporter, commands utils.Commands) {
+func checkSupportedLibraries(reporter *utils.ComponentReporter, commands utils.Commands, t supported.InstrumentationType) {
 	supported, err := supportedLibraries()
 	if err != nil {
 		reporter.AddError(fmt.Sprintf("Error reading supported libraries: %v", err))
@@ -103,7 +103,7 @@ func CheckSupportedLibraries(reporter *utils.ComponentReporter, commands utils.C
 	}
 
 	for _, dep := range deps {
-		links := findSupportedLibraries(dep, supported)
+		links := findSupportedLibraries(dep, supported, t)
 		if len(links) > 0 {
 			reporter.AddSuccessfulCheck(
 				fmt.Sprintf("Found supported library: %s:%s at %s",
