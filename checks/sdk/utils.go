@@ -2,6 +2,8 @@ package sdk
 
 import (
 	"fmt"
+	"io"
+	"net/http"
 	"os/exec"
 	"otel-checker/checks/utils"
 	"strings"
@@ -124,4 +126,17 @@ func RunCommand(reporter *utils.ComponentReporter, cmd *exec.Cmd) string {
 		return ""
 	}
 	return string(output)
+}
+
+func LoadUrl(url string) ([]byte, error) {
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, fmt.Errorf("error fetching instrumentation list: %v", err)
+	}
+	defer resp.Body.Close()
+	bytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("error reading response body: %v", err)
+	}
+	return bytes, nil
 }

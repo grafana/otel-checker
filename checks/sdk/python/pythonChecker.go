@@ -107,16 +107,15 @@ type SupportedLibrary struct {
 	VersionRange map[string]sdk.VersionRange
 }
 
-// from https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation
-//
-//go:embed instrumentations.md
-var file string
-
 var linkRegex = regexp.MustCompile(`\[opentelemetry-instrumentation-(.*)]`)
 
 func supportedLibraries() ([]SupportedLibrary, error) {
+	bytes, err := sdk.LoadUrl("https://raw.githubusercontent.com/open-telemetry/opentelemetry-python-contrib/refs/heads/main/instrumentation/README.md")
+	if err != nil {
+		return nil, err
+	}
 	var res []SupportedLibrary
-	for _, library := range strings.Split(file, "\n")[2:] {
+	for _, library := range strings.Split(string(bytes), "\n")[3:] {
 		library = strings.TrimSpace(library)
 		if library == "" {
 			continue
@@ -125,8 +124,7 @@ func supportedLibraries() ([]SupportedLibrary, error) {
 		mdLink := strings.TrimSpace(l[1])
 		name := linkRegex.FindStringSubmatch(mdLink)[1]
 		url := fmt.Sprintf("https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-%s", name)
-		versionRange := strings.TrimSpace(l[2])
-		ranges, err := versionRanges(versionRange)
+		ranges, err := versionRanges(strings.TrimSpace(l[2]))
 		if err != nil {
 			return nil, err
 		}
@@ -142,33 +140,47 @@ func supportedLibraries() ([]SupportedLibrary, error) {
 func versionRanges(list string) (map[string]sdk.VersionRange, error) {
 	res := map[string]sdk.VersionRange{}
 	name := ""
+	var err error
 	for _, s := range strings.Split(list, ",") {
-		statement := strings.Split(s, " ")
+		if s == "<0.15" {
+			s = "< 0.15"
+		}
+
+		statement := strings.Split(strings.TrimSpace(s), " ")
 		if len(statement) == 3 {
 			name = statement[0]
-			err := addVersionRange(res, name, statement[1], statement[2])
+			err = addVersionRange(res, name, statement[1], statement[2])
 			if err != nil {
-				return nil, err
+				goto er
 			}
 		} else if len(statement) == 2 {
-			err := addVersionRange(res, name, statement[0], statement[1])
+			err = addVersionRange(res, name, statement[0], statement[1])
 			if err != nil {
-				return nil, err
+				goto er
 			}
 		} else if len(statement) == 1 {
 			// no version range => all versions
 			res[name] = sdk.VersionRange{}
 		} else {
-			return nil, fmt.Errorf("invalid version range statement: %s", s)
+			err = fmt.Errorf("invalid version range statement: %s", s)
+			goto er
 		}
 	}
 	return res, nil
+
+er:
+	return nil, fmt.Errorf("error parsing version %s: %v", list, err)
 }
 
 func addVersionRange(res map[string]sdk.VersionRange, name string, op string, version string) error {
+	err := isVersion(version)
+	if err != nil {
+		return fmt.Errorf("invalid version: %s", version)
+	}
+
 	r, err := newRange(op, version)
 	if err != nil {
-		return fmt.Errorf("error parsing version range for %s: %v", name, err)
+		return err
 	}
 	old, ok := res[name]
 	if ok {
@@ -176,6 +188,11 @@ func addVersionRange(res map[string]sdk.VersionRange, name string, op string, ve
 	}
 	res[name] = r
 	return nil
+}
+
+func isVersion(version string) error {
+	_, err := strconv.Atoi(fmt.Sprintf("%c", version[0]))
+	return err
 }
 
 func mergeRanges(r1 sdk.VersionRange, r2 sdk.VersionRange) sdk.VersionRange {

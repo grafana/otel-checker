@@ -3,8 +3,6 @@ package java
 import (
 	"fmt"
 	"golang.org/x/mod/semver"
-	"io"
-	"net/http"
 	"otel-checker/checks/sdk"
 	"otel-checker/checks/sdk/supported"
 	"otel-checker/checks/utils"
@@ -115,14 +113,9 @@ func findSupportedLibraries(library Library, supported supported.SupportedModule
 }
 
 func supportedLibraries() (supported.SupportedModules, error) {
-	resp, err := http.Get("https://raw.githubusercontent.com/open-telemetry/opentelemetry-java-instrumentation/refs/heads/main/docs/instrumentation-list.yaml")
+	bytes, err := sdk.LoadUrl("https://raw.githubusercontent.com/open-telemetry/opentelemetry-java-instrumentation/refs/heads/main/docs/instrumentation-list.yaml")
 	if err != nil {
-		return nil, fmt.Errorf("error fetching instrumentation list: %v", err)
-	}
-	defer resp.Body.Close()
-	bytes, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("error reading response body: %v", err)
+		return nil, err
 	}
 	return supported.LoadSupportedLibraries(bytes)
 }
