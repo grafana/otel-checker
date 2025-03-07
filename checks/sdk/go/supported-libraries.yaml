@@ -1,0 +1,104 @@
+go.mongodb.org/mongo-driver:
+  instrumentations:
+  - name: go.mongodb.org/mongo-driver
+    srcPath: instrumentation/go.mongodb.org/mongo-driver/mongo/otelmongo
+    link: go.opentelemetry.io/contrib/instrumentation/go.mongodb.org/mongo-driver/mongo/otelmongo
+    target_versions:
+      library:
+      - '[1.17.3,)'
+github.com/felixge/httpsnoop:
+  instrumentations:
+  - name: github.com/felixge/httpsnoop
+    srcPath: instrumentation/net/http/otelhttp
+    link: go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp
+    target_versions:
+      library:
+      - '[1.0.4,)'
+go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp:
+  instrumentations:
+  - name: go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp
+    srcPath: instrumentation/net/http/httptrace/otelhttptrace
+    link: go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace
+    target_versions:
+      library:
+      - '[0.60.0,)'
+go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace:
+  instrumentations:
+  - name: go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace
+    srcPath: instrumentation/net/http/httptrace/otelhttptrace/example
+    link: go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace/example
+    target_versions:
+      library:
+      - '[0.60.0,)'
+github.com/stretchr/testify:
+  instrumentations:
+  - name: github.com/stretchr/testify
+    srcPath: instrumentation/net/http/httptrace/otelhttptrace/test
+    link: go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace/test
+    target_versions:
+      library:
+      - '[1.10.0,)'
+github.com/gorilla/mux:
+  instrumentations:
+  - name: github.com/gorilla/mux
+    srcPath: instrumentation/github.com/gorilla/mux/otelmux/example
+    link: go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux/example
+    target_versions:
+      library:
+      - '[1.8.1,)'
+github.com/emicklei/go-restful/v3:
+  instrumentations:
+  - name: github.com/emicklei/go-restful/v3
+    srcPath: instrumentation/github.com/emicklei/go-restful/otelrestful
+    link: go.opentelemetry.io/contrib/instrumentation/github.com/emicklei/go-restful/otelrestful
+    target_versions:
+      library:
+      - '[3.12.2,)'
+github.com/labstack/echo/v4:
+  instrumentations:
+  - name: github.com/labstack/echo/v4
+    srcPath: instrumentation/github.com/labstack/echo/otelecho
+    link: go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho
+    target_versions:
+      library:
+      - '[4.13.3,)'
+github.com/aws/aws-sdk-go-v2:
+  instrumentations:
+  - name: github.com/aws/aws-sdk-go-v2
+    srcPath: instrumentation/github.com/aws/aws-sdk-go-v2/otelaws
+    link: go.opentelemetry.io/contrib/instrumentation/github.com/aws/aws-sdk-go-v2/otelaws
+    target_versions:
+      library:
+      - '[1.36.3,)'
+github.com/aws/aws-lambda-go:
+  instrumentations:
+  - name: github.com/aws/aws-lambda-go
+    srcPath: instrumentation/github.com/aws/aws-lambda-go/otellambda
+    link: go.opentelemetry.io/contrib/instrumentation/github.com/aws/aws-lambda-go/otellambda
+    target_versions:
+      library:
+      - '[1.47.0,)'
+github.com/gin-gonic/gin:
+  instrumentations:
+  - name: github.com/gin-gonic/gin
+    srcPath: instrumentation/github.com/gin-gonic/gin/otelgin
+    link: go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin
+    target_versions:
+      library:
+      - '[1.10.0,)'
+google.golang.org/grpc:
+  instrumentations:
+  - name: google.golang.org/grpc
+    srcPath: instrumentation/google.golang.org/grpc/otelgrpc
+    link: go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc
+    target_versions:
+      library:
+      - '[1.71.0,)'
+go.opentelemetry.io/contrib/instrumentation/host:
+  instrumentations:
+  - name: go.opentelemetry.io/contrib/instrumentation/host
+    srcPath: instrumentation/host/example
+    link: go.opentelemetry.io/contrib/instrumentation/host/example
+    target_versions:
+      library:
+      - '[0.60.0,)'
