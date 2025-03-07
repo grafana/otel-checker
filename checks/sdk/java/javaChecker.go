@@ -4,6 +4,8 @@ import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
 	"os/exec"
 	"otel-checker/checks/sdk"
 	"otel-checker/checks/sdk/supported"
@@ -163,7 +165,7 @@ func findSupportedLibraries(library Library, supported supported.SupportedModule
 					if semver.IsValid(v) {
 						// ignore invalid versions from applications
 						if versionRange.Matches(v) {
-							l := fmt.Sprintf("https://github.com/open-telemetry/opentelemetry-java-instrumentation/tree/main/%s", instrumentation.SrcPath)
+							l := fmt.Sprintf("https://github.com/open-telemetry/opentelemetry-java-instrumentation/tree/main/%s/%s", instrumentation.SrcPath, instrumentationType)
 							if !slices.Contains(links, l) {
 								links = append(links, l)
 							}
@@ -216,15 +218,17 @@ func checkGradle(file string, reporter *utils.ComponentReporter) []Library {
 	return deps
 }
 
-// https://github.com/open-telemetry/opentelemetry-java-instrumentation/pull/13449
-// see https://cloud-native.slack.com/archives/C014L2KCTE3/p1741003980069869
-// CNCF slack channel #otel-java
-//
-//go:embed instrumentation-list.yaml
-var file []byte
-
 func supportedLibraries() (supported.SupportedModules, error) {
-	return supported.LoadSupportedLibraries(file)
+	resp, err := http.Get("https://raw.githubusercontent.com/open-telemetry/opentelemetry-java-instrumentation/refs/heads/main/docs/instrumentation-list.yaml")
+	if err != nil {
+		return nil, fmt.Errorf("error fetching instrumentation list: %v", err)
+	}
+	defer resp.Body.Close()
+	bytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("error reading response body: %v", err)
+	}
+	return supported.LoadSupportedLibraries(bytes)
 }
 
 func parseGradleDeps(out string) []Library {

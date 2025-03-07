@@ -11,7 +11,7 @@ func TestFindSupportedLibrary(t *testing.T) {
 	modules, err := supportedLibraries()
 	require.NoError(t, err)
 	assert.Equal(t,
-		[]string{"https://github.com/open-telemetry/opentelemetry-java-instrumentation/tree/main/instrumentation/logback/logback-appender-1.0"},
+		[]string{"https://github.com/open-telemetry/opentelemetry-java-instrumentation/tree/main/instrumentation/logback/logback-appender-1.0/javaagent"},
 		findSupportedLibraries(Library{
 			Group:    "ch.qos.logback",
 			Artifact: "logback-classic",
