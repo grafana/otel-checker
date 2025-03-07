@@ -9,6 +9,7 @@ func CheckGoSetup(reporter *utils.ComponentReporter, commands utils.Commands) {
 	} else {
 		checkGoAutoInstrumentation(reporter)
 	}
+	CheckSupportedLibraries(reporter, commands)
 }
 
 func checkGoVersion(reporter *utils.ComponentReporter) {}
