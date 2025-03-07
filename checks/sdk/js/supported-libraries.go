@@ -5,12 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"otel-checker/checks/sdk"
 	"otel-checker/checks/sdk/supported"
 	"otel-checker/checks/utils"
 	"strings"
-
-	"golang.org/x/mod/semver"
 )
 
 //go:embed supported-libraries.yaml
@@ -111,25 +108,14 @@ func supportedLibraries() (supported.SupportedModules, error) {
 	return supported.LoadSupportedLibraries(file)
 }
 
-func findSupportedLibraries(library supported.Library, s supported.SupportedModules) []string {
-	var links []string
-	for _, module := range s {
-		for _, instrumentation := range module.Instrumentations {
-			for _, version := range instrumentation.TargetVersions[supported.TypeLibrary] {
-				versionRange, err := sdk.ParseVersionRange(version)
-				if err != nil {
-					panic(fmt.Sprintf("error parsing version range: %v", err))
-				}
-				if library.Name == instrumentation.Name {
-					v := sdk.FixVersion(library.Version)
-					if semver.IsValid(v) {
-						if versionRange.Matches(v) {
-							links = append(links, instrumentation.Link)
-						}
-					}
-				}
-			}
-		}
+// CheckSupportedLibraries checks if JS dependencies are supported by OpenTelemetry
+func CheckSupportedLibraries(reporter *utils.ComponentReporter, commands utils.Commands) {
+	supportedLibs, err := supportedLibraries()
+	if err != nil {
+		reporter.AddError(fmt.Sprintf("Error reading supported libraries: %v", err))
+		return
 	}
-	return links
+
+	deps := readDependencies(reporter)
+	supported.CheckLibraries(reporter, commands, supportedLibs, deps, supported.TypeLibrary)
 }

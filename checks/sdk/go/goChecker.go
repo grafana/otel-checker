@@ -1,15 +1,14 @@
 package _go
 
 import (
-	"otel-checker/checks/sdk/supported"
 	"otel-checker/checks/utils"
 )
 
 func CheckGoSetup(reporter *utils.ComponentReporter, commands utils.Commands) {
 	checkGoVersion(reporter)
 	if commands.ManualInstrumentation {
-		checkSupportedLibraries(reporter, commands, supported.TypeLibrary)
 		checkGoCodeBasedInstrumentation(reporter)
+		CheckSupportedLibraries(reporter, commands)
 	} else {
 		checkGoAutoInstrumentation(reporter)
 	}

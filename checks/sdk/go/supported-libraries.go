@@ -4,12 +4,9 @@ import (
 	_ "embed"
 	"fmt"
 	"os"
-	"otel-checker/checks/sdk"
 	"otel-checker/checks/sdk/supported"
 	"otel-checker/checks/utils"
 	"strings"
-
-	"golang.org/x/mod/semver"
 )
 
 //go:embed supported-libraries.yaml
@@ -67,49 +64,14 @@ func supportedLibraries() (supported.SupportedModules, error) {
 	return supported.LoadSupportedLibraries(file)
 }
 
-func findSupportedLibraries(library supported.Library, s supported.SupportedModules, t supported.InstrumentationType) []string {
-	var links []string
-	for _, module := range s {
-		for _, instrumentation := range module.Instrumentations {
-			for _, version := range instrumentation.TargetVersions[t] {
-				versionRange, err := sdk.ParseVersionRange(version)
-				if err != nil {
-					panic(fmt.Sprintf("error parsing version range: %v", err))
-				}
-				if library.Name == instrumentation.Name {
-					v := sdk.FixVersion(library.Version)
-					if semver.IsValid(v) {
-						if versionRange.Matches(v) {
-							links = append(links, instrumentation.Link)
-						}
-					}
-				}
-			}
-		}
-	}
-	return links
-}
-
-func checkSupportedLibraries(reporter *utils.ComponentReporter, commands utils.Commands, t supported.InstrumentationType) {
-	supported, err := supportedLibraries()
+// CheckSupportedLibraries checks if Go dependencies are supported by OpenTelemetry
+func CheckSupportedLibraries(reporter *utils.ComponentReporter, commands utils.Commands) {
+	supportedLibs, err := supportedLibraries()
 	if err != nil {
 		reporter.AddError(fmt.Sprintf("Error reading supported libraries: %v", err))
 		return
 	}
 
 	deps := readGoModFile(reporter)
-	if len(deps) == 0 {
-		return
-	}
-
-	for _, dep := range deps {
-		links := findSupportedLibraries(dep, supported, t)
-		if len(links) > 0 {
-			reporter.AddSuccessfulCheck(
-				fmt.Sprintf("Found supported library: %s:%s at %s",
-					dep.Name, dep.Version, strings.Join(links, ", ")))
-		} else if commands.Debug {
-			reporter.AddWarning(fmt.Sprintf("Found unsupported library: %s:%s", dep.Name, dep.Version))
-		}
-	}
+	supported.CheckLibraries(reporter, commands, supportedLibs, deps, supported.TypeLibrary)
 }
