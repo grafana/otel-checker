@@ -18,6 +18,7 @@ func CheckSetup(reporter *utils.ComponentReporter, commands utils.Commands) {
 	} else {
 		checkAutoInstrumentation(reporter, commands.Debug)
 	}
+
 }
 
 func checkPythonVersion(reporter *utils.ComponentReporter) {}

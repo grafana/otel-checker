@@ -134,7 +134,3 @@ func checkJSCodeBasedInstrumentation(
 		}
 	}
 }
-
-func checkSupportedLibraries(reporter *utils.ComponentReporter, commands utils.Commands) {
-	CheckSupportedLibraries(reporter, commands)
-}
