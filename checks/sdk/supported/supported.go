@@ -14,8 +14,8 @@ type Library struct {
 type InstrumentationType string
 
 const (
-	TypeJavaagent InstrumentationType = "JAVAAGENT"
-	TypeLibrary   InstrumentationType = "LIBRARY"
+	TypeJavaagent InstrumentationType = "javaagent"
+	TypeLibrary   InstrumentationType = "library"
 )
 
 // Instrumentation represents a single instrumentation with its metadata

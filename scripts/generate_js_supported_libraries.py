@@ -131,7 +131,7 @@ def main():
                     'srcPath': result['src_path'],
                     'link': result['link'],
                     'target_versions': {
-                        'LIBRARY': [convert_version_range(result['version_range'])]
+                        'library': [convert_version_range(result['version_range'])]
                     }
                 }]
             }
