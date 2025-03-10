@@ -29,12 +29,16 @@ Usage of otel-checker:
     	Path to collector's config.yaml file. Required if using Collector and the config file is not in the same location as the otel-checker is being executed from. E.g. "-collector-config-path=src/inst/"
   -components string
     	Instrumentation components to test, separated by ',' (required). Possible values: sdk, collector, beyla, alloy
+  -debug
+        Output debug information
   -instrumentation-file string
     	Name (including path) to instrumentation file. Required if using manual-instrumentation. E.g."-instrumentation-file=src/inst/instrumentation.js"
   -language string
-    	Language used for instrumentation (required). Possible values: dotnet, go, java, js, python
+    	Language used for instrumentation (required). Possible values: dotnet, go, java, js, python, ruby, php
   -package-json-path string
     	Path to package.json file. Required if instrumentation is in JavaScript and the file is not in the same location as the otel-checker is being executed from. E.g. "-package-json-path=src/inst/"
+  -web-server
+        Set if you would like the results served in a web server in addition to console output
 ```
 
 ### Checks
@@ -54,6 +58,7 @@ Usage of otel-checker:
 - Resource detectors
 - Dependencies compatible with Grafana Cloud
 - Usage of Console Exporter
+- Prints which libraries are supported based on the `package.json` in the current directory.
 
 #### Python
 
@@ -77,7 +82,9 @@ Usage of otel-checker:
   - A maven or gradle wrapper will be used if found in the current directory or a parent directory.
 
 #### Go
-TBD
+
+- Prints which libraries are supported for manual instrumentation 
+  based on the `go.mod` in the current directory.
 
 #### Ruby
 
