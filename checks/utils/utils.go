@@ -60,7 +60,7 @@ func GetArguments() Commands {
 		os.Exit(1)
 	}
 
-	possibleComponents := []string{"sdk", "beyla", "alloy", "collector"}
+	possibleComponents := []string{"sdk", "beyla", "alloy", "collector", "grafana-cloud"}
 	components := strings.Split(*componentsString, ",")
 	for _, c := range components {
 		if !slices.Contains(possibleComponents, strings.Trim(c, " ")) {
