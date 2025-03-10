@@ -143,9 +143,10 @@ func versionRanges(list string) (map[string]sdk.VersionRange, error) {
 	name := ""
 	var err error
 	for _, s := range strings.Split(list, ",") {
-		if s == "<0.15" {
-			s = "< 0.15"
-		}
+		s = strings.ReplaceAll(s, "<", "< ")
+		s = strings.ReplaceAll(s, "<=", "<= ")
+		s = strings.ReplaceAll(s, ">", "> ")
+		s = strings.ReplaceAll(s, ">=", ">= ")
 
 		statement := strings.Split(strings.TrimSpace(s), " ")
 		if len(statement) == 3 {
