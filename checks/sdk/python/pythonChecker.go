@@ -141,37 +141,90 @@ func supportedLibraries() ([]SupportedLibrary, error) {
 func versionRanges(list string) (map[string]sdk.VersionRange, error) {
 	res := map[string]sdk.VersionRange{}
 	name := ""
-	var err error
-	for _, s := range strings.Split(list, ",") {
-		s = strings.ReplaceAll(s, "<", "< ")
-		s = strings.ReplaceAll(s, "<=", "<= ")
-		s = strings.ReplaceAll(s, ">", "> ")
-		s = strings.ReplaceAll(s, ">=", ">= ")
 
-		statement := strings.Split(strings.TrimSpace(s), " ")
+	for _, s := range strings.Split(list, ",") {
+		s = strings.TrimSpace(s)
+
+		// Split by space first to handle standard format
+		statement := strings.Split(s, " ")
+
 		if len(statement) == 3 {
+			// Format: "name operator version"
 			name = statement[0]
-			err = addVersionRange(res, name, statement[1], statement[2])
+			err := addVersionRange(res, name, statement[1], statement[2])
 			if err != nil {
-				goto er
+				return nil, fmt.Errorf("error parsing version %s: %v", list, err)
 			}
 		} else if len(statement) == 2 {
-			err = addVersionRange(res, name, statement[0], statement[1])
-			if err != nil {
-				goto er
+			// Format: "operator version" or "name operator<version>"
+			if len(name) == 0 {
+				// This must be the first part with the name
+				name = statement[0]
+
+				// Check if the second part contains a combined operator and version
+				part := statement[1]
+				handled := false
+				for _, op := range []string{"<=", ">=", "~=", "<", ">"} {
+					if strings.HasPrefix(part, op) {
+						version := part[len(op):]
+						if len(version) > 0 {
+							err := addVersionRange(res, name, op, version)
+							if err != nil {
+								return nil, fmt.Errorf("error parsing version %s: %v", list, err)
+							}
+							handled = true
+							break
+						}
+					}
+				}
+
+				if !handled {
+					// Standard format
+					err := addVersionRange(res, name, statement[0], statement[1])
+					if err != nil {
+						return nil, fmt.Errorf("error parsing version %s: %v", list, err)
+					}
+				}
+			} else {
+				// This is a continuation with just operator and version
+				err := addVersionRange(res, name, statement[0], statement[1])
+				if err != nil {
+					return nil, fmt.Errorf("error parsing version %s: %v", list, err)
+				}
 			}
 		} else if len(statement) == 1 {
-			// no version range => all versions
-			res[name] = sdk.VersionRange{}
+			// Could be a single term (just the library name) or a combined constraint without spaces
+			if len(name) == 0 {
+				// This is just the library name
+				name = statement[0]
+				res[name] = sdk.VersionRange{} // no version constraint
+			} else {
+				// Check for constraints without spaces
+				part := statement[0]
+				handled := false
+				for _, op := range []string{"<=", ">=", "~=", "<", ">"} {
+					if strings.HasPrefix(part, op) {
+						version := part[len(op):]
+						if len(version) > 0 {
+							err := addVersionRange(res, name, op, version)
+							if err != nil {
+								return nil, fmt.Errorf("error parsing version %s: %v", list, err)
+							}
+							handled = true
+							break
+						}
+					}
+				}
+
+				if !handled {
+					return nil, fmt.Errorf("error parsing version %s: invalid constraint format: %s", list, part)
+				}
+			}
 		} else {
-			err = fmt.Errorf("invalid version range statement: %s", s)
-			goto er
+			return nil, fmt.Errorf("error parsing version %s: invalid version range statement: %s", list, s)
 		}
 	}
 	return res, nil
-
-er:
-	return nil, fmt.Errorf("error parsing version %s: %v", list, err)
 }
 
 func addVersionRange(res map[string]sdk.VersionRange, name string, op string, version string) error {
