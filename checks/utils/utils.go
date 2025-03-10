@@ -39,7 +39,6 @@ func GetArguments() Commands {
 	manualInstrumentation := flag.Bool("manual-instrumentation", false, "Provide if your application is using manual instrumentation")
 	debug := flag.Bool("debug", false, "Output debug information")
 	webServer := flag.Bool("web-server", false, "Set if you would like the results served in a web server in addition to console output")
-	enableGrafanaCloudCheck := flag.Bool("enable-grafana-cloud", false, "Enable checking Grafana Cloud credentials")
 
 	// javascript
 	instrumentationFile := flag.String("instrumentation-file", "", `Name (including path) to instrumentation file. Required if using manual-instrumentation. E.g."-instrumentation-file=src/inst/instrumentation.js"`)
@@ -91,7 +90,6 @@ func GetArguments() Commands {
 	command.PackageJsonPath = *packageJsonPath
 	command.CollectorConfigPath = *collectorConfigPath
 	command.Debug = *debug
-	command.EnableGrafanaCloudCheck = *enableGrafanaCloudCheck
 	return command
 }
 
