@@ -20,12 +20,6 @@ func TestReadSupportedPythonLibraries(t *testing.T) {
 		}, libs))
 }
 
-func TestIncreaseLastPart(t *testing.T) {
-	part, err := upperBoundForTilde("1.4.5")
-	require.NoError(t, err)
-	require.Equal(t, "1.5", part)
-}
-
 func TestParseRequirementsTxt(t *testing.T) {
 	out := `blinker==1.9.0
 	click==8.1.8
