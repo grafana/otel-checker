@@ -55,11 +55,7 @@ var (
 
 func CheckGrafanaSetup(reporter utils.Reporter, grafanaReporter *utils.ComponentReporter, commands utils.Commands) {
 	checkEnvVarsGrafana(reporter, grafanaReporter, commands.Language, commands.Components)
-
-	// Only check authentication if explicitly enabled via flag
-	if commands.EnableGrafanaCloudCheck {
-		checkAuth(grafanaReporter)
-	}
+	checkAuth(grafanaReporter)
 }
 
 func checkEnvVarsGrafana(reporter utils.Reporter, grafana *utils.ComponentReporter, language string, components []string) {

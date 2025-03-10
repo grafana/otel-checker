@@ -15,15 +15,14 @@ const WARNINGS = "warnings"
 const CHECKS = "checks"
 
 type Commands struct {
-	Language                string
-	Components              []string
-	ManualInstrumentation   bool
-	WebServer               bool
-	InstrumentationFile     string
-	PackageJsonPath         string
-	CollectorConfigPath     string
-	Debug                   bool
-	EnableGrafanaCloudCheck bool
+	Language              string
+	Components            []string
+	ManualInstrumentation bool
+	WebServer             bool
+	InstrumentationFile   string
+	PackageJsonPath       string
+	CollectorConfigPath   string
+	Debug                 bool
 }
 
 func GetArguments() Commands {
