@@ -14,6 +14,52 @@ Thank you for your interest in contributing to otel-checker! This document provi
    ```
    go mod download
    ```
+                   
+
+## Running locally
+
+1. Find your Go path:
+```
+❯ go env GOPATH
+/Users/maryliag/go
+```
+2. Clone this repo in the go path folder, so you will have:
+```
+/Users/maryliag/go/src/otel-checker
+```
+3. Run
+```
+go run main.go
+```
+
+## Create binary and run from different directory
+
+1. Build binary
+```
+go build
+```
+2. Install
+```
+go install
+```
+3. You can confirm it was installed with:
+```
+❯ ls $GOPATH/bin
+otel-checker
+```
+4. Use from any other directory
+```
+otel-checker \
+	-language=js \
+	-components=sdk
+```
+
+Or start directly from the source code:
+```
+go run otel-checker \
+	-language=js \
+	-components=sdk
+```
 
 ## Using the Makefile
 

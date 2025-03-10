@@ -4,6 +4,7 @@ import (
 	"otel-checker/checks/alloy"
 	"otel-checker/checks/beyla"
 	"otel-checker/checks/collector"
+	"otel-checker/checks/env"
 	"otel-checker/checks/grafana"
 	"otel-checker/checks/sdk"
 	"otel-checker/checks/sdk/dotnet"
@@ -17,7 +18,8 @@ import (
 func RunAllChecks(commands utils.Commands) map[string][]string {
 	reporter := utils.Reporter{}
 
-	grafana.CheckGrafanaSetup(reporter, reporter.Component("Grafana Cloud"), commands.Language, commands.Components)
+	env.CheckCommonEnvVars(reporter.Component("Common Environment Variables"), commands.Language)
+	grafana.CheckGrafanaSetup(reporter, reporter.Component("Grafana Cloud"), commands)
 
 	for _, c := range commands.Components {
 		if c == "alloy" {

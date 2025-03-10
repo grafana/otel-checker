@@ -37,17 +37,15 @@ var (
 	}
 )
 
-func CheckBeylaSetup(reporter *utils.ComponentReporter, language string) {}
+func CheckBeylaSetup(reporter *utils.ComponentReporter, language string) {
+	CheckEnvVars(reporter, language)
+}
 
-func CheckEnvVars(reporter utils.Reporter, language string) {
-	b := reporter.Component("Beyla")
-	beylaVars := []env.EnvVar{
+func CheckEnvVars(reporter *utils.ComponentReporter, language string) {
+	env.CheckEnvVars(reporter, language,
 		ServiceName,
 		OpenPort,
 		GrafanaCloudSubmit,
 		GrafanaCloudInstanceID,
-		GrafanaCloudAPIKey,
-	}
-
-	env.CheckEnvVars(b, language, beylaVars...)
+		GrafanaCloudAPIKey)
 }
