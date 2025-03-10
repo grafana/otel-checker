@@ -5,7 +5,7 @@ go.mongodb.org/mongo-driver:
     link: go.opentelemetry.io/contrib/instrumentation/go.mongodb.org/mongo-driver/mongo/otelmongo
     target_versions:
       library:
-      - '[1.17.3,)'
+      - '[1.17.3,2.0.0)'
 github.com/felixge/httpsnoop:
   instrumentations:
   - name: github.com/felixge/httpsnoop
@@ -13,7 +13,7 @@ github.com/felixge/httpsnoop:
     link: go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp
     target_versions:
       library:
-      - '[1.0.4,)'
+      - '[1.0.4,2.0.0)'
 go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp:
   instrumentations:
   - name: go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp
@@ -21,7 +21,7 @@ go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp:
     link: go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace
     target_versions:
       library:
-      - '[0.60.0,)'
+      - '[0.60.0,1.0.0)'
 go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace:
   instrumentations:
   - name: go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace
@@ -29,7 +29,7 @@ go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace:
     link: go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace/example
     target_versions:
       library:
-      - '[0.60.0,)'
+      - '[0.60.0,1.0.0)'
 github.com/stretchr/testify:
   instrumentations:
   - name: github.com/stretchr/testify
@@ -37,7 +37,7 @@ github.com/stretchr/testify:
     link: go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace/test
     target_versions:
       library:
-      - '[1.10.0,)'
+      - '[1.10.0,2.0.0)'
 github.com/gorilla/mux:
   instrumentations:
   - name: github.com/gorilla/mux
@@ -45,7 +45,7 @@ github.com/gorilla/mux:
     link: go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux/example
     target_versions:
       library:
-      - '[1.8.1,)'
+      - '[1.8.1,2.0.0)'
 github.com/emicklei/go-restful/v3:
   instrumentations:
   - name: github.com/emicklei/go-restful/v3
@@ -53,7 +53,7 @@ github.com/emicklei/go-restful/v3:
     link: go.opentelemetry.io/contrib/instrumentation/github.com/emicklei/go-restful/otelrestful
     target_versions:
       library:
-      - '[3.12.2,)'
+      - '[3.12.2,4.0.0)'
 github.com/labstack/echo/v4:
   instrumentations:
   - name: github.com/labstack/echo/v4
@@ -61,7 +61,7 @@ github.com/labstack/echo/v4:
     link: go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho
     target_versions:
       library:
-      - '[4.13.3,)'
+      - '[4.13.3,5.0.0)'
 github.com/aws/aws-sdk-go-v2:
   instrumentations:
   - name: github.com/aws/aws-sdk-go-v2
@@ -69,7 +69,7 @@ github.com/aws/aws-sdk-go-v2:
     link: go.opentelemetry.io/contrib/instrumentation/github.com/aws/aws-sdk-go-v2/otelaws
     target_versions:
       library:
-      - '[1.36.3,)'
+      - '[1.36.3,2.0.0)'
 github.com/aws/aws-lambda-go:
   instrumentations:
   - name: github.com/aws/aws-lambda-go
@@ -77,7 +77,7 @@ github.com/aws/aws-lambda-go:
     link: go.opentelemetry.io/contrib/instrumentation/github.com/aws/aws-lambda-go/otellambda
     target_versions:
       library:
-      - '[1.47.0,)'
+      - '[1.47.0,2.0.0)'
 github.com/gin-gonic/gin:
   instrumentations:
   - name: github.com/gin-gonic/gin
@@ -85,7 +85,7 @@ github.com/gin-gonic/gin:
     link: go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin
     target_versions:
       library:
-      - '[1.10.0,)'
+      - '[1.10.0,2.0.0)'
 google.golang.org/grpc:
   instrumentations:
   - name: google.golang.org/grpc
@@ -93,7 +93,7 @@ google.golang.org/grpc:
     link: go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc
     target_versions:
       library:
-      - '[1.71.0,)'
+      - '[1.71.0,2.0.0)'
 go.opentelemetry.io/contrib/instrumentation/host:
   instrumentations:
   - name: go.opentelemetry.io/contrib/instrumentation/host
@@ -101,4 +101,4 @@ go.opentelemetry.io/contrib/instrumentation/host:
     link: go.opentelemetry.io/contrib/instrumentation/host/example
     target_versions:
       library:
-      - '[0.60.0,)'
+      - '[0.60.0,1.0.0)'

@@ -33,6 +33,23 @@ def parse_go_mod_file(file_path: Path) -> Dict[str, Any]:
         "dependencies": dependencies
     }
 
+def calculate_version_range(version: str) -> str:
+    """
+    Calculate version range for Go dependencies where upper bound is next major version.
+    Example: for v1.2.3, returns [1.2.3,2.0.0)
+    """
+    # Strip 'v' prefix if present
+    clean_version = version.lstrip('v')
+    
+    # Parse major version
+    major_version = int(clean_version.split('.')[0])
+    
+    # Calculate next major version
+    next_major = major_version + 1
+    
+    # Create version range with upper bound as next major version
+    return f"[{clean_version},{next_major}.0.0)"
+
 def find_matching_dependency(file_path: Path, go_mod_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """
     Find the dependency that matches the directory structure of the go.mod file.
@@ -122,9 +139,13 @@ def main():
                 module_name = matching_dep["module"]
                 version = matching_dep["version"]
                 
+                # Calculate version range with proper upper bound
+                version_range = calculate_version_range(version)
+                
                 print(f"Found match for {rel_path}:")
                 print(f"  Library: {library_name}")
                 print(f"  Version: {version}")
+                print(f"  Version Range: {version_range}")
                 print(f"  Module: {module_name}")
                 
                 if library_name not in supported_libraries:
@@ -134,7 +155,7 @@ def main():
                             "srcPath": str(rel_path.parent),
                             "link": module_name,
                             "target_versions": {
-                                "library": [f"[{version.lstrip('v')},)"]
+                                "library": [version_range]
                             }
                         }]
                     }
