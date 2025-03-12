@@ -27,8 +27,9 @@ var (
 
 // ResourceAttribute represents a recommended OpenTelemetry resource attribute
 type ResourceAttribute struct {
-	Name        string
-	Description string
+	Name         string
+	Description  string
+	ExampleValue string
 }
 
 // ParseResourceAttributes parses the OTEL_RESOURCE_ATTRIBUTES environment variable
@@ -61,29 +62,25 @@ func CheckResourceAttributes(reporter *utils.ComponentReporter) {
 	// See: https://grafana.com/docs/grafana-cloud/monitor-applications/application-observability/instrument/resource-attributes/
 	recommendedAttributes := []ResourceAttribute{
 		{
-			Name:        "service.namespace",
-			Description: "An optional namespace for service.name",
+			Name:         "service.namespace",
+			Description:  "An optional namespace for service.name",
+			ExampleValue: "shop",
 		},
 		{
-			Name:        "deployment.environment.name",
-			Description: "Name of the deployment environment (staging or production)",
+			Name:         "deployment.environment.name",
+			Description:  "Name of the deployment environment (staging or production)",
+			ExampleValue: "production",
 		},
 		{
-			Name:        "service.instance.id",
-			Description: "The unique instance, e.g. the pod name",
+			Name:         "service.instance.id",
+			Description:  "The unique instance, e.g. the pod name",
+			ExampleValue: "checkout-123",
 		},
 		{
-			Name:        "service.version",
-			Description: "The application version, to see if a new version has introduced a bug",
+			Name:         "service.version",
+			Description:  "The application version, to see if a new version has introduced a bug",
+			ExampleValue: "1.2",
 		},
-	}
-
-	// Example values for resource attributes
-	exampleValues := map[string]string{
-		"service.namespace":           "shop",
-		"deployment.environment.name": "production",
-		"service.instance.id":         "checkout-123",
-		"service.version":             "1.2",
 	}
 
 	attributes := ParseResourceAttributes()
@@ -96,7 +93,7 @@ func CheckResourceAttributes(reporter *utils.ComponentReporter) {
 				fmt.Sprintf("Resource attribute %s is set to '%s'", attr.Name, value))
 		} else {
 			reporter.AddWarning(
-				fmt.Sprintf("Set OTEL_RESOURCE_ATTRIBUTES=\"%s=%s\": %s", attr.Name, exampleValues[attr.Name], attr.Description))
+				fmt.Sprintf("Set OTEL_RESOURCE_ATTRIBUTES=\"%s=%s\": %s", attr.Name, attr.ExampleValue, attr.Description))
 		}
 	}
 
