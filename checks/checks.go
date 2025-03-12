@@ -18,7 +18,7 @@ import (
 func RunAllChecks(commands utils.Commands) map[string][]string {
 	reporter := utils.Reporter{}
 
-	env.CheckCommonEnvVars(reporter.Component("Common Environment Variables"), commands.Language)
+	env.CheckCommon(reporter.Component("Common Environment Variables"), commands.Language)
 
 	for _, c := range commands.Components {
 		switch c {
