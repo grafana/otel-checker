@@ -51,6 +51,18 @@ These checks are automatically performed for all languages and components.
   - Service name
   - Exporter protocol 
 
+- Resource attributes checks:
+  - Validates the presence of recommended OpenTelemetry resource attributes
+  - Checks for the following attributes:
+    - `service.name` (via `OTEL_SERVICE_NAME` or in `OTEL_RESOURCE_ATTRIBUTES`)
+    - `service.namespace` (e.g., "shop")
+    - `deployment.environment.name` (e.g., "production")
+    - `service.instance.id` (e.g., "checkout-123")
+    - `service.version` (e.g., "1.2")
+  - For missing attributes, provides specific recommendations with example values
+  - Follows the [OpenTelemetry specification](https://opentelemetry.io/docs/concepts/sdk-configuration/general-sdk-configuration/) for precedence (e.g., `OTEL_SERVICE_NAME` takes precedence over `service.name` in `OTEL_RESOURCE_ATTRIBUTES`)
+  - Example warning: `Set OTEL_RESOURCE_ATTRIBUTES="service.namespace=shop": An optional namespace for service.name`
+
 ### Grafana Cloud
 
 Use the `-components=grafana-cloud` flag to check the following:
