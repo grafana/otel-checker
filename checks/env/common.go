@@ -78,6 +78,14 @@ func CheckResourceAttributes(reporter *utils.ComponentReporter) {
 		},
 	}
 
+	// Example values for resource attributes
+	exampleValues := map[string]string{
+		"service.namespace":           "shop",
+		"deployment.environment.name": "production",
+		"service.instance.id":         "checkout-123",
+		"service.version":             "1.2",
+	}
+
 	attributes := ParseResourceAttributes()
 
 	for _, attr := range recommendedAttributes {
@@ -88,7 +96,7 @@ func CheckResourceAttributes(reporter *utils.ComponentReporter) {
 				fmt.Sprintf("Resource attribute %s is set to '%s'", attr.Name, value))
 		} else {
 			reporter.AddWarning(
-				fmt.Sprintf("Recommended resource attribute %s is not set. %s", attr.Name, attr.Description))
+				fmt.Sprintf("Set OTEL_RESOURCE_ATTRIBUTES=\"%s=%s\": %s", attr.Name, exampleValues[attr.Name], attr.Description))
 		}
 	}
 
@@ -102,7 +110,7 @@ func CheckResourceAttributes(reporter *utils.ComponentReporter) {
 	} else if serviceNameExists && serviceNameValue != "" {
 		reporter.AddSuccessfulCheck(fmt.Sprintf("Service name is set via OTEL_RESOURCE_ATTRIBUTES to '%s'", serviceNameValue))
 	} else {
-		reporter.AddWarning("Service name is not set. Set either OTEL_SERVICE_NAME environment variable or service.name resource attribute.")
+		reporter.AddWarning("Set OTEL_SERVICE_NAME=\"checkout\": The application name")
 	}
 }
 
