@@ -1,18 +1,18 @@
 package checks
 
 import (
-	"otel-checker/checks/alloy"
-	"otel-checker/checks/beyla"
-	"otel-checker/checks/collector"
-	"otel-checker/checks/env"
-	"otel-checker/checks/grafana"
-	"otel-checker/checks/sdk"
-	"otel-checker/checks/sdk/dotnet"
-	_go "otel-checker/checks/sdk/go"
-	"otel-checker/checks/sdk/java"
-	"otel-checker/checks/sdk/js"
-	"otel-checker/checks/sdk/python"
-	"otel-checker/checks/utils"
+	"github.com/grafana/otel-checker/checks/alloy"
+	"github.com/grafana/otel-checker/checks/beyla"
+	"github.com/grafana/otel-checker/checks/collector"
+	"github.com/grafana/otel-checker/checks/env"
+	"github.com/grafana/otel-checker/checks/grafana"
+	"github.com/grafana/otel-checker/checks/sdk"
+	"github.com/grafana/otel-checker/checks/sdk/dotnet"
+	_go "github.com/grafana/otel-checker/checks/sdk/go"
+	"github.com/grafana/otel-checker/checks/sdk/java"
+	"github.com/grafana/otel-checker/checks/sdk/js"
+	"github.com/grafana/otel-checker/checks/sdk/python"
+	"github.com/grafana/otel-checker/checks/utils"
 )
 
 func RunAllChecks(commands utils.Commands) map[string][]string {

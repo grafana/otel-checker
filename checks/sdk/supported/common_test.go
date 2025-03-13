@@ -1,7 +1,7 @@
 package supported
 
 import (
-	"otel-checker/checks/utils"
+	"github.com/grafana/otel-checker/checks/utils"
 	"testing"
 )
 

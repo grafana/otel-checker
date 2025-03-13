@@ -2,9 +2,9 @@ package grafana
 
 import (
 	"fmt"
+	"github.com/grafana/otel-checker/checks/env"
+	"github.com/grafana/otel-checker/checks/utils"
 	"net/http"
-	"otel-checker/checks/env"
-	"otel-checker/checks/utils"
 	"regexp"
 	"strings"
 )

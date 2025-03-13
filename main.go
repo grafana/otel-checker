@@ -6,8 +6,8 @@ import (
 	"log"
 	"net/http"
 
-	"otel-checker/checks"
-	"otel-checker/checks/utils"
+	"github.com/grafana/otel-checker/checks"
+	"github.com/grafana/otel-checker/checks/utils"
 )
 
 //go:embed static/*

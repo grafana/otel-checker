@@ -1,8 +1,8 @@
 package python
 
 import (
-	"otel-checker/checks/sdk"
-	"otel-checker/checks/utils"
+	"github.com/grafana/otel-checker/checks/sdk"
+	"github.com/grafana/otel-checker/checks/utils"
 	"testing"
 
 	"github.com/stretchr/testify/assert"

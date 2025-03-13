@@ -2,8 +2,8 @@ package supported
 
 import (
 	"fmt"
-	"otel-checker/checks/sdk"
-	"otel-checker/checks/utils"
+	"github.com/grafana/otel-checker/checks/sdk"
+	"github.com/grafana/otel-checker/checks/utils"
 	"strings"
 
 	"golang.org/x/mod/semver"

@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"otel-checker/checks/utils"
+	"github.com/grafana/otel-checker/checks/utils"
 )
 
 func TestParseResourceAttributes(t *testing.T) {

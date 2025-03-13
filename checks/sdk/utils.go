@@ -2,10 +2,10 @@ package sdk
 
 import (
 	"fmt"
+	"github.com/grafana/otel-checker/checks/utils"
 	"io"
 	"net/http"
 	"os/exec"
-	"otel-checker/checks/utils"
 	"strings"
 
 	"golang.org/x/mod/semver"

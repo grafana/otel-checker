@@ -3,10 +3,10 @@ package java
 import (
 	_ "embed"
 	"fmt"
+	"github.com/grafana/otel-checker/checks/sdk"
+	"github.com/grafana/otel-checker/checks/sdk/supported"
+	"github.com/grafana/otel-checker/checks/utils"
 	"os/exec"
-	"otel-checker/checks/sdk"
-	"otel-checker/checks/sdk/supported"
-	"otel-checker/checks/utils"
 	"strconv"
 	"strings"
 )

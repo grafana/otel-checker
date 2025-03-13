@@ -2,10 +2,10 @@ package java
 
 import (
 	"fmt"
+	"github.com/grafana/otel-checker/checks/sdk"
+	"github.com/grafana/otel-checker/checks/sdk/supported"
+	"github.com/grafana/otel-checker/checks/utils"
 	"golang.org/x/mod/semver"
-	"otel-checker/checks/sdk"
-	"otel-checker/checks/sdk/supported"
-	"otel-checker/checks/utils"
 	"path/filepath"
 	"slices"
 	"strings"

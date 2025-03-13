@@ -1,8 +1,8 @@
 package beyla
 
 import (
-	"otel-checker/checks/env"
-	"otel-checker/checks/utils"
+	"github.com/grafana/otel-checker/checks/env"
+	"github.com/grafana/otel-checker/checks/utils"
 )
 
 var (

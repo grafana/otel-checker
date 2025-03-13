@@ -1,9 +1,9 @@
 package java
 
 import (
+	"github.com/grafana/otel-checker/checks/sdk/supported"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"otel-checker/checks/sdk/supported"
 	"testing"
 )
 

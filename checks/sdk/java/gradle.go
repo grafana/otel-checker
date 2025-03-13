@@ -2,9 +2,9 @@ package java
 
 import (
 	"fmt"
+	"github.com/grafana/otel-checker/checks/sdk"
+	"github.com/grafana/otel-checker/checks/utils"
 	"os/exec"
-	"otel-checker/checks/sdk"
-	"otel-checker/checks/utils"
 	"slices"
 	"strings"
 )

@@ -2,8 +2,8 @@ package collector
 
 import (
 	"fmt"
+	"github.com/grafana/otel-checker/checks/utils"
 	"os"
-	"otel-checker/checks/utils"
 	"regexp"
 	"slices"
 	"strings"

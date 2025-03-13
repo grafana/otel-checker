@@ -3,9 +3,9 @@ package python
 import (
 	_ "embed"
 	"fmt"
+	"github.com/grafana/otel-checker/checks/sdk"
+	"github.com/grafana/otel-checker/checks/utils"
 	"os"
-	"otel-checker/checks/sdk"
-	"otel-checker/checks/utils"
 	"regexp"
 	"strconv"
 	"strings"

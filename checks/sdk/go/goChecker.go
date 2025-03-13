@@ -1,7 +1,7 @@
 package _go
 
 import (
-	"otel-checker/checks/utils"
+	"github.com/grafana/otel-checker/checks/utils"
 )
 
 func CheckGoSetup(reporter *utils.ComponentReporter, commands utils.Commands) {

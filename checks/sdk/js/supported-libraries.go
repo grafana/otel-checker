@@ -4,9 +4,9 @@ import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
+	"github.com/grafana/otel-checker/checks/sdk/supported"
+	"github.com/grafana/otel-checker/checks/utils"
 	"os"
-	"otel-checker/checks/sdk/supported"
-	"otel-checker/checks/utils"
 	"strings"
 )
 

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"otel-checker/checks/utils"
+	"github.com/grafana/otel-checker/checks/utils"
 )
 
 // EnvVar represents an environment variable configuration

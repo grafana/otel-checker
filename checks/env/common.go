@@ -2,7 +2,7 @@ package env
 
 import (
 	"fmt"
-	"otel-checker/checks/utils"
+	"github.com/grafana/otel-checker/checks/utils"
 	"strings"
 )
 

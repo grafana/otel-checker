@@ -2,10 +2,10 @@ package js
 
 import (
 	"fmt"
+	"github.com/grafana/otel-checker/checks/env"
+	"github.com/grafana/otel-checker/checks/utils"
 	"os"
 	"os/exec"
-	"otel-checker/checks/env"
-	"otel-checker/checks/utils"
 	"strconv"
 	"strings"
 )

@@ -3,7 +3,7 @@ package js
 import (
 	"testing"
 
-	"otel-checker/checks/utils"
+	"github.com/grafana/otel-checker/checks/utils"
 )
 
 func TestCheckEnvVars(t *testing.T) {

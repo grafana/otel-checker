@@ -1,9 +1,9 @@
 package sdk
 
 import (
+	"github.com/grafana/otel-checker/checks/utils"
 	"os"
 	"os/exec"
-	"otel-checker/checks/utils"
 	"strings"
 
 	"golang.org/x/mod/semver"

@@ -1,7 +1,7 @@
 package _go
 
 import (
-	"otel-checker/checks/sdk/supported"
+	"github.com/grafana/otel-checker/checks/sdk/supported"
 	"testing"
 )
 

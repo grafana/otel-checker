@@ -1,8 +1,8 @@
 package collector
 
 import (
+	"github.com/grafana/otel-checker/checks/utils"
 	"os"
-	"otel-checker/checks/utils"
 	"path/filepath"
 	"testing"
 

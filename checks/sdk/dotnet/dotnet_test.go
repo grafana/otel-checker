@@ -3,7 +3,7 @@ package dotnet
 import (
 	"testing"
 
-	"otel-checker/checks/utils"
+	"github.com/grafana/otel-checker/checks/utils"
 )
 
 func TestCheckDotNetAutoInstrumentation(t *testing.T) {
