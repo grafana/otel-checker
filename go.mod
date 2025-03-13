@@ -1,4 +1,4 @@
-module otel-checker
+module github.com/grafana/otel-checker
 
 go 1.24.0
 
