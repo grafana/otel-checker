@@ -68,7 +68,7 @@ func CheckResourceAttributes(reporter *utils.ComponentReporter) {
 		},
 		{
 			Name:         "deployment.environment.name",
-			Description:  "Name of the deployment environment (staging or production)",
+			Description:  "Name of the deployment environment (e.g. 'staging' or 'production')",
 			ExampleValue: "production",
 		},
 		{

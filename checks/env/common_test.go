@@ -140,7 +140,7 @@ func TestCheckResourceAttributes(t *testing.T) {
 			Language: "test",
 			ExpectedWarnings: []string{
 				"Resource Attributes: Set OTEL_RESOURCE_ATTRIBUTES=\"service.namespace=shop\": An optional namespace for service.name",
-				"Resource Attributes: Set OTEL_RESOURCE_ATTRIBUTES=\"deployment.environment.name=production\": Name of the deployment environment (staging or production)",
+				"Resource Attributes: Set OTEL_RESOURCE_ATTRIBUTES=\"deployment.environment.name=production\": Name of the deployment environment (e.g. 'staging' or 'production')",
 				"Resource Attributes: Set OTEL_RESOURCE_ATTRIBUTES=\"service.instance.id=checkout-123\": The unique instance, e.g. the pod name",
 				"Resource Attributes: Set OTEL_RESOURCE_ATTRIBUTES=\"service.version=1.2\": The application version, to see if a new version has introduced a bug",
 				"Resource Attributes: Set OTEL_SERVICE_NAME=\"checkout\": The application name",
@@ -158,7 +158,7 @@ func TestCheckResourceAttributes(t *testing.T) {
 				"Resource Attributes: Resource attribute service.version is set to '1.0.0'",
 			},
 			ExpectedWarnings: []string{
-				"Resource Attributes: Set OTEL_RESOURCE_ATTRIBUTES=\"deployment.environment.name=production\": Name of the deployment environment (staging or production)",
+				"Resource Attributes: Set OTEL_RESOURCE_ATTRIBUTES=\"deployment.environment.name=production\": Name of the deployment environment (e.g. 'staging' or 'production')",
 				"Resource Attributes: Set OTEL_RESOURCE_ATTRIBUTES=\"service.instance.id=checkout-123\": The unique instance, e.g. the pod name",
 			},
 		},
