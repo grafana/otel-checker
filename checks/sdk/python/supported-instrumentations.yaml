@@ -1,0 +1,146 @@
+aio-pika:
+  instrumentations:
+  - name: aio-pika
+    srcPath: instrumentation/opentelemetry-instrumentation-aio-pika
+    signals:
+      - traces: true
+aiohttp:
+  instrumentations:
+  - name: aiohttp-client
+    srcPath: instrumentation/opentelemetry-instrumentation-aiohttp-client  
+    signals:
+      - traces: true
+  - name: aiohttp-server
+    srcPath: instrumentation/opentelemetry-instrumentation-aiohttp-server
+    signals:
+      - traces: true
+      - metrics: true
+asgi:
+  instrumentations:
+  - name: asgi
+    srcPath: instrumentation/opentelemetry-instrumentation-asgi
+    signals:
+      - traces: true  
+      - metrics: true
+asyncio:
+  instrumentations:
+  - name: asyncio
+    srcPath: instrumentation/opentelemetry-instrumentation-asyncio
+    signals:
+      - traces: true
+      - metrics: true
+botocore:
+  instrumentations:
+  - name: botocore
+    srcPath: instrumentation/opentelemetry-instrumentation-botocore
+    signals:
+      - traces: true
+      - metrics: true
+cassandra:
+  instrumentations:
+  - name: cassandra
+    srcPath: instrumentation/opentelemetry-instrumentation-cassandra
+    signals:
+      - traces: true
+celery:
+  instrumentations:
+  - name: celery
+    srcPath: instrumentation/opentelemetry-instrumentation-celery
+    signals:
+      - traces: true
+      - metrics: true 
+django:
+  instrumentations: 
+  - name: django
+    srcPath: instrumentation/opentelemetry-instrumentation-django
+    signals:
+      - traces: true
+      - metrics: true
+falcon:
+  instrumentations:
+  - name: falcon
+    srcPath: instrumentation/opentelemetry-instrumentation-falcon 
+    signals:
+      - traces: true
+      - metrics: true
+fastapi:
+  instrumentations:
+  - name: fastapi
+    srcPath: instrumentation/opentelemetry-instrumentation-fastapi
+    signals:
+      - traces: true
+      - metrics: true
+flask:
+  instrumentations:
+  - name: flask 
+    srcPath: instrumentation/opentelemetry-instrumentation-flask
+    signals:
+      - traces: true
+      - metrics: true
+httpx:
+  instrumentations:
+  - name: httpx
+    srcPath: instrumentation/opentelemetry-instrumentation-httpx
+    signals:
+      - traces: true
+redis:
+  instrumentations:
+  - name: redis
+    srcPath: instrumentation/opentelemetry-instrumentation-redis
+    signals:
+      - traces: true
+requests:
+  instrumentations:
+  - name: requests
+    srcPath: instrumentation/opentelemetry-instrumentation-requests
+    signals:
+      - traces: true
+      - metrics: true
+sqlalchemy:
+  instrumentations:
+  - name: sqlalchemy
+    srcPath: instrumentation/opentelemetry-instrumentation-sqlalchemy
+    signals:
+      - traces: true
+      - metrics: true
+starlette:
+  instrumentations:
+  - name: starlette
+    srcPath: instrumentation/opentelemetry-instrumentation-starlette
+    signals:
+      - traces: true
+      - metrics: true
+system-metrics:
+  instrumentations:
+  - name: system-metrics
+    srcPath: instrumentation/opentelemetry-instrumentation-system-metrics
+    signals:
+      - metrics: true
+tornado:
+  instrumentations:
+  - name: tornado
+    srcPath: instrumentation/opentelemetry-instrumentation-tornado
+    signals:
+      - traces: true
+      - metrics: true
+urllib:
+  instrumentations:
+  - name: urllib
+    srcPath: instrumentation/opentelemetry-instrumentation-urllib
+    signals:
+      - traces: true
+      - metrics: true
+urllib3:
+  instrumentations:
+  - name: urllib3
+    srcPath: instrumentation/opentelemetry-instrumentation-urllib3
+    signals:
+      - traces: true
+      - metrics: true
+wsgi:
+  instrumentations:
+  - name: wsgi
+    srcPath: instrumentation/opentelemetry-instrumentation-wsgi
+    signals:
+      - traces: true
+      - metrics: true
