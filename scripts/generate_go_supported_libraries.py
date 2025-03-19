@@ -200,7 +200,7 @@ def main():
                     supported_libraries[library_name] = {
                         "instrumentations": [{
                             "name": library_name,
-                            "srcPath": str(rel_path.parent),
+                            "srcPath": str(rel_path.parent.as_posix()),
                             "link": module_name,
                             "signals": signals,
                             "target_versions": {
