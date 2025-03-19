@@ -113,6 +113,50 @@ def find_go_mod_files(repo_path: Path) -> List[Path]:
     
     return list(instrumentation_dir.glob("**/go.mod"))
 
+def check_instrumentation_signals(src_dir: Path) -> Dict[str, bool]:
+    """Check for traces and metrics signals in the instrumentation code."""
+    signals = {}
+    for root, _, files in os.walk(src_dir):
+        for file in files:
+            if not file.endswith('.go'):
+                continue
+            file_path = Path(root) / file
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+
+            # Check for tracing support
+            if 'traces' not in signals:
+                trace_patterns = [
+                    r'otel\.Tracer',
+                    r'WithTracerProvider',
+                    r'SpanContextConfig',
+                    r'TraceState',
+                    r'TraceID',
+                    r'TraceFlags',
+                    r'SpanID',
+                    r'WithSpan',
+                    r'StartSpan'
+                ]
+                if any(re.search(p, content) for p in trace_patterns):
+                    signals['traces'] = True
+
+            # Check for metrics support
+            if 'metrics' not in signals:
+                metric_patterns = [
+                    r'otel\.Meter',
+                    r'WithMeterProvider',
+                    r'metric\.Float64(Counter|UpDownCounter|Histogram)',
+                    r'metric\.Int64(Counter|UpDownCounter|Histogram)',
+                    r'NewInt64(Counter|UpDownCounter|Histogram)',
+                    r'NewFloat64(Counter|UpDownCounter|Histogram)',
+                    r'override _updateMetricInstruments'
+                ]
+                if any(re.search(p, content) for p in metric_patterns):
+                    signals['metrics'] = True
+            if 'traces' in signals and 'metrics' in signals:
+                break
+    return signals
+
 def main():
     parser = argparse.ArgumentParser(description='Generate supported libraries YAML file from OpenTelemetry Go Contrib repository')
     parser.add_argument('repo_dir', help='Path to the OpenTelemetry Go Contrib repository')
@@ -141,12 +185,16 @@ def main():
                 
                 # Calculate version range with proper upper bound
                 version_range = calculate_version_range(version)
+
+                # Check instrumentation signals
+                signals = check_instrumentation_signals(go_mod_file.parent)
                 
                 print(f"Found match for {rel_path}:")
                 print(f"  Library: {library_name}")
                 print(f"  Version: {version}")
                 print(f"  Version Range: {version_range}")
                 print(f"  Module: {module_name}")
+                print(f"  Signals: {signals}")
                 
                 if library_name not in supported_libraries:
                     supported_libraries[library_name] = {
@@ -154,6 +202,7 @@ def main():
                             "name": library_name,
                             "srcPath": str(rel_path.parent),
                             "link": module_name,
+                            "signals": signals,
                             "target_versions": {
                                 "library": [version_range]
                             }
