@@ -12,6 +12,7 @@ def parse_go_mod_file(file_path: Path) -> Dict[str, Any]:
     """Parse a go.mod file and extract the module name and dependencies."""
     dependencies = {}
     module_name = None
+    go_version = None
     
     with open(file_path, 'r') as f:
         content = f.read()
@@ -20,6 +21,11 @@ def parse_go_mod_file(file_path: Path) -> Dict[str, Any]:
     module_match = re.search(r'^module\s+(.+)$', content, re.MULTILINE)
     if module_match:
         module_name = module_match.group(1).strip()
+    
+    # Extract Go version
+    go_match = re.search(r'^go\s+([0-9]+\.[0-9]+(?:\.[0-9]+)?)', content, re.MULTILINE)
+    if go_match:
+        go_version = go_match.group(1).strip()
     
     # Extract dependencies
     require_pattern = re.compile(r'^\t(.+?)\s+(v[0-9]+\.[0-9]+\.[0-9]+(?:-[a-zA-Z0-9.]+)?)$', re.MULTILINE)
@@ -30,7 +36,8 @@ def parse_go_mod_file(file_path: Path) -> Dict[str, Any]:
     
     return {
         "module_name": module_name,
-        "dependencies": dependencies
+        "dependencies": dependencies,
+        "go_version": go_version
     }
 
 def calculate_version_range(version: str) -> str:
