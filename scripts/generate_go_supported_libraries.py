@@ -173,6 +173,9 @@ def main():
     print(f"Found {len(go_mod_files)} go.mod files")
     
     for go_mod_file in go_mod_files:
+        if go_mod_file.parent.name in ["example", "test"]:
+            continue
+
         try:
             go_mod_data = parse_go_mod_file(go_mod_file)
             rel_path = go_mod_file.relative_to(repo_path)
