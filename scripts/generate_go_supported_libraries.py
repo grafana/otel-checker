@@ -128,7 +128,8 @@ def check_instrumentation_signals(src_dir: Path) -> Dict[str, bool]:
             if 'traces' not in signals:
                 trace_patterns = [
                     r'otel\.Tracer',
-                    r'WithTracerProvider',
+                    r'TracerProvider',
+                    r'MeterProvider',
                     r'SpanContextConfig',
                     r'TraceState',
                     r'TraceID',
