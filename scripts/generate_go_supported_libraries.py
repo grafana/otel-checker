@@ -206,19 +206,23 @@ def main():
                 print(f"  Version Range: {version_range}")
                 print(f"  Module: {module_name}")
                 print(f"  Signals: {signals}")
+
+                entry = {
+                    "name": library_name,
+                    "srcPath": str(rel_path.parent.as_posix()),
+                    "link": module_name,
+                    "signals": signals,
+                    "target_versions": {
+                        "library": [version_range]
+                    }
+                }
                 
                 if library_name not in supported_libraries:
                     supported_libraries[library_name] = {
-                        "instrumentations": [{
-                            "name": library_name,
-                            "srcPath": str(rel_path.parent.as_posix()),
-                            "link": module_name,
-                            "signals": signals,
-                            "target_versions": {
-                                "library": [version_range]
-                            }
-                        }]
+                        "instrumentations": [entry]
                     }
+                else:
+                    supported_libraries[library_name]["instrumentations"].append(entry)
             else:
                 print(f"No matching dependency found for {rel_path}")
         except Exception as e:
