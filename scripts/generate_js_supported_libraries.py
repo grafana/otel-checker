@@ -198,7 +198,7 @@ def main():
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     with open(output_path, 'w') as f:
-        yaml.dump(supported_libraries, f, sort_keys=False)
+        yaml.dump(dict(sorted(supported_libraries.items())), f, sort_keys=False)
 
     print(f"Generated {output_path} with {len(supported_libraries)} supported libraries")
 
