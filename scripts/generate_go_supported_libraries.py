@@ -89,6 +89,16 @@ def find_matching_dependency(file_path: Path, go_mod_data: Dict[str, Any]) -> Op
             
         # Try to build a path from components
         potential_path = "/".join(rel_path_parts[:i+1])
+
+        # Assume this path is a built-in module if it doesn't contain a dot
+        if not "." in potential_path:
+            print("Potential path is a built-in module:", potential_path)
+            return {
+                "library": potential_path,
+                "name": go_mod_data["module_name"],
+                "version": go_mod_data.get("go_version", "unknown"),
+                "module": go_mod_data["module_name"]
+            }
         
         # Check if this path or any dependency starts with this path
         for dep_name in dependencies:
@@ -190,7 +200,7 @@ def main():
             matching_dep = find_matching_dependency(go_mod_file, go_mod_data)
             
             if matching_dep:
-                library_name = matching_dep["name"]
+                library_name = matching_dep.get("library", False) or matching_dep["name"]
                 module_name = matching_dep["module"]
                 version = matching_dep["version"]
                 
