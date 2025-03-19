@@ -82,7 +82,7 @@ def find_matching_dependency(file_path: Path, go_mod_data: Dict[str, Any]) -> Op
     dependencies = go_mod_data["dependencies"]
     
     # Look for a matching dependency
-    for i in range(len(rel_path_parts)):
+    for i in range(len(rel_path_parts) - 1, -1, -1):
         # Skip the last part if it looks like an instrumentation name (e.g., otelgrpc)
         if i == len(rel_path_parts) - 1 and rel_path_parts[i].startswith("otel"):
             continue
