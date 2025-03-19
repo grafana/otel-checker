@@ -21,6 +21,57 @@ def get_repo_link(dir_name: str) -> str:
     """Get the repository link for a library."""
     return f"https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/{dir_name}"
 
+def check_instrumentation_signals(src_dir: Path) -> Dict[str, bool]:
+    """Check if instrumentation supports traces and/or metrics."""
+    signals = {}
+
+    # Walk through source files
+    for root, _, files in os.walk(src_dir):
+        for file in files:
+            if not file.endswith('.ts'):
+                continue
+
+            file_path = Path(root) / file
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+
+            # Check for tracing support
+            if 'traces' not in signals:
+                trace_patterns = [
+                    r'@opentelemetry/api.*Span',
+                    r'SpanKind',
+                    r'SpanStatusCode',
+                    r'startSpan',
+                    r'getSpan',
+                    r'setSpan',
+                    r'spanContext',
+                    r'addEvent',
+                    r'setAttributes'
+                ]
+                if any(re.search(p, content) for p in trace_patterns):
+                    signals['traces'] = True
+
+            # Check for metrics support
+            if 'metrics' not in signals:
+                metric_patterns = [
+                    r'createHistogram',
+                    r'createUpDownCounter',
+                    r'UpDownCounter'
+                    r'createCounter',
+                    r'createObservableGauge',
+                    r'ObservableGauge',
+                    r'getMeter',
+                    r'override _updateMetricInstruments'
+                ]
+                if any(re.search(p, content) for p in metric_patterns):
+                   signals['metrics'] = True
+
+            # Stop if we found both signals
+            if 'traces' in signals and 'metrics' in signals:
+                break
+
+    return signals
+
 def extract_supported_versions(readme_path: Path) -> Optional[Dict[str, Any]]:
     """Extract supported versions from a README.md file."""
     try:
@@ -125,11 +176,18 @@ def main():
         result = extract_supported_versions(readme_path)
         if result:
             library_name = result['name']
+
+            # Check signals support separately
+            src_dir = item / 'src'
+            if src_dir.exists():
+                signals = check_instrumentation_signals(src_dir)
+
             supported_libraries[library_name] = {
                 'instrumentations': [{
                     'name': library_name,
                     'srcPath': result['src_path'],
                     'link': result['link'],
+                    'signals': signals,
                     'target_versions': {
                         'library': [convert_version_range(result['version_range'])]
                     }
