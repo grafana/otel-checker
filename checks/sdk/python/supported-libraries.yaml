@@ -1,0 +1,363 @@
+aio-pika:
+  instrumentations:
+  - name: aio-pika
+    srcPath: instrumentation\opentelemetry-instrumentation-aio-pika
+    signals:
+      traces: true
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-aio-pika
+aiohttp-client:
+  instrumentations:
+  - name: aiohttp-client
+    srcPath: instrumentation\opentelemetry-instrumentation-aiohttp-client
+    signals:
+      traces: true
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-aiohttp-client
+aiohttp-server:
+  instrumentations:
+  - name: aiohttp-server
+    srcPath: instrumentation\opentelemetry-instrumentation-aiohttp-server
+    signals:
+      metrics: true
+      traces: true
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-aiohttp-server
+aiokafka:
+  instrumentations:
+  - name: aiokafka
+    srcPath: instrumentation\opentelemetry-instrumentation-aiokafka
+    signals:
+      traces: true
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-aiokafka
+aiopg:
+  instrumentations:
+  - name: aiopg
+    srcPath: instrumentation\opentelemetry-instrumentation-aiopg
+    signals:
+      traces: true
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-aiopg
+asgi:
+  instrumentations:
+  - name: asgi
+    srcPath: instrumentation\opentelemetry-instrumentation-asgi
+    signals:
+      metrics: true
+      traces: true
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-asgi
+asyncio:
+  instrumentations:
+  - name: asyncio
+    srcPath: instrumentation\opentelemetry-instrumentation-asyncio
+    signals:
+      metrics: true
+      traces: true
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-asyncio
+asyncpg:
+  instrumentations:
+  - name: asyncpg
+    srcPath: instrumentation\opentelemetry-instrumentation-asyncpg
+    signals:
+      traces: true
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-asyncpg
+aws-lambda:
+  instrumentations:
+  - name: aws-lambda
+    srcPath: instrumentation\opentelemetry-instrumentation-aws-lambda
+    signals:
+      metrics: true
+      traces: true
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-aws-lambda
+boto:
+  instrumentations:
+  - name: boto
+    srcPath: instrumentation\opentelemetry-instrumentation-boto
+    signals:
+      traces: true
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-boto
+boto3sqs:
+  instrumentations:
+  - name: boto3sqs
+    srcPath: instrumentation\opentelemetry-instrumentation-boto3sqs
+    signals:
+      traces: true
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-boto3sqs
+botocore:
+  instrumentations:
+  - name: botocore
+    srcPath: instrumentation\opentelemetry-instrumentation-botocore
+    signals:
+      metrics: true
+      traces: true
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-botocore
+cassandra:
+  instrumentations:
+  - name: cassandra
+    srcPath: instrumentation\opentelemetry-instrumentation-cassandra
+    signals:
+      traces: true
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-cassandra
+celery:
+  instrumentations:
+  - name: celery
+    srcPath: instrumentation\opentelemetry-instrumentation-celery
+    signals:
+      traces: true
+      metrics: true
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-celery
+click:
+  instrumentations:
+  - name: click
+    srcPath: instrumentation\opentelemetry-instrumentation-click
+    signals:
+      traces: true
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-click
+confluent-kafka:
+  instrumentations:
+  - name: confluent-kafka
+    srcPath: instrumentation\opentelemetry-instrumentation-confluent-kafka
+    signals:
+      traces: true
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-confluent-kafka
+dbapi:
+  instrumentations:
+  - name: dbapi
+    srcPath: instrumentation\opentelemetry-instrumentation-dbapi
+    signals:
+      traces: true
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-dbapi
+django:
+  instrumentations:
+  - name: django
+    srcPath: instrumentation\opentelemetry-instrumentation-django
+    signals:
+      metrics: true
+      traces: true
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-django
+elasticsearch:
+  instrumentations:
+  - name: elasticsearch
+    srcPath: instrumentation\opentelemetry-instrumentation-elasticsearch
+    signals:
+      traces: true
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-elasticsearch
+falcon:
+  instrumentations:
+  - name: falcon
+    srcPath: instrumentation\opentelemetry-instrumentation-falcon
+    signals:
+      metrics: true
+      traces: true
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-falcon
+fastapi:
+  instrumentations:
+  - name: fastapi
+    srcPath: instrumentation\opentelemetry-instrumentation-fastapi
+    signals:
+      metrics: true
+      traces: true
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-fastapi
+flask:
+  instrumentations:
+  - name: flask
+    srcPath: instrumentation\opentelemetry-instrumentation-flask
+    signals:
+      metrics: true
+      traces: true
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-flask
+grpc:
+  instrumentations:
+  - name: grpc
+    srcPath: instrumentation\opentelemetry-instrumentation-grpc
+    signals:
+      traces: true
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-grpc
+httpx:
+  instrumentations:
+  - name: httpx
+    srcPath: instrumentation\opentelemetry-instrumentation-httpx
+    signals:
+      traces: true
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-httpx
+jinja2:
+  instrumentations:
+  - name: jinja2
+    srcPath: instrumentation\opentelemetry-instrumentation-jinja2
+    signals:
+      traces: true
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-jinja2
+kafka-python:
+  instrumentations:
+  - name: kafka-python
+    srcPath: instrumentation\opentelemetry-instrumentation-kafka-python
+    signals:
+      traces: true
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-kafka-python
+logging:
+  instrumentations:
+  - name: logging
+    srcPath: instrumentation\opentelemetry-instrumentation-logging
+    signals:
+      traces: true
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-logging
+mysql:
+  instrumentations:
+  - name: mysql
+    srcPath: instrumentation\opentelemetry-instrumentation-mysql
+    signals: {}
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-mysql
+mysqlclient:
+  instrumentations:
+  - name: mysqlclient
+    srcPath: instrumentation\opentelemetry-instrumentation-mysqlclient
+    signals: {}
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-mysqlclient
+pika:
+  instrumentations:
+  - name: pika
+    srcPath: instrumentation\opentelemetry-instrumentation-pika
+    signals:
+      traces: true
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-pika
+psycopg:
+  instrumentations:
+  - name: psycopg
+    srcPath: instrumentation\opentelemetry-instrumentation-psycopg
+    signals:
+      traces: true
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-psycopg
+psycopg2:
+  instrumentations:
+  - name: psycopg2
+    srcPath: instrumentation\opentelemetry-instrumentation-psycopg2
+    signals: {}
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-psycopg2
+pymemcache:
+  instrumentations:
+  - name: pymemcache
+    srcPath: instrumentation\opentelemetry-instrumentation-pymemcache
+    signals:
+      traces: true
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-pymemcache
+pymongo:
+  instrumentations:
+  - name: pymongo
+    srcPath: instrumentation\opentelemetry-instrumentation-pymongo
+    signals:
+      traces: true
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-pymongo
+pymssql:
+  instrumentations:
+  - name: pymssql
+    srcPath: instrumentation\opentelemetry-instrumentation-pymssql
+    signals:
+      traces: true
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-pymssql
+pymysql:
+  instrumentations:
+  - name: pymysql
+    srcPath: instrumentation\opentelemetry-instrumentation-pymysql
+    signals: {}
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-pymysql
+pyramid:
+  instrumentations:
+  - name: pyramid
+    srcPath: instrumentation\opentelemetry-instrumentation-pyramid
+    signals:
+      metrics: true
+      traces: true
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-pyramid
+redis:
+  instrumentations:
+  - name: redis
+    srcPath: instrumentation\opentelemetry-instrumentation-redis
+    signals:
+      traces: true
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-redis
+remoulade:
+  instrumentations:
+  - name: remoulade
+    srcPath: instrumentation\opentelemetry-instrumentation-remoulade
+    signals:
+      traces: true
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-remoulade
+requests:
+  instrumentations:
+  - name: requests
+    srcPath: instrumentation\opentelemetry-instrumentation-requests
+    signals:
+      metrics: true
+      traces: true
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-requests
+sqlalchemy:
+  instrumentations:
+  - name: sqlalchemy
+    srcPath: instrumentation\opentelemetry-instrumentation-sqlalchemy
+    signals:
+      metrics: true
+      traces: true
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-sqlalchemy
+sqlite3:
+  instrumentations:
+  - name: sqlite3
+    srcPath: instrumentation\opentelemetry-instrumentation-sqlite3
+    signals:
+      traces: true
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-sqlite3
+starlette:
+  instrumentations:
+  - name: starlette
+    srcPath: instrumentation\opentelemetry-instrumentation-starlette
+    signals:
+      metrics: true
+      traces: true
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-starlette
+system-metrics:
+  instrumentations:
+  - name: system-metrics
+    srcPath: instrumentation\opentelemetry-instrumentation-system-metrics
+    signals:
+      metrics: true
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-system-metrics
+threading:
+  instrumentations:
+  - name: threading
+    srcPath: instrumentation\opentelemetry-instrumentation-threading
+    signals: {}
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-threading
+tornado:
+  instrumentations:
+  - name: tornado
+    srcPath: instrumentation\opentelemetry-instrumentation-tornado
+    signals:
+      metrics: true
+      traces: true
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-tornado
+tortoiseorm:
+  instrumentations:
+  - name: tortoiseorm
+    srcPath: instrumentation\opentelemetry-instrumentation-tortoiseorm
+    signals:
+      traces: true
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-tortoiseorm
+urllib:
+  instrumentations:
+  - name: urllib
+    srcPath: instrumentation\opentelemetry-instrumentation-urllib
+    signals:
+      metrics: true
+      traces: true
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-urllib
+urllib3:
+  instrumentations:
+  - name: urllib3
+    srcPath: instrumentation\opentelemetry-instrumentation-urllib3
+    signals:
+      metrics: true
+      traces: true
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-urllib3
+wsgi:
+  instrumentations:
+  - name: wsgi
+    srcPath: instrumentation\opentelemetry-instrumentation-wsgi
+    signals:
+      metrics: true
+      traces: true
+    link: https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-wsgi
