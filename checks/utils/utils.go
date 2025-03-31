@@ -134,23 +134,23 @@ func (r *Reporter) PrintResults() map[string][]string {
 
 	if len(checks) > 0 {
 		green := color.New(color.FgGreen)
-		green.Printf("\n%d Successful Check(s)\n", len(checks))
+		_, _ = green.Printf("\n%d Successful Check(s)\n", len(checks))
 		for _, m := range checks {
-			green.Printf("✔ %s \n", m)
+			_, _ = green.Printf("✔ %s \n", m)
 		}
 	}
 	if len(warnings) > 0 {
 		yellow := color.New(color.FgYellow)
-		yellow.Printf("\n%d Warning(s)\n", len(warnings))
+		_, _ = yellow.Printf("\n%d Warning(s)\n", len(warnings))
 		for _, m := range warnings {
-			yellow.Printf("• %s \n", m)
+			_, _ = yellow.Printf("• %s \n", m)
 		}
 	}
 	if len(errors) > 0 {
 		red := color.New(color.FgRed)
-		red.Printf("\n%d Error(s)\n", len(errors))
+		_, _ = red.Printf("\n%d Error(s)\n", len(errors))
 		for _, m := range errors {
-			red.Printf("✖ %s \n", m)
+			_, _ = red.Printf("✖ %s \n", m)
 		}
 	}
 	return res
@@ -162,6 +162,10 @@ func (r *ComponentReporter) AddSuccessfulCheck(message string) {
 
 func (r *ComponentReporter) AddWarning(message string) {
 	r.Warnings = append(r.Warnings, fmt.Sprintf(`%s: %s`, r.name, message))
+}
+
+func (r *ComponentReporter) AddInternalError(message string) {
+	r.Warnings = append(r.Warnings, fmt.Sprintf(`%s: Internal Error: %s`, r.name, message))
 }
 
 func (r *ComponentReporter) AddError(message string) {

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/grafana/otel-checker/checks/env"
 	"github.com/grafana/otel-checker/checks/utils"
+	"io"
 	"net/http"
 	"regexp"
 	"strings"
@@ -92,7 +93,7 @@ func checkAuth(reporter *utils.ComponentReporter) {
 
 	// Extract auth value from headers
 	authValue := ""
-	for _, h := range strings.SplitN(headers, ",", -1) {
+	for _, h := range strings.Split(headers, ",") {
 		key, value, _ := strings.Cut(h, "=")
 		if key == "Authorization" {
 			authValue = value
@@ -105,7 +106,9 @@ func checkAuth(reporter *utils.ComponentReporter) {
 		reporter.AddError(fmt.Sprintf("Error while testing credentials of OTEL_EXPORTER_OTLP_ENDPOINT: %s", err))
 		return
 	}
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		_ = Body.Close()
+	}(resp.Body)
 
 	if resp.StatusCode == 401 {
 		reporter.AddError(fmt.Sprintf("Error while testing credentials of OTEL_EXPORTER_OTLP_ENDPOINT: %s", resp.Status))
