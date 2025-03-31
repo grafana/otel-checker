@@ -1,8 +1,30 @@
 [tools]
 go = "latest"
+golangci-lint = "latest"
+
+[tasks.build]
+description = "Build the application"
+run = "go install"
 
 [tasks.test]
+description = "Run tests"
 run = "go test $(go list ./...)"
 
+[tasks.clean]
+description = "Clean build artifacts"
+run = """
+rm -f otel-checker
+go clean
+"""
+
 [tasks.fmt]
-run = "go fmt ./..."
+description = "Format code"
+run = "gofmt -w ."
+
+[tasks.lint]
+description = "Lint code"
+run = "golangci-lint run"
+
+[tasks.deps]
+description = "Update dependencies"
+run = "go mod tidy"
