@@ -11,13 +11,13 @@ func readDotNetVersion() ([]string, error) {
 	stdout, err := cmd.Output()
 
 	if err != nil {
-		return nil, fmt.Errorf("Could not check .NET version: %s", err)
+		return nil, fmt.Errorf("could not check .NET version: %s", err)
 	}
 
 	version := strings.TrimSpace(string(stdout))
 	versionParts := strings.Split(version, ".")
 	if len(versionParts) == 0 {
-		return nil, fmt.Errorf("Could not parse .NET version: version string is empty")
+		return nil, fmt.Errorf("could not parse .NET version: version string is empty")
 	}
 
 	return versionParts, nil

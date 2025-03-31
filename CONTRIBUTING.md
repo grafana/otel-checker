@@ -74,6 +74,7 @@ We provide a `mise.toml` file with several useful commands to simplify common de
 | `mise run clean` | Removes build artifacts and cleans the Go cache |
 | `mise run fmt`   | Formats all Go code using `gofmt`               |
 | `mise run lint`  | Lints the code using `golangci-lint`            |
+| `mise run check` | Run all checks (test and lint)                  |
 | `mise run deps`  | Updates dependencies using `go mod tidy`        |
 
 ## Contribution Workflow

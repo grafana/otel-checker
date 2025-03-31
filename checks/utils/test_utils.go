@@ -28,12 +28,12 @@ func RunEnvVarComponentTest(
 	checkFunc func(Reporter, *ComponentReporter, string, []string)) {
 	// Set up environment variables for test
 	for k, v := range tt.EnvVars {
-		os.Setenv(k, v)
+		_ = os.Setenv(k, v)
 	}
 	defer func() {
 		// Clean up environment variables after test
 		for k := range tt.EnvVars {
-			os.Unsetenv(k)
+			_ = os.Unsetenv(k)
 		}
 	}()
 

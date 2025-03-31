@@ -11,7 +11,9 @@ import (
 func TestParseResourceAttributes(t *testing.T) {
 	// Save original environment values and restore after test
 	origValue := os.Getenv("OTEL_RESOURCE_ATTRIBUTES")
-	defer os.Setenv("OTEL_RESOURCE_ATTRIBUTES", origValue)
+	defer func(key, value string) {
+		_ = os.Setenv(key, value)
+	}("OTEL_RESOURCE_ATTRIBUTES", origValue)
 
 	tests := []struct {
 		name          string
@@ -57,7 +59,7 @@ func TestParseResourceAttributes(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			os.Setenv("OTEL_RESOURCE_ATTRIBUTES", tt.envValue)
+			_ = os.Setenv("OTEL_RESOURCE_ATTRIBUTES", tt.envValue)
 			result := ParseResourceAttributes()
 
 			if !reflect.DeepEqual(result, tt.expectedAttrs) {
