@@ -12,7 +12,7 @@ The `supported-libraries.yaml` file contains information about which JavaScript 
 library_name:
   instrumentations:
     - name: library_name
-      srcPath: plugins/node/instrumentation-name
+      source_path: plugins/node/instrumentation-name
       target_versions:
         LIBRARY:
           - [min_version,max_version)
@@ -23,7 +23,7 @@ Example:
 amqplib:
   instrumentations:
     - name: amqplib
-      srcPath: plugins/node/instrumentation-amqplib
+      source_path: plugins/node/instrumentation-amqplib
       target_versions:
         LIBRARY:
           - [0.5.5,1)

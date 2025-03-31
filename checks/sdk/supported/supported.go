@@ -21,7 +21,7 @@ const (
 // Instrumentation represents a single instrumentation with its metadata
 type Instrumentation struct {
 	Name           string                           `yaml:"name"`
-	SrcPath        string                           `yaml:"srcPath"`
+	SrcPath        string                           `yaml:"source_path"`
 	Link           string                           `yaml:"link,omitempty"`
 	TargetVersions map[InstrumentationType][]string `yaml:"target_versions"`
 }

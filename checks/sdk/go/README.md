@@ -12,7 +12,7 @@ The `supported-libraries.yaml` file contains information about which Go librarie
 import_path:
   instrumentations:
     - name: import_path
-      srcPath: path/to/instrumentation
+      source_path: path/to/instrumentation
       link: go.opentelemetry.io/contrib/path/to/instrumentation
       target_versions:
         library:
@@ -24,7 +24,7 @@ Example:
 go.mongodb.org/mongo-driver:
   instrumentations:
   - name: go.mongodb.org/mongo-driver
-    srcPath: instrumentation/go.mongodb.org/mongo-driver/mongo/otelmongo
+    source_path: instrumentation/go.mongodb.org/mongo-driver/mongo/otelmongo
     link: go.opentelemetry.io/contrib/instrumentation/go.mongodb.org/mongo-driver/mongo/otelmongo
     target_versions:
       library:
