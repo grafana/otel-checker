@@ -14,7 +14,7 @@ def create_result(library_name: str, link: str, version_range: str, dir_name: st
         'name': library_name,
         'link': link,
         'version_range': version_range,
-        'src_path': f"plugins/node/{dir_name}"
+        'source_path': f"plugins/node/{dir_name}"
     }
 
 def get_repo_link(dir_name: str) -> str:
@@ -128,7 +128,7 @@ def main():
             supported_libraries[library_name] = {
                 'instrumentations': [{
                     'name': library_name,
-                    'srcPath': result['src_path'],
+                    'source_path': result['source_path'],
                     'link': result['link'],
                     'target_versions': {
                         'library': [convert_version_range(result['version_range'])]

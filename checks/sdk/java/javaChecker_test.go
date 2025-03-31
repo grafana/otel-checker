@@ -11,12 +11,20 @@ func TestFindSupportedLibrary(t *testing.T) {
 	modules, err := supportedLibraries()
 	require.NoError(t, err)
 	assert.Equal(t,
-		[]string{"https://github.com/open-telemetry/opentelemetry-java-instrumentation/tree/main/instrumentation/logback/logback-appender-1.0/javaagent"},
+		[]string{
+			"https://github.com/open-telemetry/opentelemetry-java-instrumentation/tree/main/instrumentation/executors/javaagent",
+			"https://github.com/open-telemetry/opentelemetry-java-instrumentation/tree/main/instrumentation/http-url-connection/javaagent",
+			"https://github.com/open-telemetry/opentelemetry-java-instrumentation/tree/main/instrumentation/java-http-client/javaagent",
+			"https://github.com/open-telemetry/opentelemetry-java-instrumentation/tree/main/instrumentation/java-http-server/javaagent",
+			"https://github.com/open-telemetry/opentelemetry-java-instrumentation/tree/main/instrumentation/jdbc/javaagent",
+			"https://github.com/open-telemetry/opentelemetry-java-instrumentation/tree/main/instrumentation/logback/logback-appender-1.0/javaagent",
+			"https://github.com/open-telemetry/opentelemetry-java-instrumentation/tree/main/instrumentation/rmi/javaagent",
+		},
 		findSupportedLibraries(Library{
 			Group:    "ch.qos.logback",
 			Artifact: "logback-classic",
 			Version:  "1.5.16",
-		}, modules, supported.TypeJavaagent))
+		}, modules, supported.TypeJavaagent, 8, nil))
 }
 
 func TestParseGradleDependencies(t *testing.T) {
