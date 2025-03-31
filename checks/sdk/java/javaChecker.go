@@ -12,15 +12,15 @@ import (
 )
 
 func CheckSetup(reporter *utils.ComponentReporter, commands utils.Commands) {
-	checkJavaVersion(reporter)
+	javaVersion := checkJavaVersion(reporter)
 	if commands.ManualInstrumentation {
-		checkCodeBasedInstrumentation(reporter, commands.Debug)
+		checkCodeBasedInstrumentation(reporter, commands.Debug, javaVersion)
 	} else {
-		checkAutoInstrumentation(reporter, commands.Debug)
+		checkAutoInstrumentation(reporter, commands.Debug, javaVersion)
 	}
 }
 
-func checkJavaVersion(reporter *utils.ComponentReporter) {
+func checkJavaVersion(reporter *utils.ComponentReporter) int {
 	out := sdk.RunCommand(reporter, exec.Command("java", "-version"))
 	if out != "" {
 		//openjdk version "21.0.2" 2024-01-16 LTS
@@ -39,13 +39,15 @@ func checkJavaVersion(reporter *utils.ComponentReporter) {
 		} else {
 			reporter.AddSuccessfulCheck(fmt.Sprintf("Java version %s is supported", version))
 		}
+		return major
 	}
+	return 0
 }
 
-func checkAutoInstrumentation(reporter *utils.ComponentReporter, debug bool) {
-	reportSupportedInstrumentations(reporter, debug, supported.TypeJavaagent)
+func checkAutoInstrumentation(reporter *utils.ComponentReporter, debug bool, javaVersion int) {
+	reportSupportedInstrumentations(reporter, debug, supported.TypeJavaagent, javaVersion)
 }
 
-func checkCodeBasedInstrumentation(reporter *utils.ComponentReporter, debug bool) {
-	reportSupportedInstrumentations(reporter, debug, supported.TypeLibrary)
+func checkCodeBasedInstrumentation(reporter *utils.ComponentReporter, debug bool, javaVersion int) {
+	reportSupportedInstrumentations(reporter, debug, supported.TypeLibrary, javaVersion)
 }

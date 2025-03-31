@@ -247,7 +247,7 @@ func TestFindSupportedLibraries(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := supported.FindSupportedLibraries(tt.library, s, supported.TypeLibrary)
+			got := supported.FindSupportedLibraries(tt.library, s, supported.TypeLibrary, nil)
 			if len(got) != len(tt.expected) {
 				t.Errorf("Expected %d links, got %d", len(tt.expected), len(got))
 			}

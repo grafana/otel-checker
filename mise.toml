@@ -1,0 +1,8 @@
+[tools]
+go = "latest"
+
+[tasks.test]
+run = "go test $(go list ./...)"
+
+[tasks.fmt]
+run = "go fmt ./..."

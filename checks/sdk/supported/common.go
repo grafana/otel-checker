@@ -20,7 +20,7 @@ func CheckLibraries(reporter *utils.ComponentReporter,
 	}
 
 	for _, dep := range dependencies {
-		links := FindSupportedLibraries(dep, supportedLibs, instrumentationType)
+		links := FindSupportedLibraries(dep, supportedLibs, instrumentationType, reporter)
 		if len(links) > 0 {
 			reporter.AddSuccessfulCheck(
 				fmt.Sprintf("Found supported library: %s:%s at %s",
@@ -32,14 +32,16 @@ func CheckLibraries(reporter *utils.ComponentReporter,
 }
 
 // FindSupportedLibraries checks if a library is supported by any instrumentation
-func FindSupportedLibraries(library Library, supportedModules SupportedModules, instrumentationType InstrumentationType) []string {
+func FindSupportedLibraries(library Library, supportedModules SupportedModules, instrumentationType InstrumentationType, reporter *utils.ComponentReporter) []string {
 	var links []string
-	for _, module := range supportedModules {
+	for moduleName, module := range supportedModules {
 		for _, instrumentation := range module.Instrumentations {
 			for _, version := range instrumentation.TargetVersions[instrumentationType] {
 				versionRange, err := sdk.ParseVersionRange(version)
 				if err != nil {
-					panic(fmt.Sprintf("error parsing version range: %v", err))
+					reporter.AddWarning(fmt.Sprintf("Error parsing version range for module %s: %s",
+						moduleName, version))
+					continue
 				}
 				if library.Name == instrumentation.Name {
 					v := sdk.FixVersion(library.Version)
