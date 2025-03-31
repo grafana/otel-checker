@@ -117,12 +117,12 @@ func matchVersion(moduleName string, version string, library Library, javaVersio
 	// e.g. com.amazonaws:aws-lambda-java-core:[1.0.0,)
 	split := strings.Split(version, ":")
 	if len(split) != 3 {
-		reporter.AddWarning(fmt.Sprintf("Invalid java version for module %s: %s", moduleName, version))
+		reporter.AddInternalError(fmt.Sprintf("Invalid java version for module %s: %s", moduleName, version))
 		return false
 	}
 	versionRange, err := sdk.ParseVersionRange(split[2])
 	if err != nil {
-		reporter.AddWarning(fmt.Sprintf("Error parsing version range for module %s: %s", moduleName, version))
+		reporter.AddInternalError(fmt.Sprintf("Error parsing version range for module %s: %s", moduleName, version))
 		return false
 	}
 

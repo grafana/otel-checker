@@ -39,7 +39,7 @@ func FindSupportedLibraries(library Library, supportedModules SupportedModules, 
 			for _, version := range instrumentation.TargetVersions[instrumentationType] {
 				versionRange, err := sdk.ParseVersionRange(version)
 				if err != nil {
-					reporter.AddWarning(fmt.Sprintf("Error parsing version range for module %s: %s",
+					reporter.AddInternalError(fmt.Sprintf("Parsing version range for module %s: %s",
 						moduleName, version))
 					continue
 				}

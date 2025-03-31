@@ -164,6 +164,10 @@ func (r *ComponentReporter) AddWarning(message string) {
 	r.Warnings = append(r.Warnings, fmt.Sprintf(`%s: %s`, r.name, message))
 }
 
+func (r *ComponentReporter) AddInternalError(message string) {
+	r.Warnings = append(r.Warnings, fmt.Sprintf(`%s: Internal Error: %s`, r.name, message))
+}
+
 func (r *ComponentReporter) AddError(message string) {
 	r.Errors = append(r.Errors, fmt.Sprintf(`%s: %s`, r.name, message))
 }
