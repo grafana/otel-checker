@@ -7,25 +7,21 @@ import (
 
 func TestFindSupportedLibraries(t *testing.T) {
 	s := SupportedModules{
-		"test-library": {
-			Instrumentations: []Instrumentation{
-				{
-					Name: "test-library",
-					Link: "https://example.com/test-library",
-					TargetVersions: map[InstrumentationType][]string{
-						TypeLibrary: {"[1.0.0,)"},
-					},
+		"test-library": []Instrumentation{
+			{
+				Name: "test-library",
+				Link: "https://example.com/test-library",
+				TargetVersions: map[InstrumentationType][]string{
+					TypeLibrary: {"[1.0.0,)"},
 				},
 			},
 		},
-		"another-library": {
-			Instrumentations: []Instrumentation{
-				{
-					Name: "another-library",
-					Link: "https://example.com/another-library",
-					TargetVersions: map[InstrumentationType][]string{
-						TypeLibrary: {"[2.0.0,3.0.0)"},
-					},
+		"another-library": []Instrumentation{
+			{
+				Name: "another-library",
+				Link: "https://example.com/another-library",
+				TargetVersions: map[InstrumentationType][]string{
+					TypeLibrary: {"[2.0.0,3.0.0)"},
 				},
 			},
 		},
@@ -104,14 +100,12 @@ func TestFindSupportedLibraries(t *testing.T) {
 
 func TestCheckLibraries(t *testing.T) {
 	s := SupportedModules{
-		"test-library": {
-			Instrumentations: []Instrumentation{
-				{
-					Name: "test-library",
-					Link: "https://example.com/test-library",
-					TargetVersions: map[InstrumentationType][]string{
-						TypeLibrary: {"[1.0.0,)"},
-					},
+		"test-library": []Instrumentation{
+			{
+				Name: "test-library",
+				Link: "https://example.com/test-library",
+				TargetVersions: map[InstrumentationType][]string{
+					TypeLibrary: {"[1.0.0,)"},
 				},
 			},
 		},

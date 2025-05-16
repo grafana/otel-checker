@@ -1,3 +1,10 @@
+# /// script
+# requires-python = ">=3.12"
+# dependencies = [
+#     "pyyaml",
+# ]
+# ///
+
 #!/usr/bin/env python3
 
 import os
@@ -125,22 +132,20 @@ def main():
         result = extract_supported_versions(readme_path)
         if result:
             library_name = result['name']
-            supported_libraries[library_name] = {
-                'instrumentations': [{
-                    'name': library_name,
-                    'source_path': result['source_path'],
-                    'link': result['link'],
-                    'target_versions': {
-                        'library': [convert_version_range(result['version_range'])]
-                    }
-                }]
-            }
+            supported_libraries[library_name] = [{
+                'name': library_name,
+                'source_path': result['source_path'],
+                'link': result['link'],
+                'target_versions': {
+                    'library': [convert_version_range(result['version_range'])]
+                }
+            }]
 
     output_path = Path(args.output)
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     with open(output_path, 'w') as f:
-        yaml.dump(supported_libraries, f, sort_keys=False)
+        yaml.dump(supported_libraries, f, sort_keys=True)
 
     print(f"Generated {output_path} with {len(supported_libraries)} supported libraries")
 

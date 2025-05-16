@@ -34,8 +34,8 @@ func CheckLibraries(reporter *utils.ComponentReporter,
 // FindSupportedLibraries checks if a library is supported by any instrumentation
 func FindSupportedLibraries(library Library, supportedModules SupportedModules, instrumentationType InstrumentationType, reporter *utils.ComponentReporter) []string {
 	var links []string
-	for moduleName, module := range supportedModules {
-		for _, instrumentation := range module.Instrumentations {
+	for moduleName, instrumentations := range supportedModules {
+		for _, instrumentation := range instrumentations {
 			for _, version := range instrumentation.TargetVersions[instrumentationType] {
 				versionRange, err := sdk.ParseVersionRange(version)
 				if err != nil {

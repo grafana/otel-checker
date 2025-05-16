@@ -1,3 +1,10 @@
+# /// script
+# requires-python = ">=3.12"
+# dependencies = [
+#     "pyyaml",
+# ]
+# ///
+
 #!/usr/bin/env python3
 
 import os
@@ -149,16 +156,14 @@ def main():
                 print(f"  Module: {module_name}")
 
                 if library_name not in supported_libraries:
-                    supported_libraries[library_name] = {
-                        "instrumentations": [{
-                            "name": library_name,
-                            "source_path": str(rel_path.parent),
-                            "link": module_name,
-                            "target_versions": {
-                                "library": [version_range]
-                            }
-                        }]
-                    }
+                    supported_libraries[library_name] = [{
+                        "name": library_name,
+                        "source_path": str(rel_path.parent),
+                        "link": module_name,
+                        "target_versions": {
+                            "library": [version_range]
+                        }
+                    }]
             else:
                 print(f"No matching dependency found for {rel_path}")
         except Exception as e:
@@ -168,9 +173,10 @@ def main():
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     with open(output_path, 'w') as f:
-        yaml.dump(supported_libraries, f, sort_keys=False)
+        yaml.dump(supported_libraries, f, sort_keys=True)
 
     print(f"Generated {output_path} with {len(supported_libraries)} supported libraries")
 
 if __name__ == "__main__":
     main()
+
