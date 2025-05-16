@@ -174,25 +174,21 @@ func TestReadPackageLock(t *testing.T) {
 
 func TestFindSupportedLibraries(t *testing.T) {
 	s := supported.SupportedModules{
-		"express": {
-			Instrumentations: []supported.Instrumentation{
-				{
-					Name: "express",
-					Link: "https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-express",
-					TargetVersions: map[supported.InstrumentationType][]string{
-						supported.TypeLibrary: {"[4.0.0,)"},
-					},
+		"express": []supported.Instrumentation{
+			{
+				Name: "express",
+				Link: "https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-express",
+				TargetVersions: map[supported.InstrumentationType][]string{
+					supported.TypeLibrary: {"[4.0.0,)"},
 				},
 			},
 		},
-		"@opentelemetry/instrumentation-express": {
-			Instrumentations: []supported.Instrumentation{
-				{
-					Name: "@opentelemetry/instrumentation-express",
-					Link: "https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-express",
-					TargetVersions: map[supported.InstrumentationType][]string{
-						supported.TypeLibrary: {"[0.35.0,)"},
-					},
+		"@opentelemetry/instrumentation-express": []supported.Instrumentation{
+			{
+				Name: "@opentelemetry/instrumentation-express",
+				Link: "https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-express",
+				TargetVersions: map[supported.InstrumentationType][]string{
+					supported.TypeLibrary: {"[0.35.0,)"},
 				},
 			},
 		},

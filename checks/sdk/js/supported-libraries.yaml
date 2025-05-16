@@ -1,296 +1,259 @@
-lru-memorizer:
-  instrumentations:
-  - name: lru-memorizer
-    source_path: plugins/node/instrumentation-lru-memoizer
-    link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/instrumentation-lru-memoizer
-    target_versions:
-      library:
-      - '[1.3.0,3)'
-mongoose:
-  instrumentations:
-  - name: mongoose
-    source_path: plugins/node/instrumentation-mongoose
-    link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/instrumentation-mongoose
-    target_versions:
-      library:
-      - '[5.9.7,9)'
-runtime-node:
-  instrumentations:
-  - name: runtime-node
-    source_path: plugins/node/instrumentation-runtime-node
-    link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/instrumentation-runtime-node
-    target_versions:
-      library:
-      - '[14.10,)'
-undici:
-  instrumentations:
-  - name: undici
-    source_path: plugins/node/instrumentation-undici
-    link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/instrumentation-undici
-    target_versions:
-      library:
-      - '[5.12.0,)'
-ioredis:
-  instrumentations:
-  - name: ioredis
-    source_path: plugins/node/opentelemetry-instrumentation-ioredis
-    link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-ioredis
-    target_versions:
-      library:
-      - '[2.0.0,6)'
-opentelemetry-aws-lambda:
-  instrumentations:
-  - name: opentelemetry-aws-lambda
-    source_path: plugins/node/opentelemetry-instrumentation-aws-lambda
-    link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-aws-lambda
-    target_versions:
-      library:
-      - '[0.0.0,)'
-tedious:
-  instrumentations:
-  - name: tedious
-    source_path: plugins/node/instrumentation-tedious
-    link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/instrumentation-tedious
-    target_versions:
-      library:
-      - '[1.11.0,20)'
-kafkajs:
-  instrumentations:
-  - name: kafkajs
-    source_path: plugins/node/instrumentation-kafkajs
-    link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/instrumentation-kafkajs
-    target_versions:
-      library:
-      - '[0.1.0,3)'
 '@cucumber/cucumber':
-  instrumentations:
-  - name: '@cucumber/cucumber'
-    source_path: plugins/node/instrumentation-cucumber
-    link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/instrumentation-cucumber
-    target_versions:
-      library:
-      - '[8.0.0,11)'
-restify:
-  instrumentations:
-  - name: restify
-    source_path: plugins/node/opentelemetry-instrumentation-restify
-    link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-restify
-    target_versions:
-      library:
-      - '[4.1.0,12)'
-fastify:
-  instrumentations:
-  - name: fastify
-    source_path: plugins/node/opentelemetry-instrumentation-fastify
-    link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-fastify
-    target_versions:
-      library:
-      - '[3.0.0,5)'
-opentelemetry-net:
-  instrumentations:
-  - name: opentelemetry-net
-    source_path: plugins/node/opentelemetry-instrumentation-net
-    link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-net
-    target_versions:
-      library:
-      - '[14,)'
-express:
-  instrumentations:
-  - name: express
-    source_path: plugins/node/opentelemetry-instrumentation-express
-    link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-express
-    target_versions:
-      library:
-      - '[4.0.0,5)'
-mysql2:
-  instrumentations:
-  - name: mysql2
-    source_path: plugins/node/opentelemetry-instrumentation-mysql2
-    link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-mysql2
-    target_versions:
-      library:
-      - '[1.4.2,4)'
-bunyan:
-  instrumentations:
-  - name: bunyan
-    source_path: plugins/node/opentelemetry-instrumentation-bunyan
-    link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-bunyan
-    target_versions:
-      library:
-      - '[1.0.0,2)'
-aws-sdk:
-  instrumentations:
-  - name: aws-sdk
-    source_path: plugins/node/opentelemetry-instrumentation-aws-sdk
-    link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-aws-sdk
-    target_versions:
-      library:
-      - '[2.308.0,3)'
-amqplib:
-  instrumentations:
-  - name: amqplib
-    source_path: plugins/node/instrumentation-amqplib
-    link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/instrumentation-amqplib
-    target_versions:
-      library:
-      - '[0.5.5,1)'
-generic-pool:
-  instrumentations:
-  - name: generic-pool
-    source_path: plugins/node/opentelemetry-instrumentation-generic-pool
-    link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-generic-pool
-    target_versions:
-      library:
-      - '[2.0.0,4)'
-opentelemetry-dns:
-  instrumentations:
-  - name: opentelemetry-dns
-    source_path: plugins/node/opentelemetry-instrumentation-dns
-    link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-dns
-    target_versions:
-      library:
-      - '[14,)'
-router:
-  instrumentations:
-  - name: router
-    source_path: plugins/node/opentelemetry-instrumentation-router
-    link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-router
-    target_versions:
-      library:
-      - '[1.0.0,2)'
-graphql:
-  instrumentations:
-  - name: graphql
-    source_path: plugins/node/opentelemetry-instrumentation-graphql
-    link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-graphql
-    target_versions:
-      library:
-      - '[14.0.0,17)'
-knex:
-  instrumentations:
-  - name: knex
-    source_path: plugins/node/opentelemetry-instrumentation-knex
-    link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-knex
-    target_versions:
-      library:
-      - '[0.10.0,4)'
-cassandra-driver:
-  instrumentations:
-  - name: cassandra-driver
-    source_path: plugins/node/opentelemetry-instrumentation-cassandra
-    link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-cassandra
-    target_versions:
-      library:
-      - '[4.4.0,5)'
-memcached:
-  instrumentations:
-  - name: memcached
-    source_path: plugins/node/opentelemetry-instrumentation-memcached
-    link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-memcached
-    target_versions:
-      library:
-      - '[2.2.0,3)'
-redis:
-  instrumentations:
-  - name: redis
-    source_path: plugins/node/opentelemetry-instrumentation-redis
-    link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-redis
-    target_versions:
-      library:
-      - '[2.6.0,4)'
-pino:
-  instrumentations:
-  - name: pino
-    source_path: plugins/node/opentelemetry-instrumentation-pino
-    link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-pino
-    target_versions:
-      library:
-      - '[5.14.0,10)'
-'@nestjs/core':
-  instrumentations:
-  - name: '@nestjs/core'
-    source_path: plugins/node/opentelemetry-instrumentation-nestjs-core
-    link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-nestjs-core
-    target_versions:
-      library:
-      - '[4.0.0,11)'
+- link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/instrumentation-cucumber
+  name: '@cucumber/cucumber'
+  source_path: plugins/node/instrumentation-cucumber
+  target_versions:
+    library:
+    - '[8.0.0,11)'
 '@hapi/hapi':
-  instrumentations:
-  - name: '@hapi/hapi'
-    source_path: plugins/node/opentelemetry-instrumentation-hapi
-    link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-hapi
-    target_versions:
-      library:
-      - '[17.0.0,22)'
-winston:
-  instrumentations:
-  - name: winston
-    source_path: plugins/node/opentelemetry-instrumentation-winston
-    link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-winston
-    target_versions:
-      library:
-      - '[1.0.0,4)'
+- link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-hapi
+  name: '@hapi/hapi'
+  source_path: plugins/node/opentelemetry-instrumentation-hapi
+  target_versions:
+    library:
+    - '[17.0.0,22)'
+'@nestjs/core':
+- link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-nestjs-core
+  name: '@nestjs/core'
+  source_path: plugins/node/opentelemetry-instrumentation-nestjs-core
+  target_versions:
+    library:
+    - '[4.0.0,12)'
+amqplib:
+- link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/instrumentation-amqplib
+  name: amqplib
+  source_path: plugins/node/instrumentation-amqplib
+  target_versions:
+    library:
+    - '[0.5.5,1)'
+bunyan:
+- link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-bunyan
+  name: bunyan
+  source_path: plugins/node/opentelemetry-instrumentation-bunyan
+  target_versions:
+    library:
+    - '[1.0.0,2)'
+cassandra-driver:
+- link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-cassandra
+  name: cassandra-driver
+  source_path: plugins/node/opentelemetry-instrumentation-cassandra
+  target_versions:
+    library:
+    - '[4.4.0,5)'
 connect:
-  instrumentations:
-  - name: connect
-    source_path: plugins/node/opentelemetry-instrumentation-connect
-    link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-connect
-    target_versions:
-      library:
-      - '[3.0.0,4)'
-pg:
-  instrumentations:
-  - name: pg
-    source_path: plugins/node/opentelemetry-instrumentation-pg
-    link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-pg
-    target_versions:
-      library:
-      - '[8.0.3,9)'
-mongodb:
-  instrumentations:
-  - name: mongodb
-    source_path: plugins/node/opentelemetry-instrumentation-mongodb
-    link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-mongodb
-    target_versions:
-      library:
-      - '[3.3.0,7)'
-koa:
-  instrumentations:
-  - name: koa
-    source_path: plugins/node/opentelemetry-instrumentation-koa
-    link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-koa
-    target_versions:
-      library:
-      - '[2.0.0,3)'
-fs:
-  instrumentations:
-  - name: fs
-    source_path: plugins/node/instrumentation-fs
-    link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/instrumentation-fs
-    target_versions:
-      library:
-      - '[14,)'
+- link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-connect
+  name: connect
+  source_path: plugins/node/opentelemetry-instrumentation-connect
+  target_versions:
+    library:
+    - '[3.0.0,4)'
 dataloader:
-  instrumentations:
-  - name: dataloader
-    source_path: plugins/node/instrumentation-dataloader
-    link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/instrumentation-dataloader
-    target_versions:
-      library:
-      - '[2.0.0,3)'
+- link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/instrumentation-dataloader
+  name: dataloader
+  source_path: plugins/node/instrumentation-dataloader
+  target_versions:
+    library:
+    - '[2.0.0,3)'
+express:
+- link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-express
+  name: express
+  source_path: plugins/node/opentelemetry-instrumentation-express
+  target_versions:
+    library:
+    - '[4.0.0,5)'
+fastify:
+- link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-fastify
+  name: fastify
+  source_path: plugins/node/opentelemetry-instrumentation-fastify
+  target_versions:
+    library:
+    - '[3.0.0,5)'
+fs:
+- link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/instrumentation-fs
+  name: fs
+  source_path: plugins/node/instrumentation-fs
+  target_versions:
+    library:
+    - '[18,)'
+generic-pool:
+- link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-generic-pool
+  name: generic-pool
+  source_path: plugins/node/opentelemetry-instrumentation-generic-pool
+  target_versions:
+    library:
+    - '[2.0.0,4)'
+graphql:
+- link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-graphql
+  name: graphql
+  source_path: plugins/node/opentelemetry-instrumentation-graphql
+  target_versions:
+    library:
+    - '[14.0.0,17)'
+ioredis:
+- link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-ioredis
+  name: ioredis
+  source_path: plugins/node/opentelemetry-instrumentation-ioredis
+  target_versions:
+    library:
+    - '[2.0.0,6)'
+kafkajs:
+- link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/instrumentation-kafkajs
+  name: kafkajs
+  source_path: plugins/node/instrumentation-kafkajs
+  target_versions:
+    library:
+    - '[0.3.0,3)'
+knex:
+- link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-knex
+  name: knex
+  source_path: plugins/node/opentelemetry-instrumentation-knex
+  target_versions:
+    library:
+    - '[0.10.0,4)'
+koa:
+- link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-koa
+  name: koa
+  source_path: plugins/node/opentelemetry-instrumentation-koa
+  target_versions:
+    library:
+    - '[2.0.0,3)'
+lru-memorizer:
+- link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/instrumentation-lru-memoizer
+  name: lru-memorizer
+  source_path: plugins/node/instrumentation-lru-memoizer
+  target_versions:
+    library:
+    - '[1.3.0,3)'
+memcached:
+- link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-memcached
+  name: memcached
+  source_path: plugins/node/opentelemetry-instrumentation-memcached
+  target_versions:
+    library:
+    - '[2.2.0,3)'
+mongodb:
+- link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-mongodb
+  name: mongodb
+  source_path: plugins/node/opentelemetry-instrumentation-mongodb
+  target_versions:
+    library:
+    - '[3.3.0,7)'
+mongoose:
+- link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/instrumentation-mongoose
+  name: mongoose
+  source_path: plugins/node/instrumentation-mongoose
+  target_versions:
+    library:
+    - '[5.9.7,9)'
 mysql:
-  instrumentations:
-  - name: mysql
-    source_path: plugins/node/opentelemetry-instrumentation-mysql
-    link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-mysql
-    target_versions:
-      library:
-      - '[2.0.0,3)'
+- link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-mysql
+  name: mysql
+  source_path: plugins/node/opentelemetry-instrumentation-mysql
+  target_versions:
+    library:
+    - '[2.0.0,3)'
+mysql2:
+- link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-mysql2
+  name: mysql2
+  source_path: plugins/node/opentelemetry-instrumentation-mysql2
+  target_versions:
+    library:
+    - '[1.4.2,4)'
+opentelemetry-aws-lambda:
+- link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-aws-lambda
+  name: opentelemetry-aws-lambda
+  source_path: plugins/node/opentelemetry-instrumentation-aws-lambda
+  target_versions:
+    library:
+    - '[0.0.0,)'
+opentelemetry-dns:
+- link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-dns
+  name: opentelemetry-dns
+  source_path: plugins/node/opentelemetry-instrumentation-dns
+  target_versions:
+    library:
+    - '[14,)'
+opentelemetry-net:
+- link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-net
+  name: opentelemetry-net
+  source_path: plugins/node/opentelemetry-instrumentation-net
+  target_versions:
+    library:
+    - '[14,)'
+oracledb:
+- link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-oracledb
+  name: oracledb
+  source_path: plugins/node/opentelemetry-instrumentation-oracledb
+  target_versions:
+    library:
+    - '[6.7.0,7)'
+pg:
+- link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-pg
+  name: pg
+  source_path: plugins/node/opentelemetry-instrumentation-pg
+  target_versions:
+    library:
+    - '[8.0.3,9)'
+pino:
+- link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-pino
+  name: pino
+  source_path: plugins/node/opentelemetry-instrumentation-pino
+  target_versions:
+    library:
+    - '[5.14.0,10)'
+redis:
+- link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-redis
+  name: redis
+  source_path: plugins/node/opentelemetry-instrumentation-redis
+  target_versions:
+    library:
+    - '[2.6.0,4)'
+restify:
+- link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-restify
+  name: restify
+  source_path: plugins/node/opentelemetry-instrumentation-restify
+  target_versions:
+    library:
+    - '[4.1.0,12)'
+router:
+- link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-router
+  name: router
+  source_path: plugins/node/opentelemetry-instrumentation-router
+  target_versions:
+    library:
+    - '[1.0.0,2)'
+runtime-node:
+- link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/instrumentation-runtime-node
+  name: runtime-node
+  source_path: plugins/node/instrumentation-runtime-node
+  target_versions:
+    library:
+    - '[14.10,)'
 socket.io:
-  instrumentations:
-  - name: socket.io
-    source_path: plugins/node/instrumentation-socket.io
-    link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/instrumentation-socket.io
-    target_versions:
-      library:
-      - '[2.0.0,5)'
+- link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/instrumentation-socket.io
+  name: socket.io
+  source_path: plugins/node/instrumentation-socket.io
+  target_versions:
+    library:
+    - '[2.0.0,5)'
+tedious:
+- link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/instrumentation-tedious
+  name: tedious
+  source_path: plugins/node/instrumentation-tedious
+  target_versions:
+    library:
+    - '[1.11.0,20)'
+undici:
+- link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/instrumentation-undici
+  name: undici
+  source_path: plugins/node/instrumentation-undici
+  target_versions:
+    library:
+    - '[5.12.0,)'
+winston:
+- link: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-winston
+  name: winston
+  source_path: plugins/node/opentelemetry-instrumentation-winston
+  target_versions:
+    library:
+    - '[1.0.0,4)'

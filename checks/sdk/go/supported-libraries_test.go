@@ -71,25 +71,21 @@ require google.golang.org/grpc v1.71.0
 
 func TestFindSupportedLibraries(t *testing.T) {
 	s := supported.SupportedModules{
-		"google.golang.org/grpc": {
-			Instrumentations: []supported.Instrumentation{
-				{
-					Name: "google.golang.org/grpc",
-					Link: "go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc",
-					TargetVersions: map[supported.InstrumentationType][]string{
-						supported.TypeLibrary: {"[1.50.0,)"},
-					},
+		"google.golang.org/grpc": []supported.Instrumentation{
+			{
+				Name: "google.golang.org/grpc",
+				Link: "go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc",
+				TargetVersions: map[supported.InstrumentationType][]string{
+					supported.TypeLibrary: {"[1.50.0,)"},
 				},
 			},
 		},
-		"github.com/aws/aws-lambda-go": {
-			Instrumentations: []supported.Instrumentation{
-				{
-					Name: "github.com/aws/aws-lambda-go",
-					Link: "go.opentelemetry.io/contrib/instrumentation/github.com/aws/aws-lambda-go/otellambda",
-					TargetVersions: map[supported.InstrumentationType][]string{
-						supported.TypeLibrary: {"[1.41.0,)"},
-					},
+		"github.com/aws/aws-lambda-go": []supported.Instrumentation{
+			{
+				Name: "github.com/aws/aws-lambda-go",
+				Link: "go.opentelemetry.io/contrib/instrumentation/github.com/aws/aws-lambda-go/otellambda",
+				TargetVersions: map[supported.InstrumentationType][]string{
+					supported.TypeLibrary: {"[1.41.0,)"},
 				},
 			},
 		},

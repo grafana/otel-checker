@@ -6,6 +6,7 @@ import (
 	"github.com/grafana/otel-checker/checks/sdk/supported"
 	"github.com/grafana/otel-checker/checks/utils"
 	"golang.org/x/mod/semver"
+	"gopkg.in/yaml.v3"
 	"path/filepath"
 	"regexp"
 	"slices"
@@ -84,8 +85,8 @@ func outputSupportedLibraries(deps []Library, supported supported.SupportedModul
 
 func findSupportedLibraries(library Library, supported supported.SupportedModules, instrumentationType supported.InstrumentationType, javaVersion int, reporter *utils.ComponentReporter) []string {
 	var links []string
-	for moduleName, module := range supported {
-		for _, instrumentation := range module.Instrumentations {
+	for moduleName, instrumentations := range supported {
+		for _, instrumentation := range instrumentations {
 			for _, version := range instrumentation.TargetVersions[instrumentationType] {
 				if matchVersion(moduleName, version, library, javaVersion, reporter) {
 					l := fmt.Sprintf("https://github.com/open-telemetry/opentelemetry-java-instrumentation/tree/main/%s/%s",
@@ -141,5 +142,20 @@ func supportedLibraries() (supported.SupportedModules, error) {
 	if err != nil {
 		return nil, err
 	}
-	return supported.LoadSupportedLibraries(bytes)
+	return LoadSupportedJavaLibraries(bytes)
+}
+
+// SupportedJavaModules is a struct that holds the supported Java libraries
+type SupportedJavaModules struct {
+	Libraries supported.SupportedModules `json:"libraries"`
+}
+
+// LoadSupportedJavaLibraries loads supported libraries from a YAML file
+func LoadSupportedJavaLibraries(data []byte) (supported.SupportedModules, error) {
+	modules := SupportedJavaModules{}
+	err := yaml.Unmarshal(data, &modules)
+	if err != nil {
+		return nil, err
+	}
+	return modules.Libraries, nil
 }
