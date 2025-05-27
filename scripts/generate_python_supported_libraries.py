@@ -1,3 +1,10 @@
+# /// script
+# requires-python = ">=3.12"
+# dependencies = [
+#     "pyyaml",
+# ]
+# ///
+
 #!/usr/bin/env python3
 
 import os
@@ -97,13 +104,13 @@ def main():
             
         signals = check_instrumentation_signals(src_dir)            
         # Get relative path from repo root
-        src_path = os.path.relpath(inst_dir, repo_path)
+        source_path = os.path.relpath(inst_dir, repo_path)
         
         # Create library entry
         supported_libraries[lib_name] = {
             'instrumentations': [{
                 'name': lib_name,
-                'srcPath': src_path,
+                'source_path': source_path,
                 'signals': signals,
                 'link': f'https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-{lib_name}'
             }]
