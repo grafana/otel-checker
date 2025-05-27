@@ -6,10 +6,15 @@ import (
 	"github.com/grafana/otel-checker/checks/sdk/supported"
 	"github.com/grafana/otel-checker/checks/utils"
 	"golang.org/x/mod/semver"
+	"gopkg.in/yaml.v3"
 	"path/filepath"
+	"regexp"
 	"slices"
+	"strconv"
 	"strings"
 )
+
+var javaVersionRegex = regexp.MustCompile(`Java (\d)+\+`)
 
 type Library struct {
 	Group    string    `json:"groupId"`
@@ -22,14 +27,14 @@ func (l *Library) String() string {
 	return fmt.Sprintf("%s:%s:%s", l.Group, l.Artifact, l.Version)
 }
 
-func reportSupportedInstrumentations(reporter *utils.ComponentReporter, debug bool, instrumentationType supported.InstrumentationType) {
+func reportSupportedInstrumentations(reporter *utils.ComponentReporter, debug bool, instrumentationType supported.InstrumentationType, javaVersion int) {
 	s, err := supportedLibraries()
 	if err != nil {
 		reporter.AddError(fmt.Sprintf("Error reading supported libraries: %v", err))
 	}
 
 	deps := readDependencies(reporter)
-	outputSupportedLibraries(deps, s, reporter, debug, instrumentationType)
+	outputSupportedLibraries(deps, s, reporter, debug, instrumentationType, javaVersion)
 }
 
 func readDependencies(reporter *utils.ComponentReporter) []Library {
@@ -64,11 +69,9 @@ func getWrapper(wrapper string, level []string) string {
 	return getWrapper(wrapper, append(level, ".."))
 }
 
-func outputSupportedLibraries(
-	deps []Library, supported supported.SupportedModules, reporter *utils.ComponentReporter,
-	debug bool, instrumentationType supported.InstrumentationType) {
+func outputSupportedLibraries(deps []Library, supported supported.SupportedModules, reporter *utils.ComponentReporter, debug bool, instrumentationType supported.InstrumentationType, javaVersion int) {
 	for _, dep := range deps {
-		links := findSupportedLibraries(dep, supported, instrumentationType)
+		links := findSupportedLibraries(dep, supported, instrumentationType, javaVersion, reporter)
 		if len(links) > 0 {
 			reporter.AddSuccessfulCheck(
 				fmt.Sprintf("Found supported library: %s:%s:%s at %s",
@@ -76,40 +79,62 @@ func outputSupportedLibraries(
 		} else if debug {
 			reporter.AddWarning(fmt.Sprintf("Found unsupported library: %s:%s:%s", dep.Group, dep.Artifact, dep.Version))
 		}
-		outputSupportedLibraries(dep.Children, supported, reporter, false, instrumentationType)
+		outputSupportedLibraries(dep.Children, supported, reporter, false, instrumentationType, 0)
 	}
 }
 
-func findSupportedLibraries(library Library, supported supported.SupportedModules, instrumentationType supported.InstrumentationType) []string {
+func findSupportedLibraries(library Library, supported supported.SupportedModules, instrumentationType supported.InstrumentationType, javaVersion int, reporter *utils.ComponentReporter) []string {
 	var links []string
-	for moduleName, module := range supported {
-		for _, instrumentation := range module.Instrumentations {
+	for moduleName, instrumentations := range supported {
+		for _, instrumentation := range instrumentations {
 			for _, version := range instrumentation.TargetVersions[instrumentationType] {
-				// e.g. com.amazonaws:aws-lambda-java-core:[1.0.0,)
-				split := strings.Split(version, ":")
-				if len(split) != 3 {
-					panic(fmt.Sprintf("invalid version range: %s", version))
-				}
-				versionRange, err := sdk.ParseVersionRange(split[2])
-				if err != nil {
-					panic(fmt.Sprintf("error parsing version range in module %s: %v", moduleName, err))
-				}
-				if library.Group == split[0] && library.Artifact == split[1] {
-					v := sdk.FixVersion(library.Version)
-					if semver.IsValid(v) {
-						// ignore invalid versions from applications
-						if versionRange.Matches(v) {
-							l := fmt.Sprintf("https://github.com/open-telemetry/opentelemetry-java-instrumentation/tree/main/%s/%s", instrumentation.SrcPath, instrumentationType)
-							if !slices.Contains(links, l) {
-								links = append(links, l)
-							}
-						}
+				if matchVersion(moduleName, version, library, javaVersion, reporter) {
+					l := fmt.Sprintf("https://github.com/open-telemetry/opentelemetry-java-instrumentation/tree/main/%s/%s",
+						instrumentation.SrcPath, instrumentationType)
+					if !slices.Contains(links, l) {
+						links = append(links, l)
 					}
 				}
 			}
 		}
 	}
+	slices.Sort(links)
 	return links
+}
+
+func matchVersion(moduleName string, version string, library Library, javaVersion int, reporter *utils.ComponentReporter) bool {
+	javaVersionMatch := javaVersionRegex.FindStringSubmatch(version)
+
+	if javaVersionMatch != nil {
+		// e.g. Java 8+
+		wantJavaVersion, err := strconv.Atoi(javaVersionMatch[1])
+		if err != nil {
+			reporter.AddError(fmt.Sprintf("Error parsing Java version %s: %v", version, err))
+			return false
+		}
+		return wantJavaVersion <= javaVersion
+	}
+
+	// e.g. com.amazonaws:aws-lambda-java-core:[1.0.0,)
+	split := strings.Split(version, ":")
+	if len(split) != 3 {
+		reporter.AddInternalError(fmt.Sprintf("Invalid java version for module %s: %s", moduleName, version))
+		return false
+	}
+	versionRange, err := sdk.ParseVersionRange(split[2])
+	if err != nil {
+		reporter.AddInternalError(fmt.Sprintf("Error parsing version range for module %s: %s", moduleName, version))
+		return false
+	}
+
+	if library.Group == split[0] && library.Artifact == split[1] {
+		v := sdk.FixVersion(library.Version)
+		if semver.IsValid(v) {
+			// ignore invalid versions from applications
+			return versionRange.Matches(v)
+		}
+	}
+	return false
 }
 
 func supportedLibraries() (supported.SupportedModules, error) {
@@ -117,5 +142,20 @@ func supportedLibraries() (supported.SupportedModules, error) {
 	if err != nil {
 		return nil, err
 	}
-	return supported.LoadSupportedLibraries(bytes)
+	return LoadSupportedJavaLibraries(bytes)
+}
+
+// SupportedJavaModules is a struct that holds the supported Java libraries
+type SupportedJavaModules struct {
+	Libraries supported.SupportedModules `json:"libraries"`
+}
+
+// LoadSupportedJavaLibraries loads supported libraries from a YAML file
+func LoadSupportedJavaLibraries(data []byte) (supported.SupportedModules, error) {
+	modules := SupportedJavaModules{}
+	err := yaml.Unmarshal(data, &modules)
+	if err != nil {
+		return nil, err
+	}
+	return modules.Libraries, nil
 }

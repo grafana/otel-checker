@@ -61,38 +61,30 @@ go run otel-checker \
 	-components=sdk
 ```
 
-## Using the Makefile
+## Using mise
 
-We provide a Makefile with several useful commands to simplify common development tasks. The Makefile helps ensure consistent code quality and streamlines the development workflow.
+We provide a `mise.toml` file with several useful commands to simplify common development tasks. [mise](https://mise.jdx.dev/) helps ensure consistent code quality and streamlines the development workflow.
 
-### Available Make Commands
+### Available mise Commands
 
-| Command | Description |
-|---------|-------------|
-| `make build` | Builds the application using `go install` |
-| `make test` | Runs all tests in the project |
-| `make clean` | Removes build artifacts and cleans the Go cache |
-| `make fmt` | Formats all Go code using `gofmt` |
-| `make lint` | Lints the code using `golangci-lint` |
-| `make deps` | Updates dependencies using `go mod tidy` |
-| `make help` | Displays help information about available commands |
-
-### Dependency: golangci-lint
-
-For linting, we use golangci-lint. If not already installed, you can install it with:
-
-```
-go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
-```
+| Command          | Description                                     |
+|------------------|-------------------------------------------------|
+| `mise run build` | Builds the application using `go install`       |
+| `mise run test`  | Runs all tests in the project                   |
+| `mise run clean` | Removes build artifacts and cleans the Go cache |
+| `mise run fmt`   | Formats all Go code using `gofmt`               |
+| `mise run lint`  | Lints the code using `golangci-lint`            |
+| `mise run check` | Run all checks (test and lint)                  |
+| `mise run deps`  | Updates dependencies using `go mod tidy`        |
 
 ## Contribution Workflow
 
 1. Create a fork of the repository
 2. Create a new branch for your feature or bug fix
 3. Make your changes
-4. Run `make fmt` to format your code
-5. Run `make lint` to ensure code quality
-6. Run `make test` to make sure all tests pass
+4. Run `mise run fmt` to format your code
+5. Run `mise run lint` to ensure code quality
+6. Run `mise run test` to make sure all tests pass
 7. Commit your changes with a descriptive message
 8. Submit a pull request to the main repository
 
@@ -101,9 +93,9 @@ go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 Please ensure:
 
 1. Your code follows the project's style and conventions
-2. All tests pass (`make test`)
-3. Code is properly formatted (`make fmt`)
-4. Linting passes without issues (`make lint`)
+2. All tests pass (`mise run test`)
+3. Code is properly formatted (`mise run fmt`)
+4. Linting passes without issues (`mise run lint`)
 
 ## Code Review Process
 

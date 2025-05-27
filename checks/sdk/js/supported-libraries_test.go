@@ -174,25 +174,21 @@ func TestReadPackageLock(t *testing.T) {
 
 func TestFindSupportedLibraries(t *testing.T) {
 	s := supported.SupportedModules{
-		"express": {
-			Instrumentations: []supported.Instrumentation{
-				{
-					Name: "express",
-					Link: "https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-express",
-					TargetVersions: map[supported.InstrumentationType][]string{
-						supported.TypeLibrary: {"[4.0.0,)"},
-					},
+		"express": []supported.Instrumentation{
+			{
+				Name: "express",
+				Link: "https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-express",
+				TargetVersions: map[supported.InstrumentationType][]string{
+					supported.TypeLibrary: {"[4.0.0,)"},
 				},
 			},
 		},
-		"@opentelemetry/instrumentation-express": {
-			Instrumentations: []supported.Instrumentation{
-				{
-					Name: "@opentelemetry/instrumentation-express",
-					Link: "https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-express",
-					TargetVersions: map[supported.InstrumentationType][]string{
-						supported.TypeLibrary: {"[0.35.0,)"},
-					},
+		"@opentelemetry/instrumentation-express": []supported.Instrumentation{
+			{
+				Name: "@opentelemetry/instrumentation-express",
+				Link: "https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-express",
+				TargetVersions: map[supported.InstrumentationType][]string{
+					supported.TypeLibrary: {"[0.35.0,)"},
 				},
 			},
 		},
@@ -247,7 +243,7 @@ func TestFindSupportedLibraries(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := supported.FindSupportedLibraries(tt.library, s, supported.TypeLibrary)
+			got := supported.FindSupportedLibraries(tt.library, s, supported.TypeLibrary, nil)
 			if len(got) != len(tt.expected) {
 				t.Errorf("Expected %d links, got %d", len(tt.expected), len(got))
 			}

@@ -21,18 +21,14 @@ const (
 // Instrumentation represents a single instrumentation with its metadata
 type Instrumentation struct {
 	Name           string                           `yaml:"name"`
-	SrcPath        string                           `yaml:"srcPath"`
+	Description    string                           `yaml:"description"`
+	SrcPath        string                           `yaml:"source_path"`
 	Link           string                           `yaml:"link,omitempty"`
 	TargetVersions map[InstrumentationType][]string `yaml:"target_versions"`
 }
 
-// SupportedModule represents a module containing instrumentations
-type SupportedModule struct {
-	Instrumentations []Instrumentation `yaml:"instrumentations"`
-}
-
 // SupportedModules represents a map of module names to their supported modules
-type SupportedModules map[string]SupportedModule
+type SupportedModules map[string][]Instrumentation
 
 // LoadSupportedLibraries loads supported libraries from a YAML file
 func LoadSupportedLibraries(data []byte) (SupportedModules, error) {

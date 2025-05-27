@@ -1,3 +1,10 @@
+# /// script
+# requires-python = ">=3.12"
+# dependencies = [
+#     "pyyaml",
+# ]
+# ///
+
 #!/usr/bin/env python3
 
 import os
@@ -14,7 +21,7 @@ def create_result(library_name: str, link: str, version_range: str, dir_name: st
         'name': library_name,
         'link': link,
         'version_range': version_range,
-        'src_path': f"plugins/node/{dir_name}"
+        'source_path': f"plugins/node/{dir_name}"
     }
 
 def get_repo_link(dir_name: str) -> str:
@@ -182,23 +189,21 @@ def main():
             if src_dir.exists():
                 signals = check_instrumentation_signals(src_dir)
 
-            supported_libraries[library_name] = {
-                'instrumentations': [{
-                    'name': library_name,
-                    'srcPath': result['src_path'],
-                    'link': result['link'],
-                    'signals': signals,
-                    'target_versions': {
-                        'library': [convert_version_range(result['version_range'])]
-                    }
-                }]
-            }
+            supported_libraries[library_name] = [{
+                'name': library_name,
+                'source_path': result['source_path'],
+                'link': result['link'],
+                'signals': signals,
+                'target_versions': {
+                    'library': [convert_version_range(result['version_range'])]
+                }
+            }]
 
     output_path = Path(args.output)
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     with open(output_path, 'w') as f:
-        yaml.dump(dict(sorted(supported_libraries.items())), f, sort_keys=False)
+        yaml.dump(supported_libraries, f, sort_keys=True)
 
     print(f"Generated {output_path} with {len(supported_libraries)} supported libraries")
 

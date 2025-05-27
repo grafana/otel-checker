@@ -1,0 +1,44 @@
+[tools]
+go = "latest"
+golangci-lint = "latest"
+uv = "latest"
+
+[tasks.build]
+description = "Build the application"
+run = "go install"
+
+[tasks.test]
+description = "Run tests"
+run = "go test $(go list ./...)"
+
+[tasks.clean]
+description = "Clean build artifacts"
+run = """
+rm -f otel-checker
+go clean
+"""
+
+[tasks.fmt]
+description = "Format code"
+run = "gofmt -w ."
+
+[tasks.lint]
+description = "Lint code"
+run = "golangci-lint run"
+
+[tasks.deps]
+description = "Update dependencies"
+run = "go mod tidy"
+
+[tasks.check]
+description = "Run all checks"
+depends = ['lint', 'test']
+
+[tasks.generate-go-supported-libraries]
+run = "uv run scripts/generate_go_supported_libraries.py ../opentelemetry-go-contrib -o checks/sdk/go/supported-libraries.yaml"
+
+[tasks.generate-js-supported-libraries]
+run = "uv run scripts/generate_js_supported_libraries.py ../opentelemetry-js-contrib -o checks/sdk/js/supported-libraries.yaml"
+
+[tasks.generate]
+depends = ["generate-go-supported-libraries", "generate-js-supported-libraries"]

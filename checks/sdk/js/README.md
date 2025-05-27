@@ -10,23 +10,22 @@ The `supported-libraries.yaml` file contains information about which JavaScript 
 
 ```yaml
 library_name:
-  instrumentations:
-    - name: library_name
-      srcPath: plugins/node/instrumentation-name
-      target_versions:
-        LIBRARY:
-          - [min_version,max_version)
+  - name: library_name
+    source_path: plugins/node/instrumentation-name
+    target_versions:
+      LIBRARY:
+        - [ min_version,max_version)
 ```
 
 Example:
+
 ```yaml
 amqplib:
-  instrumentations:
-    - name: amqplib
-      srcPath: plugins/node/instrumentation-amqplib
-      target_versions:
-        LIBRARY:
-          - [0.5.5,1)
+  - name: amqplib
+    source_path: plugins/node/instrumentation-amqplib
+    target_versions:
+      LIBRARY:
+        - [ 0.5.5,1)
 ```
 
 ## Generating the File
@@ -35,18 +34,13 @@ The `supported-libraries.yaml` file is generated from the OpenTelemetry JS Contr
 
 ### Prerequisites
 
-- Python 3.x
-- PyYAML package (`pip install pyyaml`)
-- A local clone of the [OpenTelemetry JS Contrib repository](https://github.com/open-telemetry/opentelemetry-js-contrib)
+- [Mise](https://mise.jdx.dev/)
+- A local clone of the [OpenTelemetry JS Contrib repository](https://github.com/open-telemetry/opentelemetry-js-contrib) in a sibling directory to this repository.
 
 ### Usage
 
 ```bash
-# Using default output path
-python3 scripts/generate_js_supported_libraries.py /path/to/opentelemetry-js-contrib
-
-# Specifying custom output path
-python3 scripts/generate_js_supported_libraries.py /path/to/opentelemetry-js-contrib -o custom/path/supported-libraries.yaml
+mise r generate-js-supported-libraries
 ```
 
 ### How It Works

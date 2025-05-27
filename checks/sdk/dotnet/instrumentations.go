@@ -30,5 +30,5 @@ func ImplicitPackagesForSdk(sdk string) ([]string, error) {
 		return base, nil
 	}
 
-	return nil, fmt.Errorf("Unrecognized SDK: %s", sdk)
+	return nil, fmt.Errorf("unrecognized SDK: %s", sdk)
 }

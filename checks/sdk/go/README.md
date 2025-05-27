@@ -10,25 +10,23 @@ The `supported-libraries.yaml` file contains information about which Go librarie
 
 ```yaml
 import_path:
-  instrumentations:
-    - name: import_path
-      srcPath: path/to/instrumentation
-      link: go.opentelemetry.io/contrib/path/to/instrumentation
-      target_versions:
-        library:
-          - [min_version,max_version)
+  - name: import_path
+    source_path: path/to/instrumentation
+    link: go.opentelemetry.io/contrib/path/to/instrumentation
+    target_versions:
+      library:
+        - [ min_version,max_version)
 ```
 
 Example:
 ```yaml
 go.mongodb.org/mongo-driver:
-  instrumentations:
   - name: go.mongodb.org/mongo-driver
-    srcPath: instrumentation/go.mongodb.org/mongo-driver/mongo/otelmongo
+    source_path: instrumentation/go.mongodb.org/mongo-driver/mongo/otelmongo
     link: go.opentelemetry.io/contrib/instrumentation/go.mongodb.org/mongo-driver/mongo/otelmongo
     target_versions:
       library:
-      - '[1.17.3,2.0.0)'
+        - '[1.17.3,2.0.0)'
 ```
 
 ## Generating the File
@@ -37,18 +35,13 @@ The `supported-libraries.yaml` file is generated from the OpenTelemetry Go Contr
 
 ### Prerequisites
 
-- Python 3.x
-- PyYAML package (`pip install pyyaml`)
-- A local clone of the [OpenTelemetry Go Contrib repository](https://github.com/open-telemetry/opentelemetry-go-contrib)
+- [Mise](https://mise.jdx.dev/)
+- A local clone of the [OpenTelemetry Go Contrib repository](https://github.com/open-telemetry/opentelemetry-go-contrib) in a sibling directory to this repository.
 
 ### Usage
 
 ```bash
-# Using default output path
-python3 scripts/generate_go_supported_libraries.py /path/to/opentelemetry-go-contrib
-
-# Specifying custom output path
-python3 scripts/generate_go_supported_libraries.py /path/to/opentelemetry-go-contrib -o custom/path/supported-libraries.yaml
+mise r generate-go-supported-libraries
 ```
 
 ### How It Works

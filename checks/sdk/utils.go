@@ -133,7 +133,9 @@ func LoadUrl(url string) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error fetching instrumentation list: %v", err)
 	}
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		_ = Body.Close()
+	}(resp.Body)
 	bytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("error reading response body: %v", err)
