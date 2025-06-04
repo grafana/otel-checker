@@ -1,26 +1,33 @@
 # OTel Me If It's Right
 
-Checker if the implementation of OpenTelemetry instrumentation is correct.
+Checker for if the implementation of OpenTelemetry instrumentation is correct by scanning the code in your repository.
 
 ## Usage
 
 Requirement: Golang
 
 ## Installation
+
 1. Install the `otel-checker` binary
-```
-go install github.com/grafana/otel-checker@latest
-```
+
+   ```text
+   go install github.com/grafana/otel-checker@latest
+   ```
+
 2. You can confirm it was installed with:
-```
-❯ ls $GOPATH/bin
-otel-checker
-```
+
+   ```terminal
+   ❯ ls $GOPATH/bin
+   otel-checker
+   ```
 
 ## Flags
 
-The available flags:
-```
+The available flags are shown below:
+
+<!-- markdownlint-disable MD010 -->
+
+```terminal
 ❯ otel-checker -h
 Usage of otel-checker:
   -manual-instrumentation
@@ -41,24 +48,26 @@ Usage of otel-checker:
         Set if you would like the results served in a web server in addition to console output
 ```
 
+<!-- markdownlint-enable MD010 -->
+
 ## Checks
 
 ### Common Environment Variables
-         
+
 These checks are automatically performed for all languages and components.
 
 - Best practices for setting common environment variables:
   - Service name
-  - Exporter protocol 
+  - Exporter protocol
 
 - Resource attributes checks:
   - Validates the presence of recommended OpenTelemetry resource attributes
   - Checks for the following attributes:
     - `service.name` (via `OTEL_SERVICE_NAME` or in `OTEL_RESOURCE_ATTRIBUTES`)
-    - `service.namespace` (e.g., "shop")
-    - `deployment.environment.name` (e.g., "production")
-    - `service.instance.id` (e.g., "checkout-123")
-    - `service.version` (e.g., "1.2")
+    - `service.namespace` (e.g., `shop`)
+    - `deployment.environment.name` (e.g., `production`)
+    - `service.instance.id` (e.g., `checkout-123`)
+    - `service.version` (e.g., `1.2`)
   - For missing attributes, provides specific recommendations with example values
   - Follows the [OpenTelemetry specification](https://opentelemetry.io/docs/concepts/sdk-configuration/general-sdk-configuration/) for precedence (e.g., `OTEL_SERVICE_NAME` takes precedence over `service.name` in `OTEL_RESOURCE_ATTRIBUTES`)
   - Example warning: `Set OTEL_RESOURCE_ATTRIBUTES="service.namespace=shop": An optional namespace for service.name`
@@ -99,10 +108,11 @@ Use `-components=sdk -language=dotnet` flag to check the following:
 - Available instrumentation for .NET libraries and dependencies
 - Auto-instrumentation environment variables
 
-**Only .NET 8.0 and higher are supported**
+> [!NOTE]
+> Only .NET 8.0 and higher are supported
 
 #### Java
-   
+
 Use `-components=sdk -language=java` flag to check the following:
 
 - Java version
@@ -115,7 +125,7 @@ Use `-components=sdk -language=java` flag to check the following:
 
 Use `-components=sdk -language=go` flag to check the following:
 
-- Prints which libraries are supported for manual instrumentation 
+- Prints which libraries are supported for manual instrumentation
   based on the `go.mod` in the current directory.
 
 #### Ruby
@@ -151,7 +161,9 @@ Use `-components=beyla` flag to check the following:
 - Environment variables
 
 ### Alloy
-TBD
+
+> [!NOTE]
+> TBD
 
 ## Examples
 
