@@ -1,6 +1,6 @@
 # OTel Me If It's Right
 
-Checker for if the implementation of OpenTelemetry instrumentation is correct by scanning the code in your repository.
+Checker for if the implementation of OpenTelemetry instrumentation is correct by scanning the code in your repository, checking environment variables, validating your Grafana token and more.
 
 ## Usage
 
