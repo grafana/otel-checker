@@ -34,20 +34,18 @@ class Instrumentation:
         self.link = link
         self.target_versions_library = target_versions_library
 
-    def to_dict(self) -> Dict[str, Any]:
-        return {
+    def __to_yaml__(self) -> Dict[str, Any]:
+        """Return a YAML-serializable representation of the object."""
+        data = {
             'name': self.name,
             'source_path': self.source_path,
             'signals': self.signals,
             'link': self.link,
-            'target_versions': {
-                'library': self.target_versions_library
-            }
         }
-
-    def __to_yaml__(self) -> Dict[str, Any]:
-        """Return a YAML-serializable representation of the object."""
-        return self.to_dict()
+        # Only add target_versions if there are library versions
+        if self.target_versions_library:
+            data['target_versions'] = {'library': self.target_versions_library}
+        return data
 
 # Register the custom representers for YAML serialization
 yaml.add_representer(Signals, lambda dumper, data: dumper.represent_dict(data.__to_yaml__()))
