@@ -101,10 +101,9 @@ def main():
     
     output_path = Path(args.output)
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    sorted_supported_libraries = dict(sorted(supported_libraries.items()))
     
     with open(output_path, 'w') as f:
-        yaml.dump(dict(sorted_supported_libraries), f, sort_keys=False)
+        yaml.dump(supported_libraries, f, sort_keys=True)
 
     print(f"Generated {output_path} with {len(supported_libraries)} supported libraries")
 
