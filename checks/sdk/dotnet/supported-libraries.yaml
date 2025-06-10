@@ -1,119 +1,187 @@
-'System.Web':
-  instrumentations:
-  - name: AspNet
-    srcPath: src/OpenTelemetry.Instrumentation.AspNet
-    signals:
-      - traces: true
-      - metrics: true
-  - name: AspNet.TelemetryHttpModule
-    srcPath: src/OpenTelemetry.Instrumentation.AspNet.TelemetryHttpModule
-    signals:
-      - traces: true
-'Microsoft.AspNetCore.Http':
-  instrumentations:
-  - name: AspNetCore
-    srcPath: src/OpenTelemetry.Instrumentation.AspNetCore
-    signals:
-      - traces: true
-      - metrics: true
-'Confluent.Kafka':
-  instrumentations:
-  - name: ConfluentKafka
-    srcPath: src/OpenTelemetry.Instrumentation.ConfluentKafka
-    signals:
-      - traces: true
-'StackExchange.Redis':
-  instrumentations:
-  - name: StackExchangeRedis
-    srcPath: src/OpenTelemetry.Instrumentation.StackExchangeRedis
-    signals:
-      - traces: true
-'System.Data.SqlClient':
-  instrumentations:
-  - name: SqlClient
-    srcPath: src/OpenTelemetry.Instrumentation.SqlClient
-    signals:
-      - traces: true
-      - metrics: true
-'Microsoft.Data.SqlClient':
-  instrumentations:
-  - name: SqlClient
-    srcPath: src/OpenTelemetry.Instrumentation.SqlClient
-    signals:
-      - traces: true
-      - metrics: true
-'Microsoft.EntityFrameworkCore':
-  instrumentations:
-  - name: EntityFrameworkCore
-    srcPath: src/OpenTelemetry.Instrumentation.EntityFrameworkCore
-    signals:
-      - traces: true
-'Elasticsearch.Client':
-  instrumentations:
-  - name: ElasticsearchClient
-    srcPath: src/OpenTelemetry.Instrumentation.ElasticsearchClient
-    signals:
-      - traces: true
-'System.Diagnostics.DiagnosticSource':
-  instrumentations:
-  - name: DiagnosticSourceListener
-    srcPath: src/OpenTelemetry.Instrumentation.DiagnosticSourceListener
-    signals:
-      - traces: true
-'System.Diagnostics.EventSource':
-  instrumentations:
-  - name: EventCounters
-    srcPath: src/OpenTelemetry.Instrumentation.EventCounters
-    signals:
-      - metrics: true
-'System.Net.Http':
-  instrumentations:
-  - name: Http
-    srcPath: src/OpenTelemetry.Instrumentation.Http
-    signals:
-      - traces: true
-      - metrics: true
-'System.Runtime':
-  instrumentations:
-  - name: Process
-    srcPath: src/OpenTelemetry.Instrumentation.Process
-    signals:
-      - metrics: true
-'System.Runtime.Caching':
-  instrumentations:
-  - name: RuntimeMemoryCache
-    srcPath: src/OpenTelemetry.Instrumentation.RuntimeMemoryCache
-    signals:
-      - metrics: true
-      - traces: true
-'System.ServiceModel':
-  instrumentations:
-  - name: Wcf
-    srcPath: src/OpenTelemetry.Instrumentation.Wcf
-    signals:
-      - traces: true
-'Hangfire':
-  instrumentations:
-  - name: Hangfire
-    srcPath: src/OpenTelemetry.Instrumentation.Hangfire
-    signals:
-      - traces: true
-'MassTransit':
-  instrumentations:
-  - name: MassTransit
-    srcPath: src/OpenTelemetry.Instrumentation.MassTransit
-    signals:
-      - traces: true
-'Owin':
-  instrumentations:
-  - name: Owin
-    srcPath: src/OpenTelemetry.Instrumentation.Owin
-    signals:
-      - traces: true
-      - metrics: true
-'AWS Lambda':
-  instrumentations:
-  - name: AWSLambda
-    srcPath: src/OpenTelemetry.Instrumentation.AWSLambda
-    signals:
-      - traces: true
+OpenTelemetry.Exporter.Geneva:
+- link: https://github.com/open-telemetry/opentelemetry-dotnet-contrib/tree/main/src/OpenTelemetry.Exporter.Geneva
+  name: OpenTelemetry.Exporter.Geneva
+  signals:
+    metrics: false
+    traces: true
+  source_path: src/OpenTelemetry.Exporter.Geneva
+  target_versions:
+    library:
+    - unknown
+- link: https://github.com/open-telemetry/opentelemetry-dotnet-contrib/tree/main/src/OpenTelemetry.Exporter.Geneva
+  name: OpenTelemetry.Exporter.Geneva
+  signals:
+    metrics: true
+    traces: false
+  source_path: src/OpenTelemetry.Exporter.Geneva
+  target_versions:
+    library:
+    - unknown
+OpenTelemetry.Exporter.InfluxDB:
+- link: https://github.com/open-telemetry/opentelemetry-dotnet-contrib/tree/main/src/OpenTelemetry.Exporter.InfluxDB
+  name: OpenTelemetry.Exporter.InfluxDB
+  signals:
+    metrics: true
+    traces: false
+  source_path: src/OpenTelemetry.Exporter.InfluxDB
+  target_versions:
+    library:
+    - unknown
+OpenTelemetry.Exporter.Instana:
+- link: https://github.com/open-telemetry/opentelemetry-dotnet-contrib/tree/main/src/OpenTelemetry.Exporter.Instana
+  name: OpenTelemetry.Exporter.Instana
+  signals:
+    metrics: false
+    traces: true
+  source_path: src/OpenTelemetry.Exporter.Instana
+  target_versions:
+    library:
+    - unknown
+OpenTelemetry.Extensions.AWS:
+- link: https://github.com/open-telemetry/opentelemetry-dotnet-contrib/tree/main/src/OpenTelemetry.Extensions.AWS
+  name: OpenTelemetry.Extensions.AWS
+  signals:
+    metrics: false
+    traces: true
+  source_path: src/OpenTelemetry.Extensions.AWS
+  target_versions:
+    library:
+    - unknown
+OpenTelemetry.Extensions.Enrichment:
+- link: https://github.com/open-telemetry/opentelemetry-dotnet-contrib/tree/main/src/OpenTelemetry.Extensions.Enrichment
+  name: OpenTelemetry.Extensions.Enrichment
+  signals:
+    metrics: false
+    traces: true
+  source_path: src/OpenTelemetry.Extensions.Enrichment
+  target_versions:
+    library:
+    - unknown
+OpenTelemetry.Instrumentation.AWSLambda:
+- link: https://github.com/open-telemetry/opentelemetry-dotnet-contrib/tree/main/src/OpenTelemetry.Instrumentation.AWSLambda
+  name: OpenTelemetry.Instrumentation.AWSLambda
+  signals:
+    metrics: false
+    traces: true
+  source_path: src/OpenTelemetry.Instrumentation.AWSLambda
+  target_versions:
+    library:
+    - unknown
+OpenTelemetry.Instrumentation.AspNet:
+- link: https://github.com/open-telemetry/opentelemetry-dotnet-contrib/tree/main/src/OpenTelemetry.Instrumentation.AspNet
+  name: OpenTelemetry.Instrumentation.AspNet
+  signals:
+    metrics: true
+    traces: false
+  source_path: src/OpenTelemetry.Instrumentation.AspNet
+  target_versions:
+    library:
+    - unknown
+- link: https://github.com/open-telemetry/opentelemetry-dotnet-contrib/tree/main/src/OpenTelemetry.Instrumentation.AspNet
+  name: OpenTelemetry.Instrumentation.AspNet
+  signals:
+    metrics: false
+    traces: true
+  source_path: src/OpenTelemetry.Instrumentation.AspNet
+  target_versions:
+    library:
+    - unknown
+OpenTelemetry.Instrumentation.AspNetCore:
+- link: https://github.com/open-telemetry/opentelemetry-dotnet-contrib/tree/main/src/OpenTelemetry.Instrumentation.AspNetCore
+  name: OpenTelemetry.Instrumentation.AspNetCore
+  signals:
+    metrics: false
+    traces: true
+  source_path: src/OpenTelemetry.Instrumentation.AspNetCore
+  target_versions:
+    library:
+    - unknown
+OpenTelemetry.Instrumentation.Cassandra:
+- link: https://github.com/open-telemetry/opentelemetry-dotnet-contrib/tree/main/src/OpenTelemetry.Instrumentation.Cassandra
+  name: OpenTelemetry.Instrumentation.Cassandra
+  signals:
+    metrics: true
+    traces: false
+  source_path: src/OpenTelemetry.Instrumentation.Cassandra
+  target_versions:
+    library:
+    - unknown
+OpenTelemetry.Instrumentation.EntityFrameworkCore:
+- link: https://github.com/open-telemetry/opentelemetry-dotnet-contrib/tree/main/src/OpenTelemetry.Instrumentation.EntityFrameworkCore
+  name: OpenTelemetry.Instrumentation.EntityFrameworkCore
+  signals:
+    metrics: true
+    traces: false
+  source_path: src/OpenTelemetry.Instrumentation.EntityFrameworkCore
+  target_versions:
+    library:
+    - unknown
+OpenTelemetry.Instrumentation.GrpcNetClient:
+- link: https://github.com/open-telemetry/opentelemetry-dotnet-contrib/tree/main/src/OpenTelemetry.Instrumentation.GrpcNetClient
+  name: OpenTelemetry.Instrumentation.GrpcNetClient
+  signals:
+    metrics: false
+    traces: true
+  source_path: src/OpenTelemetry.Instrumentation.GrpcNetClient
+  target_versions:
+    library:
+    - unknown
+OpenTelemetry.Instrumentation.Http:
+- link: https://github.com/open-telemetry/opentelemetry-dotnet-contrib/tree/main/src/OpenTelemetry.Instrumentation.Http
+  name: OpenTelemetry.Instrumentation.Http
+  signals:
+    metrics: false
+    traces: true
+  source_path: src/OpenTelemetry.Instrumentation.Http
+  target_versions:
+    library:
+    - unknown
+OpenTelemetry.Instrumentation.Owin:
+- link: https://github.com/open-telemetry/opentelemetry-dotnet-contrib/tree/main/src/OpenTelemetry.Instrumentation.Owin
+  name: OpenTelemetry.Instrumentation.Owin
+  signals:
+    metrics: false
+    traces: true
+  source_path: src/OpenTelemetry.Instrumentation.Owin
+  target_versions:
+    library:
+    - unknown
+OpenTelemetry.Instrumentation.ServiceFabricRemoting:
+- link: https://github.com/open-telemetry/opentelemetry-dotnet-contrib/tree/main/src/OpenTelemetry.Instrumentation.ServiceFabricRemoting
+  name: OpenTelemetry.Instrumentation.ServiceFabricRemoting
+  signals:
+    metrics: false
+    traces: true
+  source_path: src/OpenTelemetry.Instrumentation.ServiceFabricRemoting
+  target_versions:
+    library:
+    - unknown
+OpenTelemetry.Instrumentation.SqlClient:
+- link: https://github.com/open-telemetry/opentelemetry-dotnet-contrib/tree/main/src/OpenTelemetry.Instrumentation.SqlClient
+  name: OpenTelemetry.Instrumentation.SqlClient
+  signals:
+    metrics: true
+    traces: false
+  source_path: src/OpenTelemetry.Instrumentation.SqlClient
+  target_versions:
+    library:
+    - unknown
+- link: https://github.com/open-telemetry/opentelemetry-dotnet-contrib/tree/main/src/OpenTelemetry.Instrumentation.SqlClient
+  name: OpenTelemetry.Instrumentation.SqlClient
+  signals:
+    metrics: false
+    traces: true
+  source_path: src/OpenTelemetry.Instrumentation.SqlClient
+  target_versions:
+    library:
+    - unknown
+OpenTelemetry.Instrumentation.Wcf:
+- link: https://github.com/open-telemetry/opentelemetry-dotnet-contrib/tree/main/src/OpenTelemetry.Instrumentation.Wcf
+  name: OpenTelemetry.Instrumentation.Wcf
+  signals:
+    metrics: false
+    traces: true
+  source_path: src/OpenTelemetry.Instrumentation.Wcf
+  target_versions:
+    library:
+    - unknown

@@ -1,13 +1,28 @@
 github.com/aws/aws-lambda-go:
 - link: go.opentelemetry.io/contrib/instrumentation/github.com/aws/aws-lambda-go/otellambda
   name: github.com/aws/aws-lambda-go
+  signals:
+    metrics: false
+    traces: true
   source_path: instrumentation/github.com/aws/aws-lambda-go/otellambda
   target_versions:
     library:
-    - '[1.48.0,2.0.0)'
+    - '[1.49.0,2.0.0)'
+- link: go.opentelemetry.io/contrib/instrumentation/github.com/aws/aws-lambda-go/otellambda/xrayconfig
+  name: github.com/aws/aws-lambda-go
+  signals:
+    metrics: false
+    traces: true
+  source_path: instrumentation/github.com/aws/aws-lambda-go/otellambda/xrayconfig
+  target_versions:
+    library:
+    - '[1.49.0,2.0.0)'
 github.com/aws/aws-sdk-go-v2:
 - link: go.opentelemetry.io/contrib/instrumentation/github.com/aws/aws-sdk-go-v2/otelaws
   name: github.com/aws/aws-sdk-go-v2
+  signals:
+    metrics: false
+    traces: true
   source_path: instrumentation/github.com/aws/aws-sdk-go-v2/otelaws
   target_versions:
     library:
@@ -15,84 +30,110 @@ github.com/aws/aws-sdk-go-v2:
 github.com/emicklei/go-restful/v3:
 - link: go.opentelemetry.io/contrib/instrumentation/github.com/emicklei/go-restful/otelrestful
   name: github.com/emicklei/go-restful/v3
+  signals:
+    metrics: true
+    traces: true
   source_path: instrumentation/github.com/emicklei/go-restful/otelrestful
   target_versions:
     library:
     - '[3.12.2,4.0.0)'
-github.com/felixge/httpsnoop:
-- link: go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux
-  name: github.com/felixge/httpsnoop
-  source_path: instrumentation/github.com/gorilla/mux/otelmux
-  target_versions:
-    library:
-    - '[1.0.4,2.0.0)'
 github.com/gin-gonic/gin:
 - link: go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin
   name: github.com/gin-gonic/gin
+  signals:
+    metrics: true
+    traces: true
   source_path: instrumentation/github.com/gin-gonic/gin/otelgin
   target_versions:
     library:
-    - '[1.10.0,2.0.0)'
+    - '[1.10.1,2.0.0)'
 github.com/gorilla/mux:
-- link: go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux/example
+- link: go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux
   name: github.com/gorilla/mux
-  source_path: instrumentation/github.com/gorilla/mux/otelmux/example
+  signals:
+    metrics: true
+    traces: true
+  source_path: instrumentation/github.com/gorilla/mux/otelmux
   target_versions:
     library:
     - '[1.8.1,2.0.0)'
 github.com/labstack/echo/v4:
 - link: go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho
   name: github.com/labstack/echo/v4
+  signals:
+    metrics: false
+    traces: true
   source_path: instrumentation/github.com/labstack/echo/otelecho
   target_versions:
     library:
-    - '[4.13.3,5.0.0)'
-github.com/stretchr/testify:
-- link: go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin/internal/semconv/test
-  name: github.com/stretchr/testify
-  source_path: instrumentation/github.com/gin-gonic/gin/otelgin/internal/semconv/test
-  target_versions:
-    library:
-    - '[1.10.0,2.0.0)'
+    - '[4.13.4,5.0.0)'
 go.mongodb.org/mongo-driver:
 - link: go.opentelemetry.io/contrib/instrumentation/go.mongodb.org/mongo-driver/mongo/otelmongo
   name: go.mongodb.org/mongo-driver
+  signals:
+    metrics: false
+    traces: true
   source_path: instrumentation/go.mongodb.org/mongo-driver/mongo/otelmongo
   target_versions:
     library:
-    - '[1.17.3,2.0.0)'
+    - '[1.17.4,2.0.0)'
 go.mongodb.org/mongo-driver/v2:
 - link: go.opentelemetry.io/contrib/instrumentation/go.mongodb.org/mongo-driver/v2/mongo/otelmongo
   name: go.mongodb.org/mongo-driver/v2
+  signals:
+    metrics: false
+    traces: true
   source_path: instrumentation/go.mongodb.org/mongo-driver/v2/mongo/otelmongo
   target_versions:
     library:
-    - '[2.2.1,3.0.0)'
-go.opentelemetry.io/contrib/instrumentation/host:
-- link: go.opentelemetry.io/contrib/instrumentation/host/example
-  name: go.opentelemetry.io/contrib/instrumentation/host
-  source_path: instrumentation/host/example
-  target_versions:
-    library:
-    - '[0.60.0,1.0.0)'
-go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace:
-- link: go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace/example
-  name: go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace
-  source_path: instrumentation/net/http/httptrace/otelhttptrace/example
-  target_versions:
-    library:
-    - '[0.60.0,1.0.0)'
-go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp:
-- link: go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp/example
-  name: go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp
-  source_path: instrumentation/net/http/otelhttp/example
-  target_versions:
-    library:
-    - '[0.60.0,1.0.0)'
+    - '[2.2.2,3.0.0)'
 google.golang.org/grpc:
 - link: go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc
   name: google.golang.org/grpc
+  signals:
+    metrics: true
+    traces: true
   source_path: instrumentation/google.golang.org/grpc/otelgrpc
   target_versions:
     library:
-    - '[1.72.1,2.0.0)'
+    - '[1.73.0,2.0.0)'
+host:
+- link: go.opentelemetry.io/contrib/instrumentation/host
+  name: host
+  signals:
+    metrics: true
+    traces: true
+  source_path: instrumentation/host
+  target_versions:
+    library:
+    - '[1.23.0,2.0.0)'
+net/http:
+- link: go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp
+  name: net/http
+  signals:
+    metrics: true
+    traces: true
+  source_path: instrumentation/net/http/otelhttp
+  target_versions:
+    library:
+    - '[1.23.0,2.0.0)'
+net/http/httptrace:
+- link: go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace
+  name: net/http/httptrace
+  signals:
+    metrics: true
+    traces: true
+  source_path: instrumentation/net/http/httptrace/otelhttptrace
+  target_versions:
+    library:
+    - '[1.23.0,2.0.0)'
+runtime:
+- link: go.opentelemetry.io/contrib/instrumentation/runtime
+  name: runtime
+  signals:
+    metrics: true
+    traces: true
+  source_path: instrumentation/runtime
+  target_versions:
+    library:
+    - '[1.23.0,2.0.0)'
