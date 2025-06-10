@@ -34,11 +34,20 @@ run = "go mod tidy"
 description = "Run all checks"
 depends = ['lint', 'test']
 
+[tasks.generate-dotnet-supported-libraries]
+run = "uv run scripts/generate_dotnet_supported_libraries.py ../opentelemetry-dotnet-contrib -o ./checks/sdk/dotnet/supported-libraries.yaml"
+
 [tasks.generate-go-supported-libraries]
-run = "uv run scripts/generate_go_supported_libraries.py ../opentelemetry-go-contrib -o checks/sdk/go/supported-libraries.yaml"
+run = "uv run scripts/generate_go_supported_libraries.py ../opentelemetry-go-contrib -o ./checks/sdk/go/supported-libraries.yaml"
+
+[tasks.generate-java-supported-libraries]
+run = "uv run scripts/generate_java_supported_libraries.py ../opentelemetry-java-instrumentation -o checks/sdk/java/supported-libraries.yaml"
 
 [tasks.generate-js-supported-libraries]
 run = "uv run scripts/generate_js_supported_libraries.py ../opentelemetry-js-contrib -o checks/sdk/js/supported-libraries.yaml"
 
+[tasks.generate-python-supported-libraries]
+run = "uv run scripts/generate_python_supported_libraries.py ../opentelemetry-python-contrib -o checks/sdk/python/supported-libraries.yaml"
+
 [tasks.generate]
-depends = ["generate-go-supported-libraries", "generate-js-supported-libraries"]
+depends = ["generate-dotnet-supported-libraries","generate-go-supported-libraries", "generate-java-supported-libraries", "generate-js-supported-libraries", "generate-python-supported-libraries"]
