@@ -217,7 +217,7 @@ def main():
                 entry = Instrumentation(
                     name=library_name,
                     source_path=str(rel_path.parent.as_posix()),
-                    signals=signals,
+                    signals=signals.to_dict(),
                     link=module_name,
                     target_versions_library=[version_range]
                 )

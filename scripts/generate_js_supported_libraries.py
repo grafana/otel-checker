@@ -178,7 +178,7 @@ def main():
                 name=library_name,
                 source_path=result['source_path'],
                 link=result['link'],
-                signals=signals,
+                signals=signals.to_dict(),
                 target_versions_library=[convert_version_range(result['version_range'])]
             )]
     output_path = Path(args.output)

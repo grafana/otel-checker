@@ -99,7 +99,7 @@ def main():
                     entry = Instrumentation(
                         name=library_name,
                         source_path=source_path,
-                        signals=signals,
+                        signals=signals.to_dict(),
                         link=github_link,
                         target_versions_library=[library_version]
                     )
