@@ -94,7 +94,7 @@ def main():
                                    trace_patterns=TRACE_PATTERNS)
                 if library_name and (signals.traces or signals.metrics):
                     source_path = project_dir.relative_to(repo_path).as_posix()
-                    github_link = f"https://github.com/open-telemetry/opentelemetry-dotnet-contrib/tree/main/{relative_source_path}"
+                    github_link = f"https://github.com/open-telemetry/opentelemetry-dotnet-contrib/tree/main/{source_path}"
 
                     entry = Instrumentation(
                         name=library_name,
