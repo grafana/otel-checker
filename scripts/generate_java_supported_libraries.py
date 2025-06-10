@@ -112,7 +112,7 @@ def main():
                 if signals.traces and signals.metrics:
                     break
 
-            inst_entry['signals'] = signals.to_dict()
+            inst_entry['signals'] = signals
             processed_instrumentations_count += 1
 
     print(f"Finished processing. Added signal data to {processed_instrumentations_count} instrumentations.")

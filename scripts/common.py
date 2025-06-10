@@ -1,6 +1,7 @@
 from pathlib import Path
 import re
 import sys
+import yaml
 from typing import Dict, Any, List, Optional
 
 class Signals:
@@ -21,6 +22,10 @@ class Signals:
         self.metrics = self.metrics or other.metrics
         self.traces = self.traces or other.traces
 
+    def __to_yaml__(self) -> Dict[str, bool]:
+        """Return a YAML-serializable representation of the object."""
+        return self.to_dict()
+
 class Instrumentation:
     def __init__(self, name: str, source_path: str, signals: Signals, link: str, target_versions_library: List[str] = []):
         self.name = name
@@ -33,12 +38,20 @@ class Instrumentation:
         return {
             'name': self.name,
             'source_path': self.source_path,
-            'signals': self.signals.to_dict(),
+            'signals': self.signals,
             'link': self.link,
             'target_versions': {
                 'library': self.target_versions_library
             }
         }
+
+    def __to_yaml__(self) -> Dict[str, Any]:
+        """Return a YAML-serializable representation of the object."""
+        return self.to_dict()
+
+# Register the custom representers for YAML serialization
+yaml.add_representer(Signals, lambda dumper, data: dumper.represent_dict(data.__to_yaml__()))
+yaml.add_representer(Instrumentation, lambda dumper, data: dumper.represent_dict(data.__to_yaml__()))
 
 def signals_match_file(file: Path, metric_patterns: List[str] = [], trace_patterns: List[str] = []) -> Signals:
     """Check if the file contains any metric or trace patterns."""
