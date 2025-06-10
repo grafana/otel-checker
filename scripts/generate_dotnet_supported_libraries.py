@@ -103,9 +103,9 @@ def main():
                     )
 
                     if library_name not in supported_libraries:
-                        supported_libraries[library_name] = {"instrumentations": [entry]}
+                        supported_libraries[library_name] = [entry]
                     else:
-                        supported_libraries[library_name]["instrumentations"].append(entry)
+                        supported_libraries[library_name].append(entry)
         except Exception as e:
             print(f"Error processing {csproj_file}: {e}", file=sys.stderr)
 
