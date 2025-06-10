@@ -38,14 +38,14 @@ TRACE_PATTERNS = [
     r'setAttributes'
 ]
 
-def create_result(library_name: str, link: str, version_range: str, dir_name: str) -> Instrumentation:
+def create_result(library_name: str, link: str, version_range: str, dir_name: str) -> Dict[str, Any]:
     """Create a standardized result dictionary."""
-    return Instrumentation(
-        name=library_name,
-        link=link,
-        version_range=version_range,
-        source_path=f"plugins/node/{dir_name}"
-    )
+    return {
+        "name": library_name,
+        "link": link,
+        "version_range": version_range,
+        "source_path": f"plugins/node/{dir_name}"
+    }
 
 def get_repo_link(dir_name: str) -> str:
     """Get the repository link for a library."""
