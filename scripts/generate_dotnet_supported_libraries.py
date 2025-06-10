@@ -31,15 +31,17 @@ def parse_csproj(csproj_path: Path) -> Optional[Dict[str, str]]:
         # Common tags for package name
         name_tags = ['AssemblyName', 'PackageId']
         for tag in name_tags:
-            element = root.find(f".//PropertyGroup/{tag}")
+            element = root.find(f".//{tag}")
             if element is not None and element.text:
                 name = element.text.strip()
                 break
-        
+        # Fallback to file name if no tag found
+        name = name or csproj_path.stem
+
         # Common tags for package version
         version_tags = ['Version', 'PackageVersion']
         for tag in version_tags:
-            element = root.find(f".//PropertyGroup/{tag}")
+            element = root.find(f".//{tag}")
             if element is not None and element.text:
                 version = element.text.strip()
                 break
