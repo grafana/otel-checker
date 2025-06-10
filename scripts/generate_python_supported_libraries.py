@@ -14,61 +14,48 @@ import yaml
 import argparse
 from pathlib import Path
 from typing import Dict, Any, List, Optional
+from scripts.common import Signals, Instrumentation, signals_match_file
 
-def check_instrumentation_signals(src_dir: Path) -> Dict[str, bool]:
+METRIC_PATTERNS = [
+        r'from opentelemetry.metrics import',
+        r'create_counter',
+        r'create_up_down_counter',
+        r'create_histogram',
+        r'create_observable_gauge',
+        r'Counter\(',
+        r'UpDownCounter\(',
+        r'Histogram\('
+    ]
+
+TRACE_PATTERNS = [
+        r'from opentelemetry.trace import',
+        r'SpanKind',
+        r'start_as_current_span',
+        r'start_span',
+        r'set_span_in_context',
+        r'set_attributes',
+        r'add_event'
+    ]
+
+def check_instrumentation_signals(src_dir: Path) -> Signals:
     """Check if instrumentation supports traces and/or metrics."""
-    signals = {}
-    
+    signals = Signals()
+
     # First check package.py for explicit metrics support flag
-    package_py = src_dir / "package.py"
-    if package_py.exists():
-        with open(package_py, 'r', encoding='utf-8') as f:
-            content = f.read()
-            if re.search(r'_supports_metrics\s*=\s*True', content):
-                signals['metrics'] = True
+    package_py = Path(src_dir) / "package.py"
+    signals.update(signals_match_file(package_py, metric_patterns=[r'_supports_metrics\s*=\s*True']))
 
     # Walk through Python source files
-    for root, _, files in os.walk(src_dir):
-        for file in files:
-            if not file.endswith(('.py', '.pyi')):
-                continue
-                
-            file_path = Path(root) / file
-            with open(file_path, 'r', encoding='utf-8') as f:
-                content = f.read()
-
-            # Check for metrics support (if not already found in package.py)
-            if 'metrics' not in signals:
-                metric_patterns = [
-                    r'from opentelemetry.metrics import',
-                    r'create_counter',
-                    r'create_up_down_counter',
-                    r'create_histogram',
-                    r'create_observable_gauge',
-                    r'Counter\(',
-                    r'UpDownCounter\(',
-                    r'Histogram\('
-                ]
-                if any(re.search(p, content) for p in metric_patterns):
-                    signals['metrics'] = True
+    for file_path in src_dir.rglob('*.py(i)?'):
+        if not file_path.is_file():
+            continue
             
-            if 'traces' not in signals:
-                # Check for tracing support
-                trace_patterns = [
-                    r'from opentelemetry.trace import',
-                    r'SpanKind',
-                    r'start_as_current_span',
-                    r'start_span',
-                    r'set_span_in_context',
-                    r'set_attributes',
-                    r'add_event'
-                ]
-                if any(re.search(p, content) for p in trace_patterns):
-                    signals['traces'] = True
-                
-            if 'traces' in signals and 'metrics' in signals:  # Both signals found
-                break
-                
+        signals.update(signals_match_file(file_path, 
+                                           metric_patterns=METRIC_PATTERNS, 
+                                           trace_patterns=TRACE_PATTERNS))
+
+        if signals.traces and signals.metrics:
+            break
     return signals
 
 def find_instrumentation_dirs(repo_path: Path) -> List[Path]:
@@ -108,12 +95,10 @@ def main():
         
         # Create library entry
         supported_libraries[lib_name] = {
-            'instrumentations': [{
-                'name': lib_name,
-                'source_path': source_path,
-                'signals': signals,
-                'link': f'https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-{lib_name}'
-            }]
+            'instrumentations': [Instrumentation(lib_name,
+                                                 source_path,
+                                                 signals,
+                                                 f'https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-{lib_name}')]
         }
     
     output_path = Path(args.output)

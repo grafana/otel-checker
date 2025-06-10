@@ -14,69 +14,54 @@ import yaml
 import argparse
 from pathlib import Path
 from typing import Optional, Dict, Any
+from scripts.common import Signals, Instrumentation, signals_match_file
 
-def create_result(library_name: str, link: str, version_range: str, dir_name: str) -> Dict[str, Any]:
+METRIC_PATTERNS = [
+    r'createHistogram',
+    r'createUpDownCounter',
+    r'UpDownCounter'
+    r'createCounter',
+    r'createObservableGauge',
+    r'ObservableGauge',
+    r'getMeter',
+    r'override _updateMetricInstruments'
+]
+TRACE_PATTERNS = [
+    r'@opentelemetry/api.*Span',
+    r'SpanKind',
+    r'SpanStatusCode',
+    r'startSpan',
+    r'getSpan',
+    r'setSpan',
+    r'spanContext',
+    r'addEvent',
+    r'setAttributes'
+]
+
+def create_result(library_name: str, link: str, version_range: str, dir_name: str) -> Instrumentation:
     """Create a standardized result dictionary."""
-    return {
-        'name': library_name,
-        'link': link,
-        'version_range': version_range,
-        'source_path': f"plugins/node/{dir_name}"
-    }
+    return Instrumentation(
+        name=library_name,
+        link=link,
+        version_range=version_range,
+        source_path=f"plugins/node/{dir_name}"
+    )
 
 def get_repo_link(dir_name: str) -> str:
     """Get the repository link for a library."""
     return f"https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/{dir_name}"
 
-def check_instrumentation_signals(src_dir: Path) -> Dict[str, bool]:
+def check_instrumentation_signals(src_dir: Path) -> Signals:
     """Check if instrumentation supports traces and/or metrics."""
-    signals = {}
+    signals = Signals()
 
-    # Walk through source files
-    for root, _, files in os.walk(src_dir):
-        for file in files:
-            if not file.endswith('.ts'):
-                continue
+    for file_path in src_dir.rglob('*.ts'):
+        signals.update(signals_match_file(file_path,
+                                           metric_patterns=METRIC_PATTERNS,
+                                           trace_patterns=TRACE_PATTERNS))
 
-            file_path = Path(root) / file
-            with open(file_path, 'r', encoding='utf-8') as f:
-                content = f.read()
-
-            # Check for tracing support
-            if 'traces' not in signals:
-                trace_patterns = [
-                    r'@opentelemetry/api.*Span',
-                    r'SpanKind',
-                    r'SpanStatusCode',
-                    r'startSpan',
-                    r'getSpan',
-                    r'setSpan',
-                    r'spanContext',
-                    r'addEvent',
-                    r'setAttributes'
-                ]
-                if any(re.search(p, content) for p in trace_patterns):
-                    signals['traces'] = True
-
-            # Check for metrics support
-            if 'metrics' not in signals:
-                metric_patterns = [
-                    r'createHistogram',
-                    r'createUpDownCounter',
-                    r'UpDownCounter'
-                    r'createCounter',
-                    r'createObservableGauge',
-                    r'ObservableGauge',
-                    r'getMeter',
-                    r'override _updateMetricInstruments'
-                ]
-                if any(re.search(p, content) for p in metric_patterns):
-                   signals['metrics'] = True
-
-            # Stop if we found both signals
-            if 'traces' in signals and 'metrics' in signals:
-                break
-
+        if signals.traces and signals.metrics:
+            break
     return signals
 
 def extract_supported_versions(readme_path: Path) -> Optional[Dict[str, Any]]:
@@ -189,16 +174,13 @@ def main():
             if src_dir.exists():
                 signals = check_instrumentation_signals(src_dir)
 
-            supported_libraries[library_name] = [{
-                'name': library_name,
-                'source_path': result['source_path'],
-                'link': result['link'],
-                'signals': signals,
-                'target_versions': {
-                    'library': [convert_version_range(result['version_range'])]
-                }
-            }]
-
+            supported_libraries[library_name] = [Instrumentation(
+                name=library_name,
+                source_path=result['source_path'],
+                link=result['link'],
+                signals=signals,
+                target_versions_library=[convert_version_range(result['version_range'])]
+            )]
     output_path = Path(args.output)
     output_path.parent.mkdir(parents=True, exist_ok=True)
 

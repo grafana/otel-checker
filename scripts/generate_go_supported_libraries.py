@@ -14,6 +14,29 @@ import yaml
 import argparse
 from pathlib import Path
 from typing import Dict, Any, List, Optional
+from scripts.common import Signals, Instrumentation, signals_match_file
+
+TRACE_PATTERNS = [
+    r'otel\.Tracer',
+    r'TracerProvider',
+    r'MeterProvider',
+    r'SpanContextConfig',
+    r'TraceState',
+    r'TraceID',
+    r'TraceFlags',
+    r'SpanID',
+    r'WithSpan',
+    r'StartSpan'
+]
+METRIC_PATTERNS = [
+    r'otel\.Meter',
+    r'WithMeterProvider',
+    r'metric\.Float64(Counter|UpDownCounter|Histogram)',
+    r'metric\.Int64(Counter|UpDownCounter|Histogram)',
+    r'NewInt64(Counter|UpDownCounter|Histogram)',
+    r'NewFloat64(Counter|UpDownCounter|Histogram)',
+    r'override _updateMetricInstruments'
+]
 
 def parse_go_mod_file(file_path: Path) -> Dict[str, Any]:
     """Parse a go.mod file and extract the module name and dependencies."""
@@ -137,49 +160,16 @@ def find_go_mod_files(repo_path: Path) -> List[Path]:
 
     return list(instrumentation_dir.glob("**/go.mod"))
 
-def check_instrumentation_signals(src_dir: Path) -> Dict[str, bool]:
+def check_instrumentation_signals(src_dir: Path) -> Signals:
     """Check for traces and metrics signals in the instrumentation code."""
-    signals = {}
-    for root, _, files in os.walk(src_dir):
-        for file in files:
-            if not file.endswith('.go'):
-                continue
-            file_path = Path(root) / file
-            with open(file_path, 'r', encoding='utf-8') as f:
-                content = f.read()
+    signals = Signals()
+    for file_path in src_dir.rglob('*.go'):
+        signals.update(signals_match_file(file_path, 
+                                               metric_patterns=METRIC_PATTERNS, 
+                                               trace_patterns=TRACE_PATTERNS))
 
-            # Check for tracing support
-            if 'traces' not in signals:
-                trace_patterns = [
-                    r'otel\.Tracer',
-                    r'TracerProvider',
-                    r'MeterProvider',
-                    r'SpanContextConfig',
-                    r'TraceState',
-                    r'TraceID',
-                    r'TraceFlags',
-                    r'SpanID',
-                    r'WithSpan',
-                    r'StartSpan'
-                ]
-                if any(re.search(p, content) for p in trace_patterns):
-                    signals['traces'] = True
-
-            # Check for metrics support
-            if 'metrics' not in signals:
-                metric_patterns = [
-                    r'otel\.Meter',
-                    r'WithMeterProvider',
-                    r'metric\.Float64(Counter|UpDownCounter|Histogram)',
-                    r'metric\.Int64(Counter|UpDownCounter|Histogram)',
-                    r'NewInt64(Counter|UpDownCounter|Histogram)',
-                    r'NewFloat64(Counter|UpDownCounter|Histogram)',
-                    r'override _updateMetricInstruments'
-                ]
-                if any(re.search(p, content) for p in metric_patterns):
-                    signals['metrics'] = True
-            if 'traces' in signals and 'metrics' in signals:
-                break
+        if signals.traces and signals.metrics:
+            break
     return signals
 
 def main():
@@ -224,15 +214,13 @@ def main():
                 print(f"  Module: {module_name}")
                 print(f"  Signals: {signals}")
 
-                entry = {
-                    "name": library_name,
-                    "source_path": str(rel_path.parent.as_posix()),
-                    "link": module_name,
-                    "signals": signals,
-                    "target_versions": {
-                        "library": [version_range]
-                    }
-                }
+                entry = Instrumentation(
+                    name=library_name,
+                    source_path=str(rel_path.parent.as_posix()),
+                    signals=signals,
+                    link=module_name,
+                    target_versions_library=[version_range]
+                )
 
                 if library_name not in supported_libraries:
                     supported_libraries[library_name] = {
