@@ -34,6 +34,11 @@ class Instrumentation:
         self.link = link
         self.target_versions_library = target_versions_library
 
+    def __repr__(self) -> str:
+        return (f"Instrumentation(name={self.name}, source_path={self.source_path}, "
+                f"signals={self.signals}, link={self.link}, "
+                f"target_versions_library={self.target_versions_library})")
+
     def __to_yaml__(self) -> Dict[str, Any]:
         """Return a YAML-serializable representation of the object."""
         data = {
