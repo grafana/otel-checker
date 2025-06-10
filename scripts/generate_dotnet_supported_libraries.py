@@ -109,7 +109,13 @@ def main():
         except Exception as e:
             print(f"Error processing {csproj_file}: {e}", file=sys.stderr)
 
+    print(f"Supported libraries will be saved to {args.output}")
     output_path = Path(args.output)
+
+    if not output_path:
+        print("Error: Output path is not specified or invalid.", file=sys.stderr)
+        sys.exit(1)
+
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     with open(output_path, 'w') as f:

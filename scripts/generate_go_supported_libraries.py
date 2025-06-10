@@ -223,17 +223,19 @@ def main():
                 )
 
                 if library_name not in supported_libraries:
-                    supported_libraries[library_name] = {
-                        "instrumentations": [entry]
-                    }
+                    supported_libraries[library_name] = [entry]
                 else:
-                    supported_libraries[library_name]["instrumentations"].append(entry)
+                    supported_libraries[library_name].append(entry)
             else:
                 print(f"No matching dependency found for {rel_path}")
         except Exception as e:
             print(f"Error processing {go_mod_file}: {e}", file=sys.stderr)
 
     output_path = Path(args.output)
+
+    if not output_path:
+        print("Error: Output path is not specified or invalid.", file=sys.stderr)
+        sys.exit(1)
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     with open(output_path, 'w') as f:
