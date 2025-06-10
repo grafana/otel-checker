@@ -14,7 +14,7 @@ import yaml
 import argparse
 from pathlib import Path
 from typing import Dict, Any, List, Optional
-from scripts.common import Signals, Instrumentation, signals_match_file
+from common import Signals, Instrumentation, signals_match_file
 import xml.etree.ElementTree as ET
 
 TRACE_PATTERNS = [r"public static\s+(?:async\s+)?(?:Task<)?TracerProviderBuilder(?:>)?\s+\w+\s*\(this\s+TracerProviderBuilder"]

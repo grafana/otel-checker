@@ -14,7 +14,7 @@ import yaml
 import argparse
 from pathlib import Path
 from typing import Dict, Any, List, Optional
-from scripts.common import Signals, Instrumentation, signals_match_file
+from common import Signals, Instrumentation, signals_match_file
 
 METRIC_PATTERNS = [
         r'from opentelemetry.metrics import',

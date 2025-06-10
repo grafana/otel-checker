@@ -14,7 +14,7 @@ import yaml
 import argparse
 from pathlib import Path
 from typing import Optional, Dict, Any
-from scripts.common import Signals, Instrumentation, signals_match_file
+from common import Signals, Instrumentation, signals_match_file
 
 METRIC_PATTERNS = [
     r'createHistogram',
