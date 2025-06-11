@@ -51,3 +51,6 @@ run = "uv run scripts/generate_python_supported_libraries.py ../opentelemetry-py
 
 [tasks.generate]
 depends = ["generate-dotnet-supported-libraries","generate-go-supported-libraries", "generate-java-supported-libraries", "generate-js-supported-libraries", "generate-python-supported-libraries"]
+
+[tasks.csv]
+run = "uv run scripts/generate_csv.py"
