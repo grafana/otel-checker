@@ -17,16 +17,71 @@ from typing import Dict, Any, List, Optional
 from common import Signals, Instrumentation, signals_match_file
 
 TRACE_PATTERNS: List[str] = [
+    # Imports
+    r"import.*\.instrumenter\.Instrumenter",
+    r"import.*\.trace\.(Tracer|Span|SpanBuilder)",
     r"import\s+io\.opentelemetry\.(?:api|sdk)\.trace\.(?:[^;]+);",
     r"import\s+io\.opentelemetry\.extension\.annotations\.WithSpan;",
+    
+    # Annotations
     r"@WithSpan"
+    
+    # Field declarations
+    r"private static final Instrumenter<.*>",
+    r"private static final.*Tracer",
+    
+    # Method calls and builders
+    r"JavaagentHttp(Server|Client)Instrumenters\.create",
+    r"DefaultHttp(Server|Client)InstrumenterBuilder",
+    r"\.buildInstrumenter\s*\(",
+    r"\.start\s*\(.*Context",
+    
+    # Class implementations
+    r"implements TypeInstrumentation",
+    r"extends InstrumentationModule",
+    r"class.*InstrumentationModule",
+    
+    # Instrumenter usage
+    r"instrumenter\(\)\.start",
+    r"instrumenter\(\)\.end"
 ]
+
 METRIC_PATTERNS: List[str] = [
+    # Direct metrics imports
+    r"import.*\.metrics\.(Meter|LongCounter|DoubleHistogram|LongUpDownCounter|.*Gauge)",
+    r"import.*\.instrumenter\.(OperationListener|OperationMetrics)",
     r"import\s+io\.opentelemetry\.(?:api|sdk)\.metrics\.(?:[^;]+);",
-    # Consider adding common metric instrument class usages if imports are not always explicit
-    # r"Meter\.counterBuilder\(", 
-    # r"Meter\.histogramBuilder\(",
-    # r"Meter\.gaugeBuilder\(" 
+    
+    # HTTP builders that auto-include metrics
+    r"JavaagentHttp(Server|Client)Instrumenters\.create",
+    r"DefaultHttp(Server|Client)InstrumenterBuilder",
+    
+    # Explicit metrics usage
+    r"\.addOperationMetrics\s*\(",
+    r"OperationMetrics\.get\s*\(",
+    
+    # Metrics instrument builders
+    r"\.(counter|histogram|gauge|upDownCounter)Builder\s*\(",
+    r"\.buildWithCallback\s*\(",
+    r"\.getMeter\s*\(",
+    
+    # Metrics recording
+    r"\.record\s*\(",
+    r"\.add\s*\(.*[0-9]",
+    
+    # Class implementations
+    r"implements (OperationListener|AgentListener|MetricRegistryListener)",
+    
+    # JMX and runtime metrics patterns
+    r"class.*Metrics.*implements",
+    r"registerObservers\s*\(",
+    r"MetricConfiguration",
+    
+    # OpenTelemetry meter getting
+    r"openTelemetry\.getMeter",
+    r"GlobalOpenTelemetry\.get\(\)\.getMeter"
+]
+    
 ]
 
 DEFAULT_YAML_URL = "https://raw.githubusercontent.com/open-telemetry/opentelemetry-java-instrumentation/refs/heads/main/docs/instrumentation-list.yaml"

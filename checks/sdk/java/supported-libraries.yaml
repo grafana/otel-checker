@@ -11,8 +11,8 @@ libraries:
       javaagent:
       - io.activej:activej-http:[6.0,)
     signals:
-      metrics: false
-      traces: false
+      metrics: true
+      traces: true
   akka:
   - name: akka-http-10.0
     source_path: instrumentation/akka/akka-http-10.0
@@ -24,8 +24,8 @@ libraries:
       - com.typesafe.akka:akka-http_2.13:[10,)
       - com.typesafe.akka:akka-http_2.11:[10,)
     signals:
-      metrics: false
-      traces: false
+      metrics: true
+      traces: true
   - name: akka-actor-fork-join-2.5
     source_path: instrumentation/akka/akka-actor-fork-join-2.5
     scope:
@@ -48,7 +48,7 @@ libraries:
       - com.typesafe.akka:akka-actor_2.12:[2.3,)
       - com.typesafe.akka:akka-actor_2.13:[2.3,)
     signals:
-      metrics: false
+      metrics: true
       traces: false
   alibaba:
   - name: alibaba-druid-1.0
@@ -105,7 +105,7 @@ libraries:
       - name: pool.name
         type: STRING
     signals:
-      metrics: false
+      metrics: true
       traces: true
   apache:
   - name: apache-shenyu-2.4
@@ -131,8 +131,8 @@ libraries:
       javaagent:
       - commons-httpclient:commons-httpclient:[2.0,4.0)
     signals:
-      metrics: false
-      traces: false
+      metrics: true
+      traces: true
   - name: apache-httpasyncclient-4.1
     source_path: instrumentation/apache-httpasyncclient-4.1
     scope:
@@ -141,8 +141,8 @@ libraries:
       javaagent:
       - org.apache.httpcomponents:httpasyncclient:[4.1,)
     signals:
-      metrics: false
-      traces: false
+      metrics: true
+      traces: true
   - name: apache-httpclient-4.3
     source_path: instrumentation/apache-httpclient/apache-httpclient-4.3
     scope:
@@ -151,8 +151,8 @@ libraries:
       library:
       - org.apache.httpcomponents:httpclient:[4.3,4.+)
     signals:
-      metrics: false
-      traces: false
+      metrics: true
+      traces: true
   - name: apache-httpclient-4.0
     source_path: instrumentation/apache-httpclient/apache-httpclient-4.0
     scope:
@@ -162,8 +162,8 @@ libraries:
       - io.dropwizard:dropwizard-client:(,3.0.0)
       - org.apache.httpcomponents:httpclient:[4.0,)
     signals:
-      metrics: false
-      traces: false
+      metrics: true
+      traces: true
   - name: apache-dubbo-2.7
     description: The Apache Dubbo instrumentation provides client and server spans
       for Apache Dubbo RPC calls. Each call produces a span named after the Dubbo
@@ -192,8 +192,8 @@ libraries:
       library:
       - org.apache.httpcomponents.client5:httpclient5:5.2.1
     signals:
-      metrics: false
-      traces: false
+      metrics: true
+      traces: true
   - name: apache-httpclient-5.0
     source_path: instrumentation/apache-httpclient/apache-httpclient-5.0
     scope:
@@ -218,8 +218,8 @@ libraries:
       - name: server.port
         type: LONG
     signals:
-      metrics: false
-      traces: false
+      metrics: true
+      traces: true
   - name: apache-dbcp-2.0
     source_path: instrumentation/apache-dbcp-2.0
     scope:
@@ -262,7 +262,7 @@ libraries:
       - name: pool.name
         type: STRING
     signals:
-      metrics: false
+      metrics: true
       traces: true
   armeria:
   - name: armeria-1.3
@@ -276,7 +276,7 @@ libraries:
       - com.linecorp.armeria:armeria:1.3.0
     signals:
       metrics: true
-      traces: false
+      traces: true
   - name: armeria-grpc-1.14
     source_path: instrumentation/armeria/armeria-grpc-1.14
     scope:
@@ -296,8 +296,8 @@ libraries:
       javaagent:
       - com.ning:async-http-client:[1.9.0,)
     signals:
-      metrics: false
-      traces: false
+      metrics: true
+      traces: true
   - name: async-http-client-2.0
     source_path: instrumentation/async-http-client/async-http-client-2.0
     scope:
@@ -306,8 +306,8 @@ libraries:
       javaagent:
       - org.asynchttpclient:async-http-client:[2.0.0,)
     signals:
-      metrics: false
-      traces: false
+      metrics: true
+      traces: true
   avaje:
   - name: avaje-jex-3.0
     description: 'This instrumentation does not emit telemetry on its own. Instead,
@@ -398,7 +398,7 @@ libraries:
       default: ''
     signals:
       metrics: true
-      traces: false
+      traces: true
   - name: aws-sdk-2.2
     source_path: instrumentation/aws-sdk/aws-sdk-2.2
     scope:
@@ -447,7 +447,7 @@ libraries:
       default: false
     signals:
       metrics: true
-      traces: false
+      traces: true
   azure:
   - name: azure-core-1.36
     source_path: instrumentation/azure-core/azure-core-1.36
@@ -511,7 +511,7 @@ libraries:
       - name: pool.name
         type: STRING
     signals:
-      metrics: false
+      metrics: true
       traces: true
   camel:
   - name: camel-2.20
@@ -553,8 +553,8 @@ libraries:
       type: boolean
       default: true
     signals:
-      metrics: false
-      traces: false
+      metrics: true
+      traces: true
   - name: cassandra-4.4
     description: 'Instruments the Cassandra database client, providing database client
       spans and metrics for Cassandra queries.
@@ -575,7 +575,7 @@ libraries:
       default: true
     signals:
       metrics: true
-      traces: false
+      traces: true
   - name: cassandra-3.0
     description: 'Instruments the Cassandra database client, providing database client
       spans and metrics for Cassandra queries.
@@ -594,7 +594,7 @@ libraries:
       default: true
     signals:
       metrics: true
-      traces: false
+      traces: true
   clickhouse:
   - name: clickhouse-client-0.5
     description: Instruments the V1 ClickHouseClient, providing database client spans
@@ -612,7 +612,7 @@ libraries:
       default: true
     signals:
       metrics: true
-      traces: false
+      traces: true
   couchbase:
   - name: couchbase-3.1.6
     description: 'Couchbase instrumentation is owned by the Couchbase project. This
@@ -627,7 +627,7 @@ libraries:
       javaagent:
       - com.couchbase.client:java-client:[3.1.6,3.2.0)
     signals:
-      metrics: false
+      metrics: true
       traces: false
   - name: couchbase-2.6
     source_path: instrumentation/couchbase/couchbase-2.6
@@ -643,7 +643,7 @@ libraries:
       type: boolean
       default: false
     signals:
-      metrics: false
+      metrics: true
       traces: false
   - name: couchbase-2.0
     source_path: instrumentation/couchbase/couchbase-2.0
@@ -659,8 +659,8 @@ libraries:
       type: boolean
       default: false
     signals:
-      metrics: false
-      traces: false
+      metrics: true
+      traces: true
   - name: couchbase-3.2
     description: 'Couchbase instrumentation is owned by the Couchbase project. This
       instrumentation automatically configures the instrumentation provided by the
@@ -689,7 +689,7 @@ libraries:
       javaagent:
       - com.couchbase.client:java-client:[3.1,3.1.6)
     signals:
-      metrics: false
+      metrics: true
       traces: false
   dropwizard:
   - name: dropwizard-metrics-4.0
@@ -715,7 +715,7 @@ libraries:
       type: boolean
       default: false
     signals:
-      metrics: false
+      metrics: true
       traces: true
   - name: dropwizard-views-0.7
     source_path: instrumentation/dropwizard/dropwizard-views-0.7
@@ -757,7 +757,7 @@ libraries:
       - co.elastic.clients:elasticsearch-java:[8.0.0,8.10)
     signals:
       metrics: true
-      traces: false
+      traces: true
   - name: elasticsearch-rest-5.0
     source_path: instrumentation/elasticsearch/elasticsearch-rest-5.0
     scope:
@@ -790,7 +790,7 @@ libraries:
       - org.elasticsearch:elasticsearch:[6.0.0,8.0.0)
       - org.elasticsearch.client:transport:[6.0.0,)
     signals:
-      metrics: false
+      metrics: true
       traces: false
   - name: elasticsearch-transport-5.0
     source_path: instrumentation/elasticsearch/elasticsearch-transport-5.0
@@ -801,7 +801,7 @@ libraries:
       - org.elasticsearch.client:transport:[5.0.0,5.3.0)
       - org.elasticsearch:elasticsearch:[5.0.0,5.3.0)
     signals:
-      metrics: false
+      metrics: true
       traces: false
   - name: elasticsearch-transport-5.3
     source_path: instrumentation/elasticsearch/elasticsearch-transport-5.3
@@ -839,7 +839,7 @@ libraries:
       default: false
     signals:
       metrics: true
-      traces: false
+      traces: true
   finagle:
   - name: finagle-http-23.11
     source_path: instrumentation/finagle-http-23.11
@@ -850,7 +850,7 @@ libraries:
       - com.twitter:finagle-http_2.13:[23.11.0,]
       - com.twitter:finagle-http_2.12:[23.11.0,]
     signals:
-      metrics: false
+      metrics: true
       traces: false
   finatra:
   - name: finatra-2.9
@@ -862,7 +862,7 @@ libraries:
       - com.twitter:finatra-http_2.11:[2.9.0,]
       - com.twitter:finatra-http_2.12:[2.9.0,]
     signals:
-      metrics: false
+      metrics: true
       traces: false
   geode:
   - name: geode-1.4
@@ -874,7 +874,7 @@ libraries:
       - org.apache.geode:geode-core:[1.4.0,)
     signals:
       metrics: true
-      traces: false
+      traces: true
   google:
   - name: google-http-client-1.19
     source_path: instrumentation/google-http-client-1.19
@@ -885,7 +885,7 @@ libraries:
       - com.google.http-client:google-http-client:[1.19.0,)
     signals:
       metrics: true
-      traces: false
+      traces: true
   grails:
   - name: grails-3.0
     source_path: instrumentation/grails-3.0
@@ -908,7 +908,7 @@ libraries:
       library:
       - com.graphql-java:graphql-java:[12.0,19.+)
     signals:
-      metrics: false
+      metrics: true
       traces: false
   - name: graphql-java-20.0
     source_path: instrumentation/graphql-java/graphql-java-20.0
@@ -932,8 +932,8 @@ libraries:
       javaagent:
       - org.glassfish.grizzly:grizzly-http:[2.3,)
     signals:
-      metrics: false
-      traces: false
+      metrics: true
+      traces: true
   grpc:
   - name: grpc-1.6
     source_path: instrumentation/grpc-1.6
@@ -946,7 +946,7 @@ libraries:
       - io.grpc:grpc-core:1.6.0
     signals:
       metrics: true
-      traces: false
+      traces: true
   guava:
   - name: guava-10.0
     source_path: instrumentation/guava-10.0
@@ -1013,7 +1013,7 @@ libraries:
       - org.hibernate:hibernate-core:[6.0.0.Final,)
     signals:
       metrics: true
-      traces: false
+      traces: true
   - name: hibernate-reactive-1.0
     source_path: instrumentation/hibernate/hibernate-reactive-1.0
     scope:
@@ -1098,7 +1098,7 @@ libraries:
       - name: pool.name
         type: STRING
     signals:
-      metrics: false
+      metrics: true
       traces: true
   http:
   - name: http-url-connection
@@ -1110,7 +1110,7 @@ libraries:
       - Java 8+
     signals:
       metrics: true
-      traces: false
+      traces: true
   hystrix:
   - name: hystrix-1.4
     source_path: instrumentation/hystrix-1.4
@@ -1132,7 +1132,7 @@ libraries:
       - org.influxdb:influxdb-java:[2.4,)
     signals:
       metrics: true
-      traces: false
+      traces: true
   java:
   - name: java-http-server
     source_path: instrumentation/java-http-server
@@ -1142,8 +1142,8 @@ libraries:
       javaagent:
       - Java 8+
     signals:
-      metrics: false
-      traces: false
+      metrics: true
+      traces: true
   - name: java-http-client
     source_path: instrumentation/java-http-client
     minimum_java_version: 11
@@ -1153,8 +1153,8 @@ libraries:
       javaagent:
       - Java 11+
     signals:
-      metrics: false
-      traces: false
+      metrics: true
+      traces: true
   javalin:
   - name: javalin-5.0
     source_path: instrumentation/javalin-5.0
@@ -1177,7 +1177,7 @@ libraries:
       - org.apache.tomee:openejb-cxf-rs:(8,)
       - org.apache.cxf:cxf-rt-frontend-jaxrs:[3.2,4)
     signals:
-      metrics: false
+      metrics: true
       traces: false
   - name: jaxrs-3.0-annotations
     source_path: instrumentation/jaxrs/jaxrs-3.0/jaxrs-3.0-annotations
@@ -1198,8 +1198,8 @@ libraries:
       - org.glassfish.jersey.core:jersey-server:[2.0,3.0.0)
       - org.glassfish.jersey.containers:jersey-container-servlet:[2.0,3.0.0)
     signals:
-      metrics: false
-      traces: false
+      metrics: true
+      traces: true
   - name: jaxrs-3.0-jersey-3.0
     source_path: instrumentation/jaxrs/jaxrs-3.0/jaxrs-3.0-jersey-3.0
     minimum_java_version: 11
@@ -1209,8 +1209,8 @@ libraries:
       javaagent:
       - org.glassfish.jersey.core:jersey-server:[3.0.0,)
     signals:
-      metrics: false
-      traces: false
+      metrics: true
+      traces: true
   - name: jaxrs-2.0-resteasy-3.1
     source_path: instrumentation/jaxrs/jaxrs-2.0/jaxrs-2.0-resteasy-3.1
     scope:
@@ -1220,7 +1220,7 @@ libraries:
       - org.jboss.resteasy:resteasy-jaxrs:[3.1.0.Final,3.5.0.Final)
       - org.jboss.resteasy:resteasy-core:[4.0.0.Final,6)
     signals:
-      metrics: false
+      metrics: true
       traces: false
   - name: jaxrs-2.0-resteasy-3.0
     source_path: instrumentation/jaxrs/jaxrs-2.0/jaxrs-2.0-resteasy-3.0
@@ -1231,7 +1231,7 @@ libraries:
       - org.jboss.resteasy:resteasy-jaxrs:[3.0.0.Final,3.1.0.Final)
       - org.jboss.resteasy:resteasy-jaxrs:[3.5.0.Final,4)
     signals:
-      metrics: false
+      metrics: true
       traces: false
   - name: jaxrs-2.0-annotations
     source_path: instrumentation/jaxrs/jaxrs-2.0/jaxrs-2.0-annotations
@@ -1252,7 +1252,7 @@ libraries:
       javaagent:
       - org.jboss.resteasy:resteasy-core:[6.0.0.Final,)
     signals:
-      metrics: false
+      metrics: true
       traces: false
   - name: jaxrs-1.0
     disabled_by_default: true
@@ -1264,7 +1264,7 @@ libraries:
       - javax.ws.rs:jsr311-api:[0.5,)
     signals:
       metrics: true
-      traces: false
+      traces: true
   jaxws:
   - name: jaxws-jws-api-1.1
     disabled_by_default: true
@@ -1391,7 +1391,7 @@ libraries:
       default: false
     signals:
       metrics: true
-      traces: false
+      traces: true
   jedis:
   - name: jedis-1.4
     source_path: instrumentation/jedis/jedis-1.4
@@ -1402,7 +1402,7 @@ libraries:
       - redis.clients:jedis:[1.4.0,3.0.0)
     signals:
       metrics: true
-      traces: false
+      traces: true
   - name: jedis-4.0
     source_path: instrumentation/jedis/jedis-4.0
     scope:
@@ -1412,7 +1412,7 @@ libraries:
       - redis.clients:jedis:[4.0.0-beta1,)
     signals:
       metrics: true
-      traces: false
+      traces: true
   - name: jedis-3.0
     source_path: instrumentation/jedis/jedis-3.0
     scope:
@@ -1422,7 +1422,7 @@ libraries:
       - redis.clients:jedis:[3.0.0,4)
     signals:
       metrics: true
-      traces: false
+      traces: true
   jetty:
   - name: jetty-httpclient-12.0
     source_path: instrumentation/jetty-httpclient/jetty-httpclient-12.0
@@ -1436,7 +1436,7 @@ libraries:
       - org.eclipse.jetty:jetty-client:12.0.0
     signals:
       metrics: true
-      traces: false
+      traces: true
   - name: jetty-12.0
     source_path: instrumentation/jetty/jetty-12.0
     minimum_java_version: 17
@@ -1447,7 +1447,7 @@ libraries:
       - org.eclipse.jetty:jetty-server:[12,)
     signals:
       metrics: true
-      traces: false
+      traces: true
   - name: jetty-8.0
     source_path: instrumentation/jetty/jetty-8.0
     scope:
@@ -1468,8 +1468,8 @@ libraries:
       library:
       - org.eclipse.jetty:jetty-client:[9.2.0.v20140526,9.+)
     signals:
-      metrics: false
-      traces: false
+      metrics: true
+      traces: true
   - name: jetty-11.0
     source_path: instrumentation/jetty/jetty-11.0
     minimum_java_version: 11
@@ -1514,8 +1514,8 @@ libraries:
       javaagent:
       - org.jodd:jodd-http:[4.2.0,)
     signals:
-      metrics: false
-      traces: false
+      metrics: true
+      traces: true
   jsf:
   - name: jsf-myfaces-3.0
     source_path: instrumentation/jsf/jsf-myfaces-3.0
@@ -1526,7 +1526,7 @@ libraries:
       javaagent:
       - org.apache.myfaces.core:myfaces-impl:[3,)
     signals:
-      metrics: false
+      metrics: true
       traces: false
   - name: jsf-mojarra-3.0
     source_path: instrumentation/jsf/jsf-mojarra-3.0
@@ -1537,7 +1537,7 @@ libraries:
       javaagent:
       - org.glassfish:jakarta.faces:[3,)
     signals:
-      metrics: false
+      metrics: true
       traces: false
   - name: jsf-myfaces-1.2
     source_path: instrumentation/jsf/jsf-myfaces-1.2
@@ -1547,7 +1547,7 @@ libraries:
       javaagent:
       - org.apache.myfaces.core:myfaces-impl:[1.2,3)
     signals:
-      metrics: false
+      metrics: true
       traces: false
   - name: jsf-mojarra-1.2
     source_path: instrumentation/jsf/jsf-mojarra-1.2
@@ -1561,7 +1561,7 @@ libraries:
       - org.glassfish:javax.faces:[2.0.7,3)
       - javax.faces:jsf-impl:[1.2,2)
     signals:
-      metrics: false
+      metrics: true
       traces: false
   jsp:
   - name: jsp-2.3
@@ -1594,7 +1594,7 @@ libraries:
       - org.apache.kafka:kafka-clients:2.6.0
     signals:
       metrics: true
-      traces: false
+      traces: true
   - name: kafka-clients-0.11
     source_path: instrumentation/kafka/kafka-clients/kafka-clients-0.11
     scope:
@@ -1626,7 +1626,7 @@ libraries:
       - org.jetbrains.kotlinx:kotlinx-coroutines-core:[1.0.0,1.3.8)
     signals:
       metrics: true
-      traces: false
+      traces: true
   - name: kotlinx-coroutines-1.0
     source_path: instrumentation/kotlinx-coroutines/kotlinx-coroutines-1.0
     scope:
@@ -1637,7 +1637,7 @@ libraries:
       - org.jetbrains.kotlinx:kotlinx-coroutines-core:[1.0.0,1.3.8)
     signals:
       metrics: true
-      traces: false
+      traces: true
   - name: kotlinx-coroutines-flow-1.3
     source_path: instrumentation/kotlinx-coroutines/kotlinx-coroutines-flow-1.3
     scope:
@@ -1647,7 +1647,7 @@ libraries:
       - org.jetbrains.kotlinx:kotlinx-coroutines-core:[1.3.0,1.3.8)
       - org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:[1.3.9,)
     signals:
-      metrics: false
+      metrics: true
       traces: false
   ktor:
   - name: ktor-2.0
@@ -1662,7 +1662,7 @@ libraries:
       - io.ktor:ktor-client-core:[2.0.0,2.+)
       - io.ktor:ktor-server-core:[2.0.0,2.+)
     signals:
-      metrics: false
+      metrics: true
       traces: false
   - name: ktor-3.0
     source_path: instrumentation/ktor/ktor-3.0
@@ -1676,7 +1676,7 @@ libraries:
       - io.ktor:ktor-server-core:3.0.0
       - io.ktor:ktor-client-core:3.0.0
     signals:
-      metrics: false
+      metrics: true
       traces: false
   - name: ktor-1.0
     source_path: instrumentation/ktor/ktor-1.0
@@ -1698,7 +1698,7 @@ libraries:
       - io.kubernetes:client-java-api:[7.0.0,)
     signals:
       metrics: true
-      traces: false
+      traces: true
   lettuce:
   - name: lettuce-5.1
     source_path: instrumentation/lettuce/lettuce-5.1
@@ -1711,7 +1711,7 @@ libraries:
       - io.lettuce:lettuce-core:5.1.0.RELEASE
     signals:
       metrics: true
-      traces: false
+      traces: true
   - name: lettuce-5.0
     source_path: instrumentation/lettuce/lettuce-5.0
     scope:
@@ -1721,7 +1721,7 @@ libraries:
       - io.lettuce:lettuce-core:[5.0.0.RELEASE,5.1.0.RELEASE)
     signals:
       metrics: true
-      traces: false
+      traces: true
   - name: lettuce-4.0
     source_path: instrumentation/lettuce/lettuce-4.0
     scope:
@@ -1731,21 +1731,21 @@ libraries:
       - biz.paluch.redis:lettuce:[4.0.Final,)
     signals:
       metrics: true
-      traces: false
+      traces: true
   liberty:
   - name: liberty-dispatcher-20.0
     source_path: instrumentation/liberty/liberty-dispatcher-20.0
     scope:
       name: io.opentelemetry.liberty-dispatcher-20.0
     signals:
-      metrics: false
-      traces: false
+      metrics: true
+      traces: true
   - name: liberty-20.0
     source_path: instrumentation/liberty/liberty-20.0
     scope:
       name: io.opentelemetry.liberty-20.0
     signals:
-      metrics: false
+      metrics: true
       traces: false
   log4j:
   - name: log4j-context-data-2.7
@@ -1840,7 +1840,7 @@ libraries:
       library:
       - io.micrometer:micrometer-core:1.5.0
     signals:
-      metrics: false
+      metrics: true
       traces: true
   mongo:
   - name: mongo-4.0
@@ -1851,7 +1851,7 @@ libraries:
       javaagent:
       - org.mongodb:mongodb-driver-core:[4.0,)
     signals:
-      metrics: false
+      metrics: true
       traces: false
   - name: mongo-3.1
     source_path: instrumentation/mongo/mongo-3.1
@@ -1863,8 +1863,8 @@ libraries:
       library:
       - org.mongodb:mongo-java-driver:3.1.0
     signals:
-      metrics: false
-      traces: false
+      metrics: true
+      traces: true
   - name: mongo-3.7
     source_path: instrumentation/mongo/mongo-3.7
     scope:
@@ -1874,7 +1874,7 @@ libraries:
       - org.mongodb:mongodb-driver-core:[3.7, 4.0)
       - org.mongodb:mongo-java-driver:[3.7, 4.0)
     signals:
-      metrics: false
+      metrics: true
       traces: false
   - name: mongo-async-3.3
     source_path: instrumentation/mongo/mongo-async-3.3
@@ -1884,7 +1884,7 @@ libraries:
       javaagent:
       - org.mongodb:mongodb-driver-async:[3.3,)
     signals:
-      metrics: false
+      metrics: true
       traces: false
   mybatis:
   - name: mybatis-3.2
@@ -1908,7 +1908,7 @@ libraries:
       - io.netty:netty:[3.8.0.Final,4)
     signals:
       metrics: true
-      traces: false
+      traces: true
   - name: netty-4.0
     source_path: instrumentation/netty/netty-4.0
     scope:
@@ -1919,7 +1919,7 @@ libraries:
       - io.netty:netty-codec-http:[4.0.0.Final,4.1.0.Final)
     signals:
       metrics: true
-      traces: false
+      traces: true
   - name: netty-4.1
     source_path: instrumentation/netty/netty-4.1
     scope:
@@ -1932,7 +1932,7 @@ libraries:
       - io.netty:netty-codec-http:4.1.0.Final
     signals:
       metrics: true
-      traces: false
+      traces: true
   okhttp:
   - name: okhttp-3.0
     source_path: instrumentation/okhttp/okhttp-3.0
@@ -1945,7 +1945,7 @@ libraries:
       - com.squareup.okhttp3:okhttp:3.0.0
     signals:
       metrics: true
-      traces: false
+      traces: true
   - name: okhttp-2.2
     source_path: instrumentation/okhttp/okhttp-2.2
     scope:
@@ -1954,8 +1954,8 @@ libraries:
       javaagent:
       - com.squareup.okhttp:okhttp:[2.2,3)
     signals:
-      metrics: false
-      traces: false
+      metrics: true
+      traces: true
   opensearch:
   - name: opensearch-rest-3.0
     source_path: instrumentation/opensearch/opensearch-rest-3.0
@@ -1966,7 +1966,7 @@ libraries:
       javaagent:
       - org.opensearch.client:opensearch-rest-client:[3.0,)
     signals:
-      metrics: false
+      metrics: true
       traces: false
   - name: opensearch-rest-1.0
     source_path: instrumentation/opensearch/opensearch-rest-1.0
@@ -1977,7 +1977,7 @@ libraries:
       javaagent:
       - org.opensearch.client:opensearch-rest-client:[1.0,3.0)
     signals:
-      metrics: false
+      metrics: true
       traces: false
   oracle:
   - name: oracle-ucp-11.2
@@ -2019,7 +2019,7 @@ libraries:
       - name: pool.name
         type: STRING
     signals:
-      metrics: false
+      metrics: true
       traces: true
   oshi:
   - name: oshi
@@ -2114,7 +2114,7 @@ libraries:
       - name: direction
         type: STRING
     signals:
-      metrics: false
+      metrics: true
       traces: true
   payara:
   - name: payara
@@ -2122,7 +2122,7 @@ libraries:
     scope:
       name: io.opentelemetry.payara
     signals:
-      metrics: false
+      metrics: true
       traces: false
   pekko:
   - name: pekko-actor-1.0
@@ -2135,7 +2135,7 @@ libraries:
       - org.apache.pekko:pekko-actor_2.12:[1.0,)
       - org.apache.pekko:pekko-actor_2.13:[1.0,)
     signals:
-      metrics: false
+      metrics: true
       traces: false
   - name: pekko-http-1.0
     source_path: instrumentation/pekko/pekko-http-1.0
@@ -2150,8 +2150,8 @@ libraries:
       - com.softwaremill.sttp.tapir:tapir-pekko-http-server_2.13:[1.7,)
       - org.apache.pekko:pekko-http_2.13:[1.0,)
     signals:
-      metrics: false
-      traces: false
+      metrics: true
+      traces: true
   play:
   - name: play-ws-1.0
     source_path: instrumentation/play/play-ws/play-ws-1.0
@@ -2162,7 +2162,7 @@ libraries:
       - com.typesafe.play:play-ahc-ws-standalone_2.12:[1.0.0,2.0.0)
       - com.typesafe.play:play-ahc-ws-standalone_2.11:[1.0.0,2.0.0)
     signals:
-      metrics: false
+      metrics: true
       traces: false
   - name: play-mvc-2.6
     source_path: instrumentation/play/play-mvc/play-mvc-2.6
@@ -2196,7 +2196,7 @@ libraries:
       - com.typesafe.play:play-ahc-ws-standalone_2.13:[2.0.6,2.1.0)
       - com.typesafe.play:play-ahc-ws-standalone_2.11:[2.0.0,]
     signals:
-      metrics: false
+      metrics: true
       traces: false
   - name: play-ws-2.1
     source_path: instrumentation/play/play-ws/play-ws-2.1
@@ -2207,7 +2207,7 @@ libraries:
       - com.typesafe.play:play-ahc-ws-standalone_2.13:[2.1.0,]
       - com.typesafe.play:play-ahc-ws-standalone_2.12:[2.1.0,]
     signals:
-      metrics: false
+      metrics: true
       traces: false
   powerjob:
   - name: powerjob-4.0
@@ -2230,7 +2230,7 @@ libraries:
       - org.apache.pulsar:pulsar-client:[2.8.0,)
     signals:
       metrics: true
-      traces: false
+      traces: true
   quarkus:
   - name: quarkus-resteasy-reactive
     source_path: instrumentation/quarkus-resteasy-reactive
@@ -2267,7 +2267,7 @@ libraries:
       - io.r2dbc:r2dbc-spi:1.0.0.RELEASE
     signals:
       metrics: true
-      traces: false
+      traces: true
   rabbitmq:
   - name: rabbitmq-2.7
     source_path: instrumentation/rabbitmq-2.7
@@ -2301,7 +2301,7 @@ libraries:
       - io.ratpack:ratpack-core:1.7.0
     signals:
       metrics: true
-      traces: false
+      traces: true
   reactor:
   - name: reactor-kafka-1.0
     source_path: instrumentation/reactor/reactor-kafka-1.0
@@ -2353,7 +2353,7 @@ libraries:
       - io.projectreactor.netty:reactor-netty:[1.0.0,)
     signals:
       metrics: true
-      traces: false
+      traces: true
   rediscala:
   - name: rediscala-1.8
     source_path: instrumentation/rediscala-1.8
@@ -2369,8 +2369,8 @@ libraries:
       - com.github.etaty:rediscala_2.13:[1.9.0,)
       - com.github.Ma27:rediscala_2.12:[1.8.1,)
     signals:
-      metrics: false
-      traces: false
+      metrics: true
+      traces: true
   redisson:
   - name: redisson-3.17
     source_path: instrumentation/redisson/redisson-3.17
@@ -2380,7 +2380,7 @@ libraries:
       javaagent:
       - org.redisson:redisson:[3.17.0,)
     signals:
-      metrics: false
+      metrics: true
       traces: false
   - name: redisson-3.0
     source_path: instrumentation/redisson/redisson-3.0
@@ -2390,7 +2390,7 @@ libraries:
       javaagent:
       - org.redisson:redisson:[3.0.0,3.17.0)
     signals:
-      metrics: false
+      metrics: true
       traces: false
   resources:
   - name: resources
@@ -2412,8 +2412,8 @@ libraries:
       - org.restlet:org.restlet:[1.1.5,1.+)
       - com.noelios.restlet:com.noelios.restlet:1.1.5
     signals:
-      metrics: false
-      traces: false
+      metrics: true
+      traces: true
   - name: restlet-2.0
     source_path: instrumentation/restlet/restlet-2.0
     scope:
@@ -2424,8 +2424,8 @@ libraries:
       library:
       - org.restlet.jse:org.restlet:2.0.2
     signals:
-      metrics: false
-      traces: false
+      metrics: true
+      traces: true
   rmi:
   - name: rmi
     source_path: instrumentation/rmi
@@ -2459,7 +2459,7 @@ libraries:
       - org.apache.rocketmq:rocketmq-client:4.8.0
     signals:
       metrics: true
-      traces: false
+      traces: true
   runtime:
   - name: runtime-telemetry-java17
     source_path: instrumentation/runtime-telemetry/runtime-telemetry-java17
@@ -2485,7 +2485,7 @@ libraries:
       library:
       - io.reactivex:rxjava:1.0.7
     signals:
-      metrics: false
+      metrics: true
       traces: false
   - name: rxjava-3.1.1
     source_path: instrumentation/rxjava/rxjava-3.1.1
@@ -2497,7 +2497,7 @@ libraries:
       library:
       - io.reactivex.rxjava3:rxjava:3.1.1
     signals:
-      metrics: false
+      metrics: true
       traces: false
   - name: rxjava-2.0
     source_path: instrumentation/rxjava/rxjava-2.0
@@ -2521,7 +2521,7 @@ libraries:
       library:
       - io.reactivex.rxjava3:rxjava:[3.0.12,3.1.0)
     signals:
-      metrics: false
+      metrics: true
       traces: false
   scala:
   - name: scala-fork-join-2.8
@@ -2532,7 +2532,7 @@ libraries:
       javaagent:
       - org.scala-lang:scala-library:[2.8.0,2.12.0)
     signals:
-      metrics: false
+      metrics: true
       traces: false
   servlet:
   - name: servlet-5.0
@@ -2586,7 +2586,7 @@ libraries:
       - org.springframework.amqp:spring-rabbit:(,)
     signals:
       metrics: true
-      traces: false
+      traces: true
   - name: spring-scheduling-3.1
     source_path: instrumentation/spring/spring-scheduling-3.1
     scope:
@@ -2614,7 +2614,7 @@ libraries:
       - org.springframework.batch:spring-batch-core:[3.0.0.RELEASE,5)
     signals:
       metrics: true
-      traces: false
+      traces: true
   - name: spring-cloud-aws-3.0
     source_path: instrumentation/spring/spring-cloud-aws-3.0
     minimum_java_version: 17
@@ -2637,7 +2637,7 @@ libraries:
       - io.projectreactor.netty:reactor-netty:[0.8.0.RELEASE,)
     signals:
       metrics: true
-      traces: false
+      traces: true
   - name: spring-webflux-5.3
     source_path: instrumentation/spring/spring-webflux/spring-webflux-5.3
     scope:
@@ -2647,7 +2647,7 @@ libraries:
       - org.springframework:spring-webflux:5.3.0
     signals:
       metrics: true
-      traces: false
+      traces: true
   - name: spring-jms-6.0
     source_path: instrumentation/spring/spring-jms/spring-jms-6.0
     minimum_java_version: 17
@@ -2668,7 +2668,7 @@ libraries:
       javaagent:
       - org.springframework.boot:spring-boot-actuator-autoconfigure:[2.0.0.RELEASE,)
     signals:
-      metrics: false
+      metrics: true
       traces: false
   - name: spring-rmi-4.0
     source_path: instrumentation/spring/spring-rmi-4.0
@@ -2700,7 +2700,7 @@ libraries:
       - org.springframework:spring-webmvc:[6.0.0,)
     signals:
       metrics: true
-      traces: false
+      traces: true
   - name: spring-data-1.8
     source_path: instrumentation/spring/spring-data/spring-data-1.8
     scope:
@@ -2710,7 +2710,7 @@ libraries:
       - org.springframework:spring-aop:[1.2,]
       - org.springframework.data:spring-data-commons:[1.8.0.RELEASE,]
     signals:
-      metrics: false
+      metrics: true
       traces: false
   - name: spring-pulsar-1.0
     source_path: instrumentation/spring/spring-pulsar-1.0
@@ -2731,8 +2731,8 @@ libraries:
       javaagent:
       - org.springframework:spring-web:[3.1.0.RELEASE,6)
     signals:
-      metrics: false
-      traces: false
+      metrics: true
+      traces: true
   - name: spring-kafka-2.7
     source_path: instrumentation/spring/spring-kafka-2.7
     scope:
@@ -2748,8 +2748,8 @@ libraries:
     scope:
       name: io.opentelemetry.spring-webmvc-5.3
     signals:
-      metrics: false
-      traces: false
+      metrics: true
+      traces: true
   - name: spring-core-2.0
     source_path: instrumentation/spring/spring-core-2.0
     minimum_java_version: 17
@@ -2829,7 +2829,7 @@ libraries:
       javaagent:
       - org.springframework:spring-web:[6.0.0,)
     signals:
-      metrics: false
+      metrics: true
       traces: false
   spymemcached:
   - name: spymemcached-2.12
@@ -2841,7 +2841,7 @@ libraries:
       - net.spy:spymemcached:[2.12.0,)
     signals:
       metrics: true
-      traces: false
+      traces: true
   struts:
   - name: struts-2.3
     source_path: instrumentation/struts/struts-2.3
@@ -2945,7 +2945,7 @@ libraries:
       - name: pool.name
         type: STRING
     signals:
-      metrics: false
+      metrics: true
       traces: true
   twilio:
   - name: twilio-6.6
@@ -2968,7 +2968,7 @@ libraries:
       - io.undertow:undertow-core:[1.4.0.Final,)
     signals:
       metrics: true
-      traces: false
+      traces: true
   vaadin:
   - name: vaadin-14.2
     source_path: instrumentation/vaadin-14.2
@@ -3001,7 +3001,7 @@ libraries:
       - io.vertx:vertx-redis-client:[4.0.0,)
     signals:
       metrics: true
-      traces: false
+      traces: true
   - name: vertx-sql-client-5.0
     source_path: instrumentation/vertx/vertx-sql-client/vertx-sql-client-5.0
     minimum_java_version: 11
@@ -3012,7 +3012,7 @@ libraries:
       - io.vertx:vertx-sql-client:[5.0.0,)
     signals:
       metrics: true
-      traces: false
+      traces: true
   - name: vertx-http-client-5.0
     source_path: instrumentation/vertx/vertx-http-client/vertx-http-client-5.0
     minimum_java_version: 11
@@ -3022,7 +3022,7 @@ libraries:
       javaagent:
       - io.vertx:vertx-core:[5.0.0,)
     signals:
-      metrics: false
+      metrics: true
       traces: false
   - name: vertx-web-3.0
     source_path: instrumentation/vertx/vertx-web-3.0
@@ -3043,7 +3043,7 @@ libraries:
       - io.vertx:vertx-sql-client:[4.0.0,5)
     signals:
       metrics: true
-      traces: false
+      traces: true
   - name: vertx-http-client-4.0
     source_path: instrumentation/vertx/vertx-http-client/vertx-http-client-4.0
     scope:
@@ -3052,7 +3052,7 @@ libraries:
       javaagent:
       - io.vertx:vertx-core:[4.0.0,5)
     signals:
-      metrics: false
+      metrics: true
       traces: false
   - name: vertx-rx-java-3.5
     source_path: instrumentation/vertx/vertx-rx-java-3.5
@@ -3072,7 +3072,7 @@ libraries:
       javaagent:
       - io.vertx:vertx-core:[3.0.0,4.0.0)
     signals:
-      metrics: false
+      metrics: true
       traces: false
   vibur:
   - name: vibur-dbcp-11.0
@@ -3105,7 +3105,7 @@ libraries:
       - name: pool.name
         type: STRING
     signals:
-      metrics: false
+      metrics: true
       traces: true
   wicket:
   - name: wicket-8.0
@@ -3127,7 +3127,7 @@ libraries:
       javaagent:
       - com.xuxueli:xxl-job-core:[2.3.0,)
     signals:
-      metrics: false
+      metrics: true
       traces: false
   - name: xxl-job-2.1.2
     source_path: instrumentation/xxl-job/xxl-job-2.1.2
@@ -3137,7 +3137,7 @@ libraries:
       javaagent:
       - com.xuxueli:xxl-job-core:[2.1.2,2.3.0)
     signals:
-      metrics: false
+      metrics: true
       traces: false
   - name: xxl-job-1.9.2
     source_path: instrumentation/xxl-job/xxl-job-1.9.2
@@ -3147,7 +3147,7 @@ libraries:
       javaagent:
       - com.xuxueli:xxl-job-core:[1.9.2, 2.1.2)
     signals:
-      metrics: false
+      metrics: true
       traces: false
   zio:
   - name: zio-2.0
@@ -3160,7 +3160,7 @@ libraries:
       - dev.zio:zio_3:[2.0.0,)
       - dev.zio:zio_2.12:[2.0.0,)
     signals:
-      metrics: false
+      metrics: true
       traces: false
 internal:
 - name: opentelemetry-api-1.15
