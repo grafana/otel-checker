@@ -162,6 +162,9 @@ def main():
 
             signals = Signals()
 
+            if 'metrics' in inst_entry:
+                signals.metrics = True
+
             for file in source_code_full_path.rglob('*.java'):
                 signals.update(signals_match_file(file, TRACE_PATTERNS, METRIC_PATTERNS))
                 if signals.traces and signals.metrics:
