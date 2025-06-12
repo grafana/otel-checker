@@ -59,10 +59,10 @@ def parse_csproj(csproj_path: Path) -> Optional[Dict[str, str]]:
     return None # Default return if critical info missing or error
 
 def main():
-    parser = argparse.ArgumentParser(description='Generate supported libraries YAML file from OpenTelemetry Go Contrib repository')
-    parser.add_argument('repo_dir', help='Path to the OpenTelemetry Go Contrib repository')
-    parser.add_argument('--output', '-o', default='checks/sdk/go/supported-libraries.yaml',
-                        help='Output path for the YAML file (default: checks/sdk/go/supported-libraries.yaml)')
+    parser = argparse.ArgumentParser(description='Generate supported libraries YAML file from OpenTelemetry .NET Contrib repository')
+    parser.add_argument('repo_dir', help='Path to the OpenTelemetry .NET Contrib repository')
+    parser.add_argument('--output', '-o', default='checks/sdk/dotnet/supported-libraries.yaml',
+                        help='Output path for the YAML file (default: checks/sdk/dotnet/supported-libraries.yaml)')
     args = parser.parse_args()
 
     repo_path = Path(args.repo_dir)
