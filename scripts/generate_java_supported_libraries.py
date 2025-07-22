@@ -82,7 +82,6 @@ METRIC_PATTERNS: List[str] = [
     r"GlobalOpenTelemetry\.get\(\)\.getMeter"
 ]
     
-]
 
 DEFAULT_YAML_URL = "https://raw.githubusercontent.com/open-telemetry/opentelemetry-java-instrumentation/refs/heads/main/docs/instrumentation-list.yaml"
 
