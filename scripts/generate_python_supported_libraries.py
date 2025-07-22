@@ -94,7 +94,7 @@ def main():
         source_path = os.path.relpath(inst_dir, repo_path)
         
         # Create library entry
-        supported_libraries[lib_name] =[Instrumentation(lib_name,
+        supported_libraries[lib_name] = [Instrumentation(lib_name,
                                                  source_path,
                                                  signals,
                                                  f'https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-{lib_name}')]
