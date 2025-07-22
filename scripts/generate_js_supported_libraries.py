@@ -19,7 +19,7 @@ from common import Signals, Instrumentation, signals_match_file
 METRIC_PATTERNS = [
     r'createHistogram',
     r'createUpDownCounter',
-    r'UpDownCounter'
+    r'UpDownCounter',
     r'createCounter',
     r'createObservableGauge',
     r'ObservableGauge',
