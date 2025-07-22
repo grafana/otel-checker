@@ -8,7 +8,7 @@
   labels: [
     "dependencies"
   ],
-  mackageRules: [
+  packageRules: [
     {
       matchPackageNames: [
         "jdx/mise"
