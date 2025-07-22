@@ -24,7 +24,7 @@ TRACE_PATTERNS: List[str] = [
     r"import\s+io\.opentelemetry\.extension\.annotations\.WithSpan;",
     
     # Annotations
-    r"@WithSpan"
+    r"@WithSpan",
     
     # Field declarations
     r"private static final Instrumenter<.*>",
