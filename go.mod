@@ -4,7 +4,7 @@ go 1.24.1
 require (
 	github.com/fatih/color v1.18.0
 	github.com/stretchr/testify v1.10.0
-	golang.org/x/mod v0.26.0
+	golang.org/x/mod v0.27.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
