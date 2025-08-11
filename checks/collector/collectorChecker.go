@@ -2,13 +2,14 @@ package collector
 
 import (
 	"fmt"
-	"github.com/grafana/otel-checker/checks/utils"
 	"os"
 	"regexp"
 	"slices"
 	"strings"
 
-	"gopkg.in/yaml.v3"
+	"github.com/grafana/otel-checker/checks/utils"
+
+	"go.yaml.in/yaml/v3"
 )
 
 func CheckCollectorSetup(reporter *utils.ComponentReporter, language string, configPath string) {
