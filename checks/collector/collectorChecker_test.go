@@ -1,10 +1,11 @@
 package collector
 
 import (
-	"github.com/grafana/otel-checker/checks/utils"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/grafana/otel-checker/checks/utils"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -32,8 +33,10 @@ func TestCheckCollectorConfig(t *testing.T) {
 receivers:
   otlp:
     protocols:
-      grpc: ""
-      http: ""
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318 
 exporters:
   otlphttp:
     endpoint: https://otlp-gateway-prod-us-east-0.grafana.net/otlp
