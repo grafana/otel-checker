@@ -2,13 +2,14 @@ package collector
 
 import (
 	"fmt"
-	"github.com/grafana/otel-checker/checks/utils"
 	"os"
 	"regexp"
 	"slices"
 	"strings"
 
-	"gopkg.in/yaml.v3"
+	"github.com/grafana/otel-checker/checks/utils"
+
+	"go.yaml.in/yaml/v3"
 )
 
 func CheckCollectorSetup(reporter *utils.ComponentReporter, language string, configPath string) {
@@ -18,10 +19,7 @@ func CheckCollectorSetup(reporter *utils.ComponentReporter, language string, con
 type configFile struct {
 	Receivers struct {
 		Otlp struct {
-			Protocols struct {
-				Grpc *string `yaml:"grpc"`
-				Http *string `yaml:"http"`
-			} `yaml:"protocols"`
+			Protocols map[string]any `yaml:"protocols"`
 		} `yaml:"otlp"`
 	} `yaml:"receivers"`
 	Exporters struct {
@@ -64,7 +62,7 @@ func checkCollectorConfig(reporter *utils.ComponentReporter, configPath string) 
 			return
 		}
 
-		if c.Receivers.Otlp.Protocols.Http == nil {
+		if c.Receivers.Otlp.Protocols["http"] == nil {
 			reporter.AddWarning("The value of receivers > otlp > protocols > http is nil. Make sure the key exists on your config.yaml")
 		}
 

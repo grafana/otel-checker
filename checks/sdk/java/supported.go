@@ -3,16 +3,17 @@ package java
 import (
 	"encoding/base64"
 	"fmt"
-	"github.com/grafana/otel-checker/checks/sdk"
-	"github.com/grafana/otel-checker/checks/sdk/supported"
-	"github.com/grafana/otel-checker/checks/utils"
-	"golang.org/x/mod/semver"
-	"gopkg.in/yaml.v3"
 	"path/filepath"
 	"regexp"
 	"slices"
 	"strconv"
 	"strings"
+
+	"github.com/grafana/otel-checker/checks/sdk"
+	"github.com/grafana/otel-checker/checks/sdk/supported"
+	"github.com/grafana/otel-checker/checks/utils"
+	"go.yaml.in/yaml/v3"
+	"golang.org/x/mod/semver"
 )
 
 var javaVersionRegex = regexp.MustCompile(`Java (\d)+\+`)
