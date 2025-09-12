@@ -1,6 +1,7 @@
 package java
 
 import (
+	"encoding/base64"
 	"fmt"
 	"github.com/grafana/otel-checker/checks/sdk"
 	"github.com/grafana/otel-checker/checks/sdk/supported"
@@ -27,14 +28,40 @@ func (l *Library) String() string {
 	return fmt.Sprintf("%s:%s:%s", l.Group, l.Artifact, l.Version)
 }
 
-func reportSupportedInstrumentations(reporter *utils.ComponentReporter, debug bool, instrumentationType supported.InstrumentationType, javaVersion int) {
+func reportSupportedInstrumentations(reporter *utils.ComponentReporter, debug bool, explorer bool, instrumentationType supported.InstrumentationType, javaVersion int) {
 	s, err := supportedLibraries()
 	if err != nil {
 		reporter.AddError(fmt.Sprintf("Error reading supported libraries: %v", err))
+		return
 	}
 
 	deps := readDependencies(reporter)
-	outputSupportedLibraries(deps, s, reporter, debug, instrumentationType, javaVersion)
+	// Initialize global collection for this run
+	globalInstrumentations = make(map[string]bool)
+	isFirstCall = true // Ensure it's reset for each top-level call to reportSupportedInstrumentations
+
+	outputSupportedLibraries(deps, s, reporter, debug, explorer, instrumentationType, javaVersion) // This populates globalInstrumentations
+
+	// Output final summary using the global collection
+	var globalList []string
+	for name := range globalInstrumentations {
+		globalList = append(globalList, name)
+	}
+	slices.Sort(globalList)
+
+	if len(globalList) > 0 {
+		reporter.AddSuccessfulCheck(fmt.Sprintf("🎯 Summary: Found %d unique OpenTelemetry instrumentations: %s",
+			len(globalList), strings.Join(globalList, ", ")))
+
+		if explorer {
+			explorerLink := generateInstrumentationExplorerLink(globalList)
+			if explorerLink != "" {
+				reporter.AddSuccessfulCheck(fmt.Sprintf("🔗 Explore these instrumentations: %s", explorerLink))
+			}
+		}
+	} else {
+		reporter.AddSuccessfulCheck("❌ No instrumentations found")
+	}
 }
 
 func readDependencies(reporter *utils.ComponentReporter) []Library {
@@ -69,18 +96,97 @@ func getWrapper(wrapper string, level []string) string {
 	return getWrapper(wrapper, append(level, ".."))
 }
 
-func outputSupportedLibraries(deps []Library, supported supported.SupportedModules, reporter *utils.ComponentReporter, debug bool, instrumentationType supported.InstrumentationType, javaVersion int) {
+// extractInstrumentationNames extracts instrumentation names from GitHub URLs
+// e.g. "https://github.com/open-telemetry/opentelemetry-java-instrumentation/tree/main/instrumentation/kafka/kafka-clients/kafka-clients-0.11/javaagent" -> "kafka-clients-0.11"
+func extractInstrumentationNames(links []string) []string {
+	var names []string
+	seen := make(map[string]bool)
+	
+	for _, link := range links {
+		// Extract the instrumentation name from the URL path
+		// The instrumentation name is the second-to-last directory before /javaagent
+		parts := strings.Split(link, "/")
+		if len(parts) >= 9 && parts[7] == "instrumentation" {
+			// Find the last part that is "javaagent" and get the part before it
+			for i := len(parts) - 1; i >= 8; i-- {
+				if parts[i] == "javaagent" && i > 8 {
+					name := parts[i-1]
+					if !seen[name] {
+						names = append(names, name)
+						seen[name] = true
+					}
+					break
+				}
+			}
+		}
+	}
+	
+	slices.Sort(names)
+	return names
+}
+
+// generateInstrumentationExplorerLink creates a link to the instrumentation explorer with base64 encoded instrumentations
+func generateInstrumentationExplorerLink(instrumentations []string) string {
+	if len(instrumentations) == 0 {
+		return ""
+	}
+	
+	// Join instrumentations without spaces
+	instrumentationsList := strings.Join(instrumentations, ",")
+	
+	// Base64 encode the list
+	encoded := base64.StdEncoding.EncodeToString([]byte(instrumentationsList))
+	
+	// Create the link with a reasonable default version (latest stable)
+	return fmt.Sprintf("https://jaydeluca.github.io/instrumentation-explorer/analyze?instrumentations=%s&version=2.19", encoded)
+}
+
+// Global variable to collect all instrumentations across calls
+var globalInstrumentations = make(map[string]bool)
+var isFirstCall = true
+
+func outputSupportedLibraries(deps []Library, supported supported.SupportedModules, reporter *utils.ComponentReporter, debug bool, explorer bool, instrumentationType supported.InstrumentationType, javaVersion int) []string {
+	var allInstrumentations []string
+	seen := make(map[string]bool)
+	
+	// Reset global collection on first call
+	if isFirstCall {
+		globalInstrumentations = make(map[string]bool)
+		isFirstCall = false
+	}
+	
 	for _, dep := range deps {
 		links := findSupportedLibraries(dep, supported, instrumentationType, javaVersion, reporter)
 		if len(links) > 0 {
+			instrumentationNames := extractInstrumentationNames(links)
 			reporter.AddSuccessfulCheck(
-				fmt.Sprintf("Found supported library: %s:%s:%s at %s",
-					dep.Group, dep.Artifact, dep.Version, strings.Join(links, ", ")))
+				fmt.Sprintf("Found supported library: %s:%s:%s at %s (instrumentations: %s)",
+					dep.Group, dep.Artifact, dep.Version, strings.Join(links, ", "), strings.Join(instrumentationNames, ", ")))
+			// Collect unique instrumentations
+			for _, name := range instrumentationNames {
+				if !seen[name] {
+					allInstrumentations = append(allInstrumentations, name)
+					seen[name] = true
+				}
+				// Also add to global collection
+				globalInstrumentations[name] = true
+			}
 		} else if debug {
 			reporter.AddWarning(fmt.Sprintf("Found unsupported library: %s:%s:%s", dep.Group, dep.Artifact, dep.Version))
 		}
-		outputSupportedLibraries(dep.Children, supported, reporter, false, instrumentationType, 0)
+		
+		// Collect instrumentations from children
+		childInstrumentations := outputSupportedLibraries(dep.Children, supported, reporter, false, explorer, instrumentationType, javaVersion)
+		for _, name := range childInstrumentations {
+			if !seen[name] {
+				allInstrumentations = append(allInstrumentations, name)
+				seen[name] = true
+			}
+		}
 	}
+	
+	slices.Sort(allInstrumentations)
+	return allInstrumentations
 }
 
 func findSupportedLibraries(library Library, supported supported.SupportedModules, instrumentationType supported.InstrumentationType, javaVersion int, reporter *utils.ComponentReporter) []string {

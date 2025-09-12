@@ -14,9 +14,9 @@ import (
 func CheckSetup(reporter *utils.ComponentReporter, commands utils.Commands) {
 	javaVersion := checkJavaVersion(reporter)
 	if commands.ManualInstrumentation {
-		checkCodeBasedInstrumentation(reporter, commands.Debug, javaVersion)
+		checkCodeBasedInstrumentation(reporter, commands, javaVersion)
 	} else {
-		checkAutoInstrumentation(reporter, commands.Debug, javaVersion)
+		checkAutoInstrumentation(reporter, commands, javaVersion)
 	}
 }
 
@@ -44,10 +44,10 @@ func checkJavaVersion(reporter *utils.ComponentReporter) int {
 	return 0
 }
 
-func checkAutoInstrumentation(reporter *utils.ComponentReporter, debug bool, javaVersion int) {
-	reportSupportedInstrumentations(reporter, debug, supported.TypeJavaagent, javaVersion)
+func checkAutoInstrumentation(reporter *utils.ComponentReporter, commands utils.Commands, javaVersion int) {
+	reportSupportedInstrumentations(reporter, commands.Debug, commands.Explorer, supported.TypeJavaagent, javaVersion)
 }
 
-func checkCodeBasedInstrumentation(reporter *utils.ComponentReporter, debug bool, javaVersion int) {
-	reportSupportedInstrumentations(reporter, debug, supported.TypeLibrary, javaVersion)
+func checkCodeBasedInstrumentation(reporter *utils.ComponentReporter, commands utils.Commands, javaVersion int) {
+	reportSupportedInstrumentations(reporter, commands.Debug, commands.Explorer, supported.TypeLibrary, javaVersion)
 }
