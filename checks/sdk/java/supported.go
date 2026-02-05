@@ -70,9 +70,9 @@ func getWrapper(wrapper string, level []string) string {
 	return getWrapper(wrapper, append(level, ".."))
 }
 
-func outputSupportedLibraries(deps []Library, supported supported.SupportedModules, reporter *utils.ComponentReporter, debug bool, instrumentationType supported.InstrumentationType, javaVersion int) {
+func outputSupportedLibraries(deps []Library, supportedModules supported.SupportedModules, reporter *utils.ComponentReporter, debug bool, instrumentationType supported.InstrumentationType, javaVersion int) {
 	for _, dep := range deps {
-		links := findSupportedLibraries(dep, supported, instrumentationType, javaVersion, reporter)
+		links := findSupportedLibraries(dep, supportedModules, instrumentationType, javaVersion, reporter)
 		if len(links) > 0 {
 			reporter.AddSuccessfulCheck(
 				fmt.Sprintf("Found supported library: %s:%s:%s at %s",
@@ -80,15 +80,23 @@ func outputSupportedLibraries(deps []Library, supported supported.SupportedModul
 		} else if debug {
 			reporter.AddWarning(fmt.Sprintf("Found unsupported library: %s:%s:%s", dep.Group, dep.Artifact, dep.Version))
 		}
-		outputSupportedLibraries(dep.Children, supported, reporter, false, instrumentationType, 0)
+		outputSupportedLibraries(dep.Children, supportedModules, reporter, false, instrumentationType, 0)
 	}
 }
 
-func findSupportedLibraries(library Library, supported supported.SupportedModules, instrumentationType supported.InstrumentationType, javaVersion int, reporter *utils.ComponentReporter) []string {
+func findSupportedLibraries(library Library, supportedModules supported.SupportedModules, instrumentationType supported.InstrumentationType, javaVersion int, reporter *utils.ComponentReporter) []string {
 	var links []string
-	for moduleName, instrumentations := range supported {
+	for moduleName, instrumentations := range supportedModules {
 		for _, instrumentation := range instrumentations {
-			for _, version := range instrumentation.TargetVersions[instrumentationType] {
+			var versions []string
+			if instrumentationType == supported.TypeJavaagent {
+				versions = instrumentation.JavavagentTargetVersions
+			} else if instrumentationType == supported.TypeLibrary && instrumentation.HasStandaloneLibrary {
+				// Library instrumentations support the same versions as javaagent
+				versions = instrumentation.JavavagentTargetVersions
+			}
+
+			for _, version := range versions {
 				if matchVersion(moduleName, version, library, javaVersion, reporter) {
 					l := fmt.Sprintf("https://github.com/open-telemetry/opentelemetry-java-instrumentation/tree/main/%s/%s",
 						instrumentation.SrcPath, instrumentationType)

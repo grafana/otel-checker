@@ -36,7 +36,15 @@ func FindSupportedLibraries(library Library, supportedModules SupportedModules, 
 	var links []string
 	for moduleName, instrumentations := range supportedModules {
 		for _, instrumentation := range instrumentations {
-			for _, version := range instrumentation.TargetVersions[instrumentationType] {
+			var versions []string
+			if instrumentationType == TypeJavaagent {
+				versions = instrumentation.JavavagentTargetVersions
+			} else if instrumentationType == TypeLibrary && instrumentation.HasStandaloneLibrary {
+				// Library instrumentations support the same versions as javaagent
+				versions = instrumentation.JavavagentTargetVersions
+			}
+
+			for _, version := range versions {
 				versionRange, err := sdk.ParseVersionRange(version)
 				if err != nil {
 					reporter.AddInternalError(fmt.Sprintf("Parsing version range for module %s: %s",
