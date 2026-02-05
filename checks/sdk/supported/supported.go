@@ -20,12 +20,12 @@ const (
 
 // Instrumentation represents a single instrumentation with its metadata
 type Instrumentation struct {
-	Name                     string   `yaml:"name"`
-	Description              string   `yaml:"description"`
-	SrcPath                  string   `yaml:"source_path"`
-	Link                     string   `yaml:"link,omitempty"`
-	JavavagentTargetVersions []string `yaml:"javaagent_target_versions"`
-	HasStandaloneLibrary     bool     `yaml:"has_standalone_library"`
+	Name                          string   `yaml:"name"`
+	Description                   string   `yaml:"description"`
+	SrcPath                       string   `yaml:"source_path"`
+	Link                          string   `yaml:"link,omitempty"`
+	Versions                      []string `yaml:"versions"`
+	SupportsManualInstrumentation bool     `yaml:"supports_manual_instrumentation"`
 }
 
 // SupportedModules represents a map of module names to their supported modules

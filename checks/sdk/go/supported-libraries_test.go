@@ -73,18 +73,18 @@ func TestFindSupportedLibraries(t *testing.T) {
 	s := supported.SupportedModules{
 		"google.golang.org/grpc": []supported.Instrumentation{
 			{
-				Name:                     "google.golang.org/grpc",
-				Link:                     "go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc",
-				JavavagentTargetVersions: []string{"[1.50.0,)"},
-				HasStandaloneLibrary:     true,
+				Name:                          "google.golang.org/grpc",
+				Link:                          "go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc",
+				Versions:                      []string{"[1.50.0,)"},
+				SupportsManualInstrumentation: true,
 			},
 		},
 		"github.com/aws/aws-lambda-go": []supported.Instrumentation{
 			{
-				Name:                     "github.com/aws/aws-lambda-go",
-				Link:                     "go.opentelemetry.io/contrib/instrumentation/github.com/aws/aws-lambda-go/otellambda",
-				JavavagentTargetVersions: []string{"[1.41.0,)"},
-				HasStandaloneLibrary:     true,
+				Name:                          "github.com/aws/aws-lambda-go",
+				Link:                          "go.opentelemetry.io/contrib/instrumentation/github.com/aws/aws-lambda-go/otellambda",
+				Versions:                      []string{"[1.41.0,)"},
+				SupportsManualInstrumentation: true,
 			},
 		},
 	}

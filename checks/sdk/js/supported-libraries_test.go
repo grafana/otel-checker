@@ -176,18 +176,18 @@ func TestFindSupportedLibraries(t *testing.T) {
 	s := supported.SupportedModules{
 		"express": []supported.Instrumentation{
 			{
-				Name:                     "express",
-				Link:                     "https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-express",
-				JavavagentTargetVersions: []string{"[4.0.0,)"},
-				HasStandaloneLibrary:     true,
+				Name:                          "express",
+				Link:                          "https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-express",
+				Versions:                      []string{"[4.0.0,)"},
+				SupportsManualInstrumentation: true,
 			},
 		},
 		"@opentelemetry/instrumentation-express": []supported.Instrumentation{
 			{
-				Name:                     "@opentelemetry/instrumentation-express",
-				Link:                     "https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-express",
-				JavavagentTargetVersions: []string{"[0.35.0,)"},
-				HasStandaloneLibrary:     true,
+				Name:                          "@opentelemetry/instrumentation-express",
+				Link:                          "https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-express",
+				Versions:                      []string{"[0.35.0,)"},
+				SupportsManualInstrumentation: true,
 			},
 		},
 	}

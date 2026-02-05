@@ -38,10 +38,10 @@ func FindSupportedLibraries(library Library, supportedModules SupportedModules, 
 		for _, instrumentation := range instrumentations {
 			var versions []string
 			if instrumentationType == TypeJavaagent {
-				versions = instrumentation.JavavagentTargetVersions
-			} else if instrumentationType == TypeLibrary && instrumentation.HasStandaloneLibrary {
-				// Library instrumentations support the same versions as javaagent
-				versions = instrumentation.JavavagentTargetVersions
+				versions = instrumentation.Versions
+			} else if instrumentationType == TypeLibrary && instrumentation.SupportsManualInstrumentation {
+				// Manual instrumentation supports the same versions
+				versions = instrumentation.Versions
 			}
 
 			for _, version := range versions {

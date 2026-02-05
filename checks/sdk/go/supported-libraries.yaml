@@ -2,97 +2,97 @@ github.com/aws/aws-lambda-go:
 - link: go.opentelemetry.io/contrib/instrumentation/github.com/aws/aws-lambda-go/otellambda
   name: github.com/aws/aws-lambda-go
   source_path: instrumentation/github.com/aws/aws-lambda-go/otellambda
-  target_versions:
-    library:
-    - '[1.48.0,2.0.0)'
+  versions:
+  - '[1.48.0,2.0.0)'
+  supports_manual_instrumentation: true
 github.com/aws/aws-sdk-go-v2:
 - link: go.opentelemetry.io/contrib/instrumentation/github.com/aws/aws-sdk-go-v2/otelaws
   name: github.com/aws/aws-sdk-go-v2
   source_path: instrumentation/github.com/aws/aws-sdk-go-v2/otelaws
-  target_versions:
-    library:
-    - '[1.36.3,2.0.0)'
+  versions:
+  - '[1.36.3,2.0.0)'
+  supports_manual_instrumentation: true
 github.com/emicklei/go-restful/v3:
 - link: go.opentelemetry.io/contrib/instrumentation/github.com/emicklei/go-restful/otelrestful
   name: github.com/emicklei/go-restful/v3
   source_path: instrumentation/github.com/emicklei/go-restful/otelrestful
-  target_versions:
-    library:
-    - '[3.12.2,4.0.0)'
+  versions:
+  - '[3.12.2,4.0.0)'
+  supports_manual_instrumentation: true
 github.com/felixge/httpsnoop:
 - link: go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux
   name: github.com/felixge/httpsnoop
   source_path: instrumentation/github.com/gorilla/mux/otelmux
-  target_versions:
-    library:
-    - '[1.0.4,2.0.0)'
+  versions:
+  - '[1.0.4,2.0.0)'
+  supports_manual_instrumentation: true
 github.com/gin-gonic/gin:
 - link: go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin
   name: github.com/gin-gonic/gin
   source_path: instrumentation/github.com/gin-gonic/gin/otelgin
-  target_versions:
-    library:
-    - '[1.10.0,2.0.0)'
+  versions:
+  - '[1.10.0,2.0.0)'
+  supports_manual_instrumentation: true
 github.com/gorilla/mux:
 - link: go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux/example
   name: github.com/gorilla/mux
   source_path: instrumentation/github.com/gorilla/mux/otelmux/example
-  target_versions:
-    library:
-    - '[1.8.1,2.0.0)'
+  versions:
+  - '[1.8.1,2.0.0)'
+  supports_manual_instrumentation: true
 github.com/labstack/echo/v4:
 - link: go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho
   name: github.com/labstack/echo/v4
   source_path: instrumentation/github.com/labstack/echo/otelecho
-  target_versions:
-    library:
-    - '[4.13.3,5.0.0)'
+  versions:
+  - '[4.13.3,5.0.0)'
+  supports_manual_instrumentation: true
 github.com/stretchr/testify:
 - link: go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin/internal/semconv/test
   name: github.com/stretchr/testify
   source_path: instrumentation/github.com/gin-gonic/gin/otelgin/internal/semconv/test
-  target_versions:
-    library:
-    - '[1.10.0,2.0.0)'
+  versions:
+  - '[1.10.0,2.0.0)'
+  supports_manual_instrumentation: true
 go.mongodb.org/mongo-driver:
 - link: go.opentelemetry.io/contrib/instrumentation/go.mongodb.org/mongo-driver/mongo/otelmongo
   name: go.mongodb.org/mongo-driver
   source_path: instrumentation/go.mongodb.org/mongo-driver/mongo/otelmongo
-  target_versions:
-    library:
-    - '[1.17.3,2.0.0)'
+  versions:
+  - '[1.17.3,2.0.0)'
+  supports_manual_instrumentation: true
 go.mongodb.org/mongo-driver/v2:
 - link: go.opentelemetry.io/contrib/instrumentation/go.mongodb.org/mongo-driver/v2/mongo/otelmongo
   name: go.mongodb.org/mongo-driver/v2
   source_path: instrumentation/go.mongodb.org/mongo-driver/v2/mongo/otelmongo
-  target_versions:
-    library:
-    - '[2.2.1,3.0.0)'
+  versions:
+  - '[2.2.1,3.0.0)'
+  supports_manual_instrumentation: true
 go.opentelemetry.io/contrib/instrumentation/host:
 - link: go.opentelemetry.io/contrib/instrumentation/host/example
   name: go.opentelemetry.io/contrib/instrumentation/host
   source_path: instrumentation/host/example
-  target_versions:
-    library:
-    - '[0.60.0,1.0.0)'
+  versions:
+  - '[0.60.0,1.0.0)'
+  supports_manual_instrumentation: true
 go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace:
 - link: go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace/example
   name: go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace
   source_path: instrumentation/net/http/httptrace/otelhttptrace/example
-  target_versions:
-    library:
-    - '[0.60.0,1.0.0)'
+  versions:
+  - '[0.60.0,1.0.0)'
+  supports_manual_instrumentation: true
 go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp:
 - link: go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp/example
   name: go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp
   source_path: instrumentation/net/http/otelhttp/example
-  target_versions:
-    library:
-    - '[0.60.0,1.0.0)'
+  versions:
+  - '[0.60.0,1.0.0)'
+  supports_manual_instrumentation: true
 google.golang.org/grpc:
 - link: go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc
   name: google.golang.org/grpc
   source_path: instrumentation/google.golang.org/grpc/otelgrpc
-  target_versions:
-    library:
-    - '[1.72.1,2.0.0)'
+  versions:
+  - '[1.72.1,2.0.0)'
+  supports_manual_instrumentation: true
