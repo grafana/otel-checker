@@ -20,11 +20,12 @@ const (
 
 // Instrumentation represents a single instrumentation with its metadata
 type Instrumentation struct {
-	Name           string                           `yaml:"name"`
-	Description    string                           `yaml:"description"`
-	SrcPath        string                           `yaml:"source_path"`
-	Link           string                           `yaml:"link,omitempty"`
-	TargetVersions map[InstrumentationType][]string `yaml:"target_versions"`
+	Name                          string   `yaml:"name"`
+	Description                   string   `yaml:"description"`
+	SrcPath                       string   `yaml:"source_path"`
+	Link                          string   `yaml:"link,omitempty"`
+	Versions                      []string `yaml:"versions"`
+	SupportsManualInstrumentation bool     `yaml:"supports_manual_instrumentation"`
 }
 
 // SupportedModules represents a map of module names to their supported modules

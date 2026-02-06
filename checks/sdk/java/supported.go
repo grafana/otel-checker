@@ -70,9 +70,9 @@ func getWrapper(wrapper string, level []string) string {
 	return getWrapper(wrapper, append(level, ".."))
 }
 
-func outputSupportedLibraries(deps []Library, supported supported.SupportedModules, reporter *utils.ComponentReporter, debug bool, instrumentationType supported.InstrumentationType, javaVersion int) {
+func outputSupportedLibraries(deps []Library, supportedModules supported.SupportedModules, reporter *utils.ComponentReporter, debug bool, instrumentationType supported.InstrumentationType, javaVersion int) {
 	for _, dep := range deps {
-		links := findSupportedLibraries(dep, supported, instrumentationType, javaVersion, reporter)
+		links := findSupportedLibraries(dep, supportedModules, instrumentationType, javaVersion, reporter)
 		if len(links) > 0 {
 			reporter.AddSuccessfulCheck(
 				fmt.Sprintf("Found supported library: %s:%s:%s at %s",
@@ -80,15 +80,23 @@ func outputSupportedLibraries(deps []Library, supported supported.SupportedModul
 		} else if debug {
 			reporter.AddWarning(fmt.Sprintf("Found unsupported library: %s:%s:%s", dep.Group, dep.Artifact, dep.Version))
 		}
-		outputSupportedLibraries(dep.Children, supported, reporter, false, instrumentationType, 0)
+		outputSupportedLibraries(dep.Children, supportedModules, reporter, false, instrumentationType, 0)
 	}
 }
 
-func findSupportedLibraries(library Library, supported supported.SupportedModules, instrumentationType supported.InstrumentationType, javaVersion int, reporter *utils.ComponentReporter) []string {
+func findSupportedLibraries(library Library, supportedModules supported.SupportedModules, instrumentationType supported.InstrumentationType, javaVersion int, reporter *utils.ComponentReporter) []string {
 	var links []string
-	for moduleName, instrumentations := range supported {
+	for moduleName, instrumentations := range supportedModules {
 		for _, instrumentation := range instrumentations {
-			for _, version := range instrumentation.TargetVersions[instrumentationType] {
+			var versions []string
+			if instrumentationType == supported.TypeJavaagent {
+				versions = instrumentation.Versions
+			} else if instrumentationType == supported.TypeLibrary && instrumentation.SupportsManualInstrumentation {
+				// Manual instrumentation supports the same versions
+				versions = instrumentation.Versions
+			}
+
+			for _, version := range versions {
 				if matchVersion(moduleName, version, library, javaVersion, reporter) {
 					l := fmt.Sprintf("https://github.com/open-telemetry/opentelemetry-java-instrumentation/tree/main/%s/%s",
 						instrumentation.SrcPath, instrumentationType)
@@ -146,17 +154,45 @@ func supportedLibraries() (supported.SupportedModules, error) {
 	return LoadSupportedJavaLibraries(bytes)
 }
 
-// SupportedJavaModules is a struct that holds the supported Java libraries
-type SupportedJavaModules struct {
-	Libraries supported.SupportedModules `json:"libraries"`
+// JavaInstrumentation matches the upstream Java YAML format
+type JavaInstrumentation struct {
+	Name                     string   `yaml:"name"`
+	Description              string   `yaml:"description"`
+	SrcPath                  string   `yaml:"source_path"`
+	Link                     string   `yaml:"link,omitempty"`
+	JavavagentTargetVersions []string `yaml:"javaagent_target_versions"`
+	HasStandaloneLibrary     bool     `yaml:"has_standalone_library"`
 }
 
-// LoadSupportedJavaLibraries loads supported libraries from a YAML file
+// SupportedJavaModules is a struct that holds the supported Java libraries in upstream format
+type SupportedJavaModules struct {
+	Libraries map[string][]JavaInstrumentation `yaml:"libraries"`
+}
+
+// LoadSupportedJavaLibraries loads supported libraries from a YAML file and maps to generic format
 func LoadSupportedJavaLibraries(data []byte) (supported.SupportedModules, error) {
-	modules := SupportedJavaModules{}
-	err := yaml.Unmarshal(data, &modules)
+	javaModules := SupportedJavaModules{}
+	err := yaml.Unmarshal(data, &javaModules)
 	if err != nil {
 		return nil, err
 	}
-	return modules.Libraries, nil
+
+	// Map from Java-specific format to generic format
+	result := make(supported.SupportedModules)
+	for moduleName, javaInstrumentations := range javaModules.Libraries {
+		instrumentations := make([]supported.Instrumentation, len(javaInstrumentations))
+		for i, javaInst := range javaInstrumentations {
+			instrumentations[i] = supported.Instrumentation{
+				Name:                          javaInst.Name,
+				Description:                   javaInst.Description,
+				SrcPath:                       javaInst.SrcPath,
+				Link:                          javaInst.Link,
+				Versions:                      javaInst.JavavagentTargetVersions,
+				SupportsManualInstrumentation: javaInst.HasStandaloneLibrary,
+			}
+		}
+		result[moduleName] = instrumentations
+	}
+
+	return result, nil
 }

@@ -136,9 +136,8 @@ def main():
                 'name': library_name,
                 'source_path': result['source_path'],
                 'link': result['link'],
-                'target_versions': {
-                    'library': [convert_version_range(result['version_range'])]
-                }
+                'versions': [convert_version_range(result['version_range'])],
+                'supports_manual_instrumentation': True
             }]
 
     output_path = Path(args.output)

@@ -160,9 +160,8 @@ def main():
                         "name": library_name,
                         "source_path": str(rel_path.parent),
                         "link": module_name,
-                        "target_versions": {
-                            "library": [version_range]
-                        }
+                        "versions": [version_range],
+                        "supports_manual_instrumentation": True
                     }]
             else:
                 print(f"No matching dependency found for {rel_path}")
