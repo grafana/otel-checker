@@ -1,7 +1,7 @@
 [tools]
 go = "1.25.7"
 golangci-lint = "2.8.0"
-uv = "0.10.0"
+uv = "0.10.1"
 
 [tasks.build]
 description = "Build the application"
