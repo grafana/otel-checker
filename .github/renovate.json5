@@ -1,23 +1,14 @@
 {
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
-  extends: [
-    "config:best-practices",
-    "config:recommended"
-  ],
+  extends: ["config:best-practices", "config:recommended"],
   automerge: true,
-  labels: [
-    "dependencies"
-  ],
+  labels: ["dependencies"],
   packageRules: [
     {
-      matchPackageNames: [
-        "jdx/mise"
-      ],
+      matchPackageNames: ["jdx/mise"],
       groupName: "mise",
-      schedule: [
-        "before 4am on monday"
-      ],
-    }
+      schedule: ["before 4am on monday"],
+    },
   ],
   customManagers: [
     {
@@ -25,14 +16,14 @@
       description: "update mise",
       managerFilePatterns: [
         "/(^|/)(workflow-templates|\\.(?:github|gitea|forgejo)/(?:workflows|actions))/.+\\.ya?ml$/",
-        "/(^|/)action\\.ya?ml$/"
+        "/(^|/)action\\.ya?ml$/",
       ],
       datasourceTemplate: "github-release-attachments",
       packageNameTemplate: "jdx/mise",
       depNameTemplate: "mise",
       matchStrings: [
-        "jdx/mise-action.*\\n\\s*with:\\s*\\n\\s*version: [\"']?(?<currentValue>v[.\\d]+)[\"']?\\s*\\n\\s*sha256: [\"']?(?<currentDigest>\\w+)[\"']?"
+        "jdx/mise-action.*\\n\\s*with:\\s*\\n\\s*version: [\"']?(?<currentValue>v[.\\d]+)[\"']?\\s*\\n\\s*sha256: [\"']?(?<currentDigest>\\w+)[\"']?",
       ],
     },
-  ]
+  ],
 }
