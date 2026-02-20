@@ -7,22 +7,4 @@
   ],
   automerge: true,
   labels: ["dependencies"],
-  // Kept inline because renovate-deps.py runs with --platform=local
-  // which cannot resolve the github>grafana/flint preset.
-  customManagers: [
-    {
-      customType: "regex",
-      description: "Update mise version in GitHub Actions workflows",
-      managerFilePatterns: [
-        "/(^|/)(workflow-templates|\\.(?:github|gitea|forgejo)/(?:workflows|actions))/.+\\.ya?ml$/",
-        "/(^|/)action\\.ya?ml$/",
-      ],
-      datasourceTemplate: "github-release-attachments",
-      packageNameTemplate: "jdx/mise",
-      depNameTemplate: "mise",
-      matchStrings: [
-        'jdx/mise-action.*\\n\\s*with:\\s*\\n\\s*version: ["\']?(?<currentValue>v[.\\d]+)["\']?\\s*\\n\\s*sha256: ["\']?(?<currentDigest>\\w+)["\']?',
-      ],
-    },
-  ],
 }
