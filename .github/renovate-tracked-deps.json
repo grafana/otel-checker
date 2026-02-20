@@ -1,4 +1,9 @@
 {
+  ".github/renovate.json5": {
+    "renovate-config-presets": [
+      "grafana/flint"
+    ]
+  },
   ".github/workflows/test.yaml": {
     "regex": [
       "mise"
@@ -27,6 +32,10 @@
       "node",
       "npm:renovate",
       "uv"
+    ],
+    "regex": [
+      "ghcr.io/super-linter/super-linter",
+      "grafana/flint"
     ]
   }
 }
