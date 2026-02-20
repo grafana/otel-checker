@@ -7,7 +7,6 @@
 
 #!/usr/bin/env python3
 
-import os
 import re
 import sys
 import yaml
@@ -15,30 +14,31 @@ import argparse
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 
+
 def parse_go_mod_file(file_path: Path) -> Dict[str, Any]:
     """Parse a go.mod file and extract the module name and dependencies."""
     dependencies = {}
     module_name = None
 
-    with open(file_path, 'r') as f:
+    with open(file_path, "r") as f:
         content = f.read()
 
     # Extract the module name
-    module_match = re.search(r'^module\s+(.+)$', content, re.MULTILINE)
+    module_match = re.search(r"^module\s+(.+)$", content, re.MULTILINE)
     if module_match:
         module_name = module_match.group(1).strip()
 
     # Extract dependencies
-    require_pattern = re.compile(r'^\t(.+?)\s+(v[0-9]+\.[0-9]+\.[0-9]+(?:-[a-zA-Z0-9.]+)?)$', re.MULTILINE)
+    require_pattern = re.compile(
+        r"^\t(.+?)\s+(v[0-9]+\.[0-9]+\.[0-9]+(?:-[a-zA-Z0-9.]+)?)$", re.MULTILINE
+    )
     for match in require_pattern.finditer(content):
         dep_name = match.group(1).strip()
         dep_version = match.group(2).strip()
         dependencies[dep_name] = dep_version
 
-    return {
-        "module_name": module_name,
-        "dependencies": dependencies
-    }
+    return {"module_name": module_name, "dependencies": dependencies}
+
 
 def calculate_version_range(version: str) -> str:
     """
@@ -46,10 +46,10 @@ def calculate_version_range(version: str) -> str:
     Example: for v1.2.3, returns [1.2.3,2.0.0)
     """
     # Strip 'v' prefix if present
-    clean_version = version.lstrip('v')
+    clean_version = version.lstrip("v")
 
     # Parse major version
-    major_version = int(clean_version.split('.')[0])
+    major_version = int(clean_version.split(".")[0])
 
     # Calculate next major version
     next_major = major_version + 1
@@ -57,7 +57,10 @@ def calculate_version_range(version: str) -> str:
     # Create version range with upper bound as next major version
     return f"[{clean_version},{next_major}.0.0)"
 
-def find_matching_dependency(file_path: Path, go_mod_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+
+def find_matching_dependency(
+    file_path: Path, go_mod_data: Dict[str, Any]
+) -> Optional[Dict[str, Any]]:
     """
     Find the dependency that matches the directory structure of the go.mod file.
 
@@ -88,7 +91,7 @@ def find_matching_dependency(file_path: Path, go_mod_data: Dict[str, Any]) -> Op
             continue
 
         # Try to build a path from components
-        potential_path = "/".join(rel_path_parts[:i+1])
+        potential_path = "/".join(rel_path_parts[: i + 1])
 
         # Check if this path or any dependency starts with this path
         for dep_name in dependencies:
@@ -96,7 +99,7 @@ def find_matching_dependency(file_path: Path, go_mod_data: Dict[str, Any]) -> Op
                 return {
                     "name": dep_name,
                     "version": dependencies[dep_name],
-                    "module": go_mod_data["module_name"]
+                    "module": go_mod_data["module_name"],
                 }
 
     # If nothing matched directly, look at all parts
@@ -106,10 +109,11 @@ def find_matching_dependency(file_path: Path, go_mod_data: Dict[str, Any]) -> Op
                 return {
                     "name": dep_name,
                     "version": dependencies[dep_name],
-                    "module": go_mod_data["module_name"]
+                    "module": go_mod_data["module_name"],
                 }
 
     return None
+
 
 def find_go_mod_files(repo_path: Path) -> List[Path]:
     """Find all go.mod files in the instrumentation directory."""
@@ -120,11 +124,20 @@ def find_go_mod_files(repo_path: Path) -> List[Path]:
 
     return list(instrumentation_dir.glob("**/go.mod"))
 
+
 def main():
-    parser = argparse.ArgumentParser(description='Generate supported libraries YAML file from OpenTelemetry Go Contrib repository')
-    parser.add_argument('repo_dir', help='Path to the OpenTelemetry Go Contrib repository')
-    parser.add_argument('--output', '-o', default='checks/sdk/go/supported-libraries.yaml',
-                        help='Output path for the YAML file (default: checks/sdk/go/supported-libraries.yaml)')
+    parser = argparse.ArgumentParser(
+        description="Generate supported libraries YAML file from OpenTelemetry Go Contrib repository"
+    )
+    parser.add_argument(
+        "repo_dir", help="Path to the OpenTelemetry Go Contrib repository"
+    )
+    parser.add_argument(
+        "--output",
+        "-o",
+        default="checks/sdk/go/supported-libraries.yaml",
+        help="Output path for the YAML file (default: checks/sdk/go/supported-libraries.yaml)",
+    )
     args = parser.parse_args()
 
     repo_path = Path(args.repo_dir)
@@ -156,13 +169,15 @@ def main():
                 print(f"  Module: {module_name}")
 
                 if library_name not in supported_libraries:
-                    supported_libraries[library_name] = [{
-                        "name": library_name,
-                        "source_path": str(rel_path.parent),
-                        "link": module_name,
-                        "versions": [version_range],
-                        "supports_manual_instrumentation": True
-                    }]
+                    supported_libraries[library_name] = [
+                        {
+                            "name": library_name,
+                            "source_path": str(rel_path.parent),
+                            "link": module_name,
+                            "versions": [version_range],
+                            "supports_manual_instrumentation": True,
+                        }
+                    ]
             else:
                 print(f"No matching dependency found for {rel_path}")
         except Exception as e:
@@ -171,11 +186,13 @@ def main():
     output_path = Path(args.output)
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    with open(output_path, 'w') as f:
+    with open(output_path, "w") as f:
         yaml.dump(supported_libraries, f, sort_keys=True)
 
-    print(f"Generated {output_path} with {len(supported_libraries)} supported libraries")
+    print(
+        f"Generated {output_path} with {len(supported_libraries)} supported libraries"
+    )
+
 
 if __name__ == "__main__":
     main()
-

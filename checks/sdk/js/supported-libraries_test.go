@@ -1,8 +1,9 @@
 package js
 
 import (
-	"github.com/grafana/otel-checker/checks/sdk/supported"
 	"testing"
+
+	"github.com/grafana/otel-checker/checks/sdk/supported"
 )
 
 func TestReadPackageJson(t *testing.T) {

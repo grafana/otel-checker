@@ -2,8 +2,9 @@ package env
 
 import (
 	"fmt"
-	"github.com/grafana/otel-checker/checks/utils"
 	"strings"
+
+	"github.com/grafana/otel-checker/checks/utils"
 )
 
 // Common environment variables used across the project

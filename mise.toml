@@ -59,7 +59,7 @@ run = "go mod tidy"
 
 [tasks.check]
 description = "Run all checks"
-depends = ['lint', 'test']
+depends = ['lint:go', 'test']
 
 [tasks.generate-go-supported-libraries]
 run = "uv run scripts/generate_go_supported_libraries.py ../opentelemetry-go-contrib -o checks/sdk/go/supported-libraries.yaml"

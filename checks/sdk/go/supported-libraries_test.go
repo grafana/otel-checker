@@ -1,8 +1,9 @@
 package _go
 
 import (
-	"github.com/grafana/otel-checker/checks/sdk/supported"
 	"testing"
+
+	"github.com/grafana/otel-checker/checks/sdk/supported"
 )
 
 func TestReadGoMod(t *testing.T) {

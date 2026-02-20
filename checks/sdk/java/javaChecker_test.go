@@ -1,10 +1,11 @@
 package java
 
 import (
+	"testing"
+
 	"github.com/grafana/otel-checker/checks/sdk/supported"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestFindSupportedLibrary(t *testing.T) {

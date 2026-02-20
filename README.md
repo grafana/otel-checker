@@ -168,7 +168,7 @@ Use `-components=beyla` flag to check the following:
 ## Examples
 
 Application with auto-instrumentation
-![auto instrumentation exemple](./assets/auto.png)
+![auto instrumentation example](./assets/auto.png)
 
 Application with custom instrumentation using SDKs and Collector
 ![sdk and collector example](./assets/sdk.png)

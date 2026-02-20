@@ -3,12 +3,13 @@ package java
 import (
 	_ "embed"
 	"fmt"
-	"github.com/grafana/otel-checker/checks/sdk"
-	"github.com/grafana/otel-checker/checks/sdk/supported"
-	"github.com/grafana/otel-checker/checks/utils"
 	"os/exec"
 	"strconv"
 	"strings"
+
+	"github.com/grafana/otel-checker/checks/sdk"
+	"github.com/grafana/otel-checker/checks/sdk/supported"
+	"github.com/grafana/otel-checker/checks/utils"
 )
 
 func CheckSetup(reporter *utils.ComponentReporter, commands utils.Commands) {
@@ -23,7 +24,7 @@ func CheckSetup(reporter *utils.ComponentReporter, commands utils.Commands) {
 func checkJavaVersion(reporter *utils.ComponentReporter) int {
 	out := sdk.RunCommand(reporter, exec.Command("java", "-version"))
 	if out != "" {
-		//openjdk version "21.0.2" 2024-01-16 LTS
+		// openjdk version "21.0.2" 2024-01-16 LTS
 		line := strings.Split(out, "\n")[0]
 		field := strings.Split(line, " ")[2]
 		version := strings.Trim(field, "\"")
