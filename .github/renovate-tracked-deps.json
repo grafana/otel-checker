@@ -4,11 +4,6 @@
       "grafana/flint"
     ]
   },
-  ".github/workflows/test.yaml": {
-    "regex": [
-      "mise"
-    ]
-  },
   "go.mod": {
     "gomod": [
       "github.com/davecgh/go-spew",
