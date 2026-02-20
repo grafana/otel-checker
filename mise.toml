@@ -1,6 +1,6 @@
 [tools]
 go = "1.26.0"
-golangci-lint = "2.9.0"
+golangci-lint = "2.10.0"
 uv = "0.10.3"
 lychee = "0.22.0"
 "npm:renovate" = "43.11.1"
