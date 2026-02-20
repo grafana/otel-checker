@@ -1,8 +1,9 @@
 package supported
 
 import (
-	"github.com/grafana/otel-checker/checks/utils"
 	"testing"
+
+	"github.com/grafana/otel-checker/checks/utils"
 )
 
 func TestFindSupportedLibraries(t *testing.T) {

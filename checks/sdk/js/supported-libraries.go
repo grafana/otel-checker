@@ -4,10 +4,11 @@ import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
-	"github.com/grafana/otel-checker/checks/sdk/supported"
-	"github.com/grafana/otel-checker/checks/utils"
 	"os"
 	"strings"
+
+	"github.com/grafana/otel-checker/checks/sdk/supported"
+	"github.com/grafana/otel-checker/checks/utils"
 )
 
 //go:embed supported-libraries.yaml

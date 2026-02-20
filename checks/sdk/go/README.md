@@ -19,6 +19,7 @@ import_path:
 ```
 
 Example:
+
 ```yaml
 go.mongodb.org/mongo-driver:
   - name: go.mongodb.org/mongo-driver
@@ -26,7 +27,7 @@ go.mongodb.org/mongo-driver:
     link: go.opentelemetry.io/contrib/instrumentation/go.mongodb.org/mongo-driver/mongo/otelmongo
     target_versions:
       library:
-        - '[1.17.3,2.0.0)'
+        - "[1.17.3,2.0.0)"
 ```
 
 ## Generating the File
@@ -47,6 +48,7 @@ mise r generate-go-supported-libraries
 ### How It Works
 
 The script:
+
 1. Finds all instrumentation packages in the Go Contrib repository
 2. Extracts supported version information from go.mod files
 3. Converts version ranges to a consistent format
@@ -55,11 +57,13 @@ The script:
 ## Maintenance
 
 The `supported-libraries.yaml` file should be updated when:
+
 1. New instrumentations are added to the OpenTelemetry Go Contrib repository
 2. Version ranges for existing instrumentations change
 3. Instrumentation paths change
 
 To update the file:
+
 1. Update your local clone of the OpenTelemetry Go Contrib repository
 2. Run the generation script
 3. Review the changes in the generated YAML file
@@ -72,6 +76,7 @@ The Go checker scans `go.mod` files in your project to identify dependencies and
 ## Version Range Format
 
 Version ranges are specified in the following format:
+
 - `[1.0.0,2.0.0)` means version 1.0.0 (inclusive) to 2.0.0 (exclusive)
 - `[1.0.0,)` means version 1.0.0 or higher
-- `[,2.0.0)` means any version below 2.0.0 
+- `[,2.0.0)` means any version below 2.0.0

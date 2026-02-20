@@ -6,59 +6,71 @@ Thank you for your interest in contributing to otel-checker! This document provi
 
 1. Ensure you have Go installed (1.24 or higher)
 2. Clone the repository:
-   ```
+   ```bash
    git clone https://github.com/yourusername/otel-checker.git
    cd otel-checker
    ```
 3. Install dependencies:
-   ```
+   ```bash
    go mod download
    ```
-                   
 
 ## Running locally
 
 1. Find your Go path:
-```
+
+```bash
 ❯ go env GOPATH
 /Users/maryliag/go
 ```
+
 2. Clone this repo in the go path folder, so you will have:
-```
+
+```text
 /Users/maryliag/go/src/otel-checker
 ```
+
 3. Run
-```
+
+```bash
 go run main.go
 ```
 
 ## Create binary and run from different directory
 
 1. Build binary
-```
+
+```bash
 go build
 ```
+
 2. Install
-```
+
+```bash
 go install
 ```
+
 3. You can confirm it was installed with:
-```
+
+```bash
 ❯ ls $GOPATH/bin
 otel-checker
 ```
+
 4. Use from any other directory
-```
+
+```bash
 otel-checker \
-	-language=js \
-	-components=sdk
+ -language=js \
+ -components=sdk
 ```
 
 Or start directly from the source code:
-```
+
+```bash
 go run otel-checker \
-	-language=js \
-	-components=sdk
+ -language=js \
+ -components=sdk
 ```
 
 ## Using mise
@@ -68,7 +80,7 @@ We provide a `mise.toml` file with several useful commands to simplify common de
 ### Available mise Commands
 
 | Command          | Description                                     |
-|------------------|-------------------------------------------------|
+| ---------------- | ----------------------------------------------- |
 | `mise run build` | Builds the application using `go install`       |
 | `mise run test`  | Runs all tests in the project                   |
 | `mise run clean` | Removes build artifacts and cleans the Go cache |

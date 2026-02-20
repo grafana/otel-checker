@@ -2,9 +2,10 @@ package dotnet
 
 import (
 	"fmt"
+	"strconv"
+
 	"github.com/grafana/otel-checker/checks/env"
 	"github.com/grafana/otel-checker/checks/utils"
-	"strconv"
 )
 
 const minDotNetVersion = 8

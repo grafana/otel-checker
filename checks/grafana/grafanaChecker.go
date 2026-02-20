@@ -2,12 +2,13 @@ package grafana
 
 import (
 	"fmt"
-	"github.com/grafana/otel-checker/checks/env"
-	"github.com/grafana/otel-checker/checks/utils"
 	"io"
 	"net/http"
 	"regexp"
 	"strings"
+
+	"github.com/grafana/otel-checker/checks/env"
+	"github.com/grafana/otel-checker/checks/utils"
 )
 
 var (

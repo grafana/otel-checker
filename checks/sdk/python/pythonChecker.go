@@ -3,12 +3,13 @@ package python
 import (
 	_ "embed"
 	"fmt"
-	"github.com/grafana/otel-checker/checks/sdk"
-	"github.com/grafana/otel-checker/checks/utils"
 	"os"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/grafana/otel-checker/checks/sdk"
+	"github.com/grafana/otel-checker/checks/utils"
 )
 
 func CheckSetup(reporter *utils.ComponentReporter, commands utils.Commands) {

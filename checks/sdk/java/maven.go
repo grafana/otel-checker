@@ -3,10 +3,11 @@ package java
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/grafana/otel-checker/checks/sdk"
-	"github.com/grafana/otel-checker/checks/utils"
 	"os/exec"
 	"strings"
+
+	"github.com/grafana/otel-checker/checks/sdk"
+	"github.com/grafana/otel-checker/checks/utils"
 )
 
 func checkMaven(reporter *utils.ComponentReporter) []Library {

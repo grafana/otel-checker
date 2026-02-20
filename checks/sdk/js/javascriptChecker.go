@@ -2,12 +2,13 @@ package js
 
 import (
 	"fmt"
-	"github.com/grafana/otel-checker/checks/env"
-	"github.com/grafana/otel-checker/checks/utils"
 	"os"
 	"os/exec"
 	"strconv"
 	"strings"
+
+	"github.com/grafana/otel-checker/checks/env"
+	"github.com/grafana/otel-checker/checks/utils"
 )
 
 func CheckJSSetup(reporter *utils.ComponentReporter, commands utils.Commands) {

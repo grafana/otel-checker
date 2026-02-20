@@ -46,6 +46,7 @@ mise r generate-js-supported-libraries
 ### How It Works
 
 The script:
+
 1. Reads README.md files from each instrumentation directory in the JS Contrib repository
 2. Extracts supported version information from the "Supported Versions" section
 3. Converts version ranges to a consistent format (e.g., `>=0.5.5 <1` becomes `[0.5.5,1)`)
@@ -54,11 +55,13 @@ The script:
 ## Maintenance
 
 The `supported-libraries.yaml` file should be updated when:
+
 1. New instrumentations are added to the OpenTelemetry JS Contrib repository
 2. Version ranges for existing instrumentations change
 3. Instrumentation paths change
 
 To update the file:
+
 1. Update your local clone of the OpenTelemetry JS Contrib repository
 2. Run the generation script
 3. Review the changes in the generated YAML file
@@ -67,8 +70,9 @@ To update the file:
 ## Version Range Format
 
 The script converts version ranges from the format in README files to a consistent format:
+
 - `>=0.5.5 <1` becomes `[0.5.5,1)`
 - `>=1.0.0` becomes `[1.0.0,)`
 - `<2.0.0` becomes `[,2.0.0)`
 
-This format is compatible with the version range parsing in the JavaScript checker. 
+This format is compatible with the version range parsing in the JavaScript checker.
