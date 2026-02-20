@@ -1,0 +1,32 @@
+{
+  ".github/workflows/test.yaml": {
+    "regex": [
+      "mise"
+    ]
+  },
+  "go.mod": {
+    "gomod": [
+      "github.com/davecgh/go-spew",
+      "github.com/fatih/color",
+      "github.com/mattn/go-colorable",
+      "github.com/mattn/go-isatty",
+      "github.com/pmezard/go-difflib",
+      "github.com/stretchr/testify",
+      "go",
+      "go.yaml.in/yaml/v3",
+      "golang.org/x/mod",
+      "golang.org/x/sys",
+      "gopkg.in/yaml.v3"
+    ]
+  },
+  "mise.toml": {
+    "mise": [
+      "go",
+      "golangci-lint",
+      "lychee",
+      "node",
+      "npm:renovate",
+      "uv"
+    ]
+  }
+}
