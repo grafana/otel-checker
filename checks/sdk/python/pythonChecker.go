@@ -311,10 +311,19 @@ func versionRanges(list string) (map[string]sdk.VersionRange, error) {
 
 		case len(parts) == 1:
 			// Could be a single term (just the library name) or a combined constraint without spaces
-			if name == "" {
-				// Just the library name
-				name = parts[0]
-				res[name] = sdk.VersionRange{} // no version constraint
+			if name == "" || containsPackageWithOperator(parts[0]) {
+				// Check for combined "name<op>version" format (e.g., "aiobotocore~=2.0")
+				if pkgName, remainder, ok := splitPackageOperator(parts[0]); ok {
+					name = pkgName
+					err := handleVersionStatement(res, name, remainder)
+					if err != nil {
+						return nil, fmt.Errorf("error parsing version %s: %v", list, err)
+					}
+				} else {
+					// Just the library name
+					name = parts[0]
+					res[name] = sdk.VersionRange{} // no version constraint
+				}
 			} else {
 				// Check for constraints without spaces
 				err := handleVersionStatement(res, name, parts[0])
@@ -328,6 +337,29 @@ func versionRanges(list string) (map[string]sdk.VersionRange, error) {
 		}
 	}
 	return res, nil
+}
+
+// containsPackageWithOperator checks if a string contains a package name followed by a version operator
+// e.g., "aiobotocore~=2.0" contains "aiobotocore" followed by "~="
+func containsPackageWithOperator(s string) bool {
+	for _, op := range []string{"<=", ">=", "~=", "<", ">"} {
+		idx := strings.Index(s, op)
+		if idx > 0 {
+			return true
+		}
+	}
+	return false
+}
+
+// splitPackageOperator splits a string like "aiobotocore~=2.0" into ("aiobotocore", "~=2.0", true)
+func splitPackageOperator(s string) (name string, remainder string, ok bool) {
+	for _, op := range []string{"<=", ">=", "~=", "<", ">"} {
+		idx := strings.Index(s, op)
+		if idx > 0 {
+			return s[:idx], s[idx:], true
+		}
+	}
+	return "", "", false
 }
 
 // hasOperatorPrefix checks if a string starts with a version operator
