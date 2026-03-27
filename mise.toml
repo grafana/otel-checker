@@ -4,7 +4,7 @@ golangci-lint = "2.11.4"
 uv = "0.11.0"
 lychee = "0.22.0"
 "npm:renovate" = "43.84.0"
-node = "24.14.0"
+node = "24.14.1"
 
 [env]
 RENOVATE_TRACKED_DEPS_EXCLUDE="github-actions,github-runners"
