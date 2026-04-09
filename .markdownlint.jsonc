@@ -1,0 +1,4 @@
+{
+  // Disable line-length enforcement — long lines are common in tables and code links
+  "MD013": false,
+}

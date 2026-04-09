@@ -1,0 +1,6 @@
+[settings]
+# renovate-tracked-deps.json is generated; launch.json uses JSONC; supported-libraries.yaml is generated
+exclude = "renovate-tracked-deps\\.json|\\.vscode/launch\\.json|supported-libraries\\.yaml"
+
+[checks.renovate-deps]
+exclude_managers = ["github-actions", "github-runners"]

@@ -33,19 +33,16 @@ mise run generate
 
 ```bash
 # Auto-fix and verify (recommended dev workflow)
-mise run fix
+mise run lint:fix
 
 # Verify only (same command used in CI)
 mise run lint
 
 # Go linting only
 mise run lint:go
-
-# Format Go code
-mise run fmt
 ```
 
-Lint tasks are sourced from [grafana/flint](https://github.com/grafana/flint).
+Linting is powered by [grafana/flint](https://github.com/grafana/flint) v2.
 
 ## Architecture
 
@@ -97,5 +94,5 @@ otel-checker -language=python -components=sdk,grafana-cloud -web-server
 ## CI
 
 - `mise run check` (lint + test) on PRs
-- Linting via flint (super-linter, lychee, golangci-lint)
+- Linting via flint v2 (shellcheck, shfmt, prettier, markdownlint, codespell, actionlint, editorconfig, lychee, renovate-deps, gofmt) + golangci-lint
 - Python scripts use uv for dependencies
