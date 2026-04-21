@@ -157,42 +157,70 @@ func supportedLibraries() (supported.SupportedModules, error) {
 // JavaInstrumentation matches the upstream Java YAML format
 type JavaInstrumentation struct {
 	Name                     string   `yaml:"name"`
+	DisplayName              string   `yaml:"display_name"`
 	Description              string   `yaml:"description"`
 	SrcPath                  string   `yaml:"source_path"`
 	Link                     string   `yaml:"link,omitempty"`
+	LibraryLink              string   `yaml:"library_link,omitempty"`
 	JavavagentTargetVersions []string `yaml:"javaagent_target_versions"`
 	HasStandaloneLibrary     bool     `yaml:"has_standalone_library"`
+	HasJavaagent             bool     `yaml:"has_javaagent"`
 }
 
-// SupportedJavaModules is a struct that holds the supported Java libraries in upstream format
-type SupportedJavaModules struct {
+type supportedJavaModulesMap struct {
 	Libraries map[string][]JavaInstrumentation `yaml:"libraries"`
+}
+
+type supportedJavaModulesList struct {
+	Libraries []JavaInstrumentation `yaml:"libraries"`
 }
 
 // LoadSupportedJavaLibraries loads supported libraries from a YAML file and maps to generic format
 func LoadSupportedJavaLibraries(data []byte) (supported.SupportedModules, error) {
-	javaModules := SupportedJavaModules{}
-	err := yaml.Unmarshal(data, &javaModules)
-	if err != nil {
+	javaModulesMap := supportedJavaModulesMap{}
+	if err := yaml.Unmarshal(data, &javaModulesMap); err == nil && len(javaModulesMap.Libraries) > 0 {
+		return mapSupportedJavaModules(javaModulesMap.Libraries), nil
+	}
+
+	javaModulesList := supportedJavaModulesList{}
+	if err := yaml.Unmarshal(data, &javaModulesList); err != nil {
 		return nil, err
 	}
 
-	// Map from Java-specific format to generic format
+	grouped := make(map[string][]JavaInstrumentation)
+	for _, library := range javaModulesList.Libraries {
+		grouped[library.Name] = append(grouped[library.Name], library)
+	}
+	return mapSupportedJavaModules(grouped), nil
+}
+
+func mapSupportedJavaModules(modules map[string][]JavaInstrumentation) supported.SupportedModules {
 	result := make(supported.SupportedModules)
-	for moduleName, javaInstrumentations := range javaModules.Libraries {
-		instrumentations := make([]supported.Instrumentation, len(javaInstrumentations))
-		for i, javaInst := range javaInstrumentations {
-			instrumentations[i] = supported.Instrumentation{
+	for moduleName, javaInstrumentations := range modules {
+		instrumentations := make([]supported.Instrumentation, 0, len(javaInstrumentations))
+		for _, javaInst := range javaInstrumentations {
+			versions := javaInst.JavavagentTargetVersions
+			if !javaInst.HasJavaagent && len(versions) == 0 {
+				continue
+			}
+
+			link := javaInst.Link
+			if link == "" {
+				link = javaInst.LibraryLink
+			}
+
+			instrumentations = append(instrumentations, supported.Instrumentation{
 				Name:                          javaInst.Name,
 				Description:                   javaInst.Description,
 				SrcPath:                       javaInst.SrcPath,
-				Link:                          javaInst.Link,
-				Versions:                      javaInst.JavavagentTargetVersions,
+				Link:                          link,
+				Versions:                      versions,
 				SupportsManualInstrumentation: javaInst.HasStandaloneLibrary,
-			}
+			})
 		}
-		result[moduleName] = instrumentations
+		if len(instrumentations) > 0 {
+			result[moduleName] = instrumentations
+		}
 	}
-
-	return result, nil
+	return result
 }
