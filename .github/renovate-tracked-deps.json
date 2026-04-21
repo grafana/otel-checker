@@ -1,12 +1,18 @@
 {
   ".github/renovate.json5": {
-    "renovate-config-presets": ["grafana/flint"]
+    "renovate-config-presets": [
+      "grafana/flint"
+    ]
   },
   ".github/workflows/lint.yml": {
-    "regex": ["mise"]
+    "regex": [
+      "mise"
+    ]
   },
   ".github/workflows/test.yaml": {
-    "regex": ["mise"]
+    "regex": [
+      "mise"
+    ]
   },
   "go.mod": {
     "gomod": [
@@ -26,8 +32,8 @@
   "mise.toml": {
     "mise": [
       "actionlint",
-      "cargo:https://github.com/grafana/flint",
       "editorconfig-checker",
+      "github:grafana/flint",
       "go",
       "golangci-lint",
       "lychee",
