@@ -25,16 +25,11 @@ FLINT_CONFIG_DIR = ".github/config"
 
 [tasks.lint]
 description = "Run all lints"
-depends = ["lint:go"]
 run = "flint run"
 
 [tasks."lint:fix"]
 description = "Auto-fix lint issues"
 run = "flint run --fix"
-
-[tasks."lint:go"]
-description = "Lint Go code"
-run = "golangci-lint run"
 
 [tasks."setup:pre-commit-hook"]
 description = "Install git pre-commit hook"
@@ -61,7 +56,7 @@ run = "go mod tidy"
 
 [tasks.check]
 description = "Run all checks"
-depends = ['lint:go', 'test']
+depends = ["lint", "test"]
 
 [tasks.generate-go-supported-libraries]
 run = "uv run scripts/generate_go_supported_libraries.py ../opentelemetry-go-contrib -o checks/sdk/go/supported-libraries.yaml"

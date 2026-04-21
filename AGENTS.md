@@ -38,8 +38,6 @@ mise run lint:fix
 # Verify only (same command used in CI)
 mise run lint
 
-# Go linting only
-mise run lint:go
 ```
 
 Linting is powered by [grafana/flint](https://github.com/grafana/flint) v2.
@@ -94,5 +92,5 @@ otel-checker -language=python -components=sdk,grafana-cloud -web-server
 ## CI
 
 - `mise run check` (lint + test) on PRs
-- Linting via flint v2 (shellcheck, shfmt, prettier, markdownlint, codespell, actionlint, editorconfig, lychee, renovate-deps, gofmt) + golangci-lint
+- Linting via flint v2 (shellcheck, shfmt, prettier, markdownlint, codespell, actionlint, editorconfig, lychee, renovate-deps, gofmt)
 - Python scripts use uv for dependencies
