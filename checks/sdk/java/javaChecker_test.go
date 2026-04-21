@@ -8,6 +8,33 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestLoadSupportedJavaLibrariesListFormat(t *testing.T) {
+	data := []byte(`
+libraries:
+  - name: executors
+    description: Executor instrumentation
+    source_path: instrumentation/executors
+    has_javaagent: true
+    javaagent_target_versions:
+      - Java 8+
+  - name: logback-appender-1.0
+    description: Logback instrumentation
+    source_path: instrumentation/logback/logback-appender-1.0
+    library_link: https://logback.qos.ch/
+    has_javaagent: true
+    javaagent_target_versions:
+      - ch.qos.logback:logback-classic:[1.0.0,)
+    has_standalone_library: true
+`)
+
+	modules, err := LoadSupportedJavaLibraries(data)
+	require.NoError(t, err)
+	require.Contains(t, modules, "logback-appender-1.0")
+	assert.Equal(t, "https://logback.qos.ch/", modules["logback-appender-1.0"][0].Link)
+	assert.Equal(t, []string{"ch.qos.logback:logback-classic:[1.0.0,)"}, modules["logback-appender-1.0"][0].Versions)
+	assert.True(t, modules["logback-appender-1.0"][0].SupportsManualInstrumentation)
+}
+
 func TestFindSupportedLibrary(t *testing.T) {
 	modules, err := supportedLibraries()
 	require.NoError(t, err)
