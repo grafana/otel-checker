@@ -38,10 +38,12 @@
       "golangci-lint",
       "lychee",
       "node",
+      "npm:@biomejs/biome",
       "npm:markdownlint-cli2",
       "npm:prettier",
       "npm:renovate",
       "pipx:codespell",
+      "pipx:ruff",
       "shellcheck",
       "shfmt",
       "uv"
