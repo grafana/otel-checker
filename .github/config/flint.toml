@@ -1,7 +1,6 @@
 [settings]
 # Generated or JSONC files flint should ignore.
 exclude = [
-  ".github/renovate-tracked-deps.json",
   ".vscode/launch.json",
   "**/supported-libraries.yaml",
 ]
