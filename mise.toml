@@ -2,7 +2,6 @@
 go = "1.26.2"
 
 # Tools
-"github:grafana/flint" = "0.20.3"
 node = "24.15.0"
 "npm:renovate" = "43.129.0"
 uv = "0.11.7"
@@ -10,6 +9,7 @@ uv = "0.11.7"
 # Linters
 actionlint = "1.7.10"
 editorconfig-checker = "v3.6.1"
+"github:grafana/flint" = "0.20.3"
 golangci-lint = "2.11.4"
 lychee = "0.22.0"
 "npm:@biomejs/biome" = "2.4.12"
