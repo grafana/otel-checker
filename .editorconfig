@@ -1,7 +1,6 @@
 root = true
 
 [*]
-max_line_length = 100
 indent_size = 2
 
 [*.py]
