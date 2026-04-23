@@ -1,12 +1,18 @@
 {
   ".github/renovate.json5": {
-    "renovate-config-presets": ["grafana/flint"]
+    "renovate-config-presets": [
+      "grafana/flint"
+    ]
   },
   ".github/workflows/lint.yml": {
-    "regex": ["mise"]
+    "regex": [
+      "mise"
+    ]
   },
   ".github/workflows/test.yaml": {
-    "regex": ["mise"]
+    "regex": [
+      "mise"
+    ]
   },
   "go.mod": {
     "gomod": [
@@ -25,19 +31,20 @@
   },
   "mise.toml": {
     "mise": [
+      "go",
       "actionlint",
+      "biome",
+      "cargo:yaml-lint",
       "editorconfig-checker",
       "github:grafana/flint",
-      "go",
       "golangci-lint",
       "lychee",
       "node",
-      "npm:@biomejs/biome",
-      "npm:markdownlint-cli2",
       "npm:prettier",
       "npm:renovate",
       "pipx:codespell",
       "pipx:ruff",
+      "rumdl",
       "shellcheck",
       "shfmt",
       "uv"
