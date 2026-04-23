@@ -1,22 +1,24 @@
 [tools]
 go = "1.26.2"
-node = "24.15.0"
-uv = "0.11.7"
 
 # Linters
 actionlint = "1.7.10"
+biome = "2.4.12"
+"cargo:yaml-lint" = "0.1.0"
 editorconfig-checker = "v3.6.1"
-"github:grafana/flint" = "0.20.3"
+"github:grafana/flint" = "0.20.4"
 golangci-lint = "2.11.4"
 lychee = "0.22.0"
-"npm:@biomejs/biome" = "2.4.12"
+node = "24.15.0"
 "npm:markdownlint-cli2" = "latest"
 "npm:prettier" = "3.8.1"
 "npm:renovate" = "43.132.3"
 "pipx:codespell" = "2.4.1"
 "pipx:ruff" = "0.15.11"
+rumdl = "0.1.80"
 shellcheck = "v0.11.0"
 shfmt = "v3.12.0"
+uv = "0.11.7"
 
 [env]
 FLINT_CONFIG_DIR = ".github/config"
@@ -68,3 +70,7 @@ uv run scripts/generate_js_supported_libraries.py \
 
 [tasks.generate]
 depends = ["generate-go-supported-libraries", "generate-js-supported-libraries"]
+
+[tasks."lint:pre-commit"]
+description = "Fast auto-fix lint (skips slow checks) — for pre-commit/pre-push hooks"
+run = "flint run --fix --fast-only"
