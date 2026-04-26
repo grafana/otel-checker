@@ -49,7 +49,9 @@ Linting is powered by [grafana/flint](https://github.com/grafana/flint) v2.
 - **`main.go`** — Entry point. Parses CLI args, runs checks, optional web server on `:8080`
 - **`checks/checks.go`** — Orchestrator: always runs env checks first, then routes to component-specific checkers
 - **`checks/env/`** — Common OTel environment variable validation
-- **`checks/sdk/`** — Language-specific SDK checkers, each in its own subpackage (`go/`, `js/`, `java/`, `python/`, `dotnet/`, `rubyChecker.go`, `phpChecker.go`)
+- **`checks/sdk/`** — Language-specific SDK checkers, each in its own
+  subpackage (`go/`, `js/`, `java/`, `python/`, `dotnet/`,
+  `rubyChecker.go`, `phpChecker.go`)
 - **`checks/sdk/supported/`** — Shared library support checking logic
 - **`checks/collector/`** — OTel Collector YAML config validation
 - **`checks/beyla/`** — Beyla-specific checks
@@ -61,8 +63,11 @@ Linting is powered by [grafana/flint](https://github.com/grafana/flint) v2.
 
 ### Key Patterns
 
-- **Reporter pattern**: `ComponentReporter` accumulates checks/warnings/errors, `Reporter` aggregates multiple component reporters
-- **Generated files**: `supported-libraries.yaml` files in `checks/sdk/go/` and `checks/sdk/js/` — regenerate via `mise run generate`, don't edit manually
+- **Reporter pattern**: `ComponentReporter` accumulates checks/warnings/errors,
+  `Reporter` aggregates multiple component reporters
+- **Generated files**: `supported-libraries.yaml` files in `checks/sdk/go/`
+  and `checks/sdk/js/` — regenerate via `mise run generate`, don't edit
+  manually
 - **Embedded resources**: Static files and templates use `//go:embed`
 
 ## CLI Usage
@@ -92,5 +97,6 @@ otel-checker -language=python -components=sdk,grafana-cloud -web-server
 ## CI
 
 - `mise run check` (lint + test) on PRs
-- Linting via flint v2 (shellcheck, shfmt, prettier, markdownlint, codespell, actionlint, editorconfig, lychee, renovate-deps, gofmt)
+- Linting via flint v2 (shellcheck, shfmt, prettier, markdownlint,
+  codespell, actionlint, editorconfig, lychee, renovate-deps, gofmt)
 - Python scripts use uv for dependencies

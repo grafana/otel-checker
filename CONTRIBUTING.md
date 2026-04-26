@@ -1,6 +1,7 @@
 # Contributing to otel-checker
 
-Thank you for your interest in contributing to otel-checker! This document provides guidelines and instructions for contributing to this project.
+Thank you for your interest in contributing to otel-checker! This document
+provides guidelines and instructions for contributing to this project.
 
 ## Development Environment Setup
 
@@ -78,7 +79,9 @@ go run otel-checker \
 
 ## Using mise
 
-We provide a `mise.toml` file with several useful commands to simplify common development tasks. [mise](https://mise.jdx.dev/) helps ensure consistent code quality and streamlines the development workflow.
+We provide a `mise.toml` file with several useful commands to simplify common
+development tasks. [mise](https://mise.jdx.dev/) helps ensure consistent code
+quality and streamlines the development workflow.
 
 ### Available mise Commands
 

@@ -33,19 +33,20 @@
     "mise": [
       "go",
       "actionlint",
+      "aqua:owenlamont/ryl",
       "biome",
-      "cargo:yaml-lint",
+      "cargo:https://github.com/grafana/flint",
       "editorconfig-checker",
-      "github:grafana/flint",
+      "github:koalaman/shellcheck",
       "golangci-lint",
       "lychee",
       "node",
       "npm:renovate",
       "pipx:codespell",
-      "pipx:ruff",
+      "ruff",
       "rumdl",
-      "shellcheck",
       "shfmt",
+      "taplo",
       "uv"
     ]
   }

@@ -1,22 +1,23 @@
 [tools]
 go = "1.26.2"
+node = "24.15.0"
+uv = "0.11.7"
 
 # Linters
 actionlint = "1.7.10"
-biome = "2.4.12"
-"cargo:yaml-lint" = "0.1.0"
+"aqua:owenlamont/ryl" = "0.6.0"
+biome = "2.4.13"
+"cargo:https://github.com/grafana/flint" = "rev:5e9a6d6"
 editorconfig-checker = "v3.6.1"
-"github:grafana/flint" = "0.20.4"
+"github:koalaman/shellcheck" = "v0.11.0"
 golangci-lint = "2.11.4"
 lychee = "0.22.0"
-node = "24.15.0"
 "npm:renovate" = "43.132.3"
 "pipx:codespell" = "2.4.1"
-"pipx:ruff" = "0.15.11"
-rumdl = "0.1.80"
-shellcheck = "v0.11.0"
+ruff = "0.15.12"
+rumdl = "0.1.82"
 shfmt = "v3.12.0"
-uv = "0.11.7"
+taplo = "0.10.0"
 
 [env]
 FLINT_CONFIG_DIR = ".github/config"

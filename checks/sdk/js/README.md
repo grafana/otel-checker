@@ -4,7 +4,9 @@ This directory contains the configuration for supported JavaScript libraries tha
 
 ## Supported Libraries File
 
-The `supported-libraries.yaml` file contains information about which JavaScript libraries are supported by OpenTelemetry instrumentation, along with their version ranges and source paths.
+The `supported-libraries.yaml` file contains information about which
+JavaScript libraries are supported by OpenTelemetry instrumentation, along with
+their version ranges and source paths.
 
 ### File Format
 
@@ -30,12 +32,15 @@ amqplib:
 
 ## Generating the File
 
-The `supported-libraries.yaml` file is generated from the OpenTelemetry JS Contrib repository using the `generate_js_supported_libraries.py` script.
+The `supported-libraries.yaml` file is generated from the OpenTelemetry JS
+Contrib repository using the `generate_js_supported_libraries.py` script.
 
 ### Prerequisites
 
 - [Mise](https://mise.jdx.dev/)
-- A local clone of the [OpenTelemetry JS Contrib repository](https://github.com/open-telemetry/opentelemetry-js-contrib) in a sibling directory to this repository.
+- A local clone of the
+  [OpenTelemetry JS Contrib repository](https://github.com/open-telemetry/opentelemetry-js-contrib)
+  in a sibling directory to this repository.
 
 ### Usage
 
