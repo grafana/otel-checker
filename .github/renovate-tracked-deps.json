@@ -31,13 +31,13 @@
   },
   "mise.toml": {
     "mise": [
-      "go",
       "actionlint",
       "aqua:owenlamont/ryl",
       "biome",
       "cargo:https://github.com/grafana/flint",
       "editorconfig-checker",
       "github:koalaman/shellcheck",
+      "go",
       "golangci-lint",
       "lychee",
       "node",
