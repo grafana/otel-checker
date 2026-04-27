@@ -3,7 +3,7 @@ go = "1.26.2"
 golangci-lint = "2.11.4"
 uv = "0.11.7"
 lychee = "0.22.0"
-"npm:renovate" = "43.137.0"
+"npm:renovate" = "43.141.0"
 node = "24.15.0"
 
 [env]
