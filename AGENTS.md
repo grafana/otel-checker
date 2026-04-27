@@ -40,7 +40,7 @@ mise run lint
 
 ```
 
-Linting is powered by [grafana/flint](https://github.com/grafana/flint) v2.
+Linting is powered by [grafana/flint](https://github.com/grafana/flint).
 
 ## Architecture
 
@@ -97,6 +97,6 @@ otel-checker -language=python -components=sdk,grafana-cloud -web-server
 ## CI
 
 - `mise run check` (lint + test) on PRs
-- Linting via flint v2 (shellcheck, shfmt, prettier, markdownlint,
+- Linting via flint (shellcheck, shfmt, prettier, markdownlint,
   codespell, actionlint, editorconfig, lychee, renovate-deps, gofmt)
 - Python scripts use uv for dependencies
