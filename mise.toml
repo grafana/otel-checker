@@ -69,7 +69,3 @@ uv run scripts/generate_js_supported_libraries.py \
 
 [tasks.generate]
 depends = ["generate-go-supported-libraries", "generate-js-supported-libraries"]
-
-[tasks."lint:pre-commit"]
-description = "Fast auto-fix lint (skips slow checks) — for pre-commit/pre-push hooks"
-run = "flint run --fix --fast-only"
