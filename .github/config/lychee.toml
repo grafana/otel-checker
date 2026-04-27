@@ -11,5 +11,5 @@ include_fragments = true
 
 exclude = [
   # Google Docs links are often rate-limited
-  "https://docs.google.com/.*"
+  "https://docs.google.com/.*",
 ]

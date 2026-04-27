@@ -1,16 +1,20 @@
 # Contributing to otel-checker
 
-Thank you for your interest in contributing to otel-checker! This document provides guidelines and instructions for contributing to this project.
+Thank you for your interest in contributing to otel-checker! This document
+provides guidelines and instructions for contributing to this project.
 
 ## Development Environment Setup
 
 1. Ensure you have Go installed (1.24 or higher)
 2. Clone the repository:
+
    ```bash
    git clone https://github.com/yourusername/otel-checker.git
    cd otel-checker
    ```
+
 3. Install dependencies:
+
    ```bash
    go mod download
    ```
@@ -24,13 +28,13 @@ Thank you for your interest in contributing to otel-checker! This document provi
 /Users/maryliag/go
 ```
 
-2. Clone this repo in the go path folder, so you will have:
+1. Clone this repo in the go path folder, so you will have:
 
 ```text
 /Users/maryliag/go/src/otel-checker
 ```
 
-3. Run
+1. Run
 
 ```bash
 go run main.go
@@ -44,20 +48,20 @@ go run main.go
 go build
 ```
 
-2. Install
+1. Install
 
 ```bash
 go install
 ```
 
-3. You can confirm it was installed with:
+1. You can confirm it was installed with:
 
 ```bash
 ❯ ls $GOPATH/bin
 otel-checker
 ```
 
-4. Use from any other directory
+1. Use from any other directory
 
 ```bash
 otel-checker \
@@ -75,26 +79,28 @@ go run otel-checker \
 
 ## Using mise
 
-We provide a `mise.toml` file with several useful commands to simplify common development tasks. [mise](https://mise.jdx.dev/) helps ensure consistent code quality and streamlines the development workflow.
+We provide a `mise.toml` file with several useful commands to simplify common
+development tasks. [mise](https://mise.jdx.dev/) helps ensure consistent code
+quality and streamlines the development workflow.
 
 ### Available mise Commands
 
-| Command          | Description                                     |
-| ---------------- | ----------------------------------------------- |
-| `mise run build` | Builds the application using `go install`       |
-| `mise run test`  | Runs all tests in the project                   |
-| `mise run clean` | Removes build artifacts and cleans the Go cache |
-| `mise run fmt`   | Formats all Go code using `gofmt`               |
-| `mise run lint`  | Lints the code using `golangci-lint`            |
-| `mise run check` | Run all checks (test and lint)                  |
-| `mise run deps`  | Updates dependencies using `go mod tidy`        |
+| Command             | Description                                     |
+| ------------------- | ----------------------------------------------- |
+| `mise run build`    | Builds the application using `go install`       |
+| `mise run test`     | Runs all tests in the project                   |
+| `mise run clean`    | Removes build artifacts and cleans the Go cache |
+| `mise run lint:fix` | Auto-fix lint and formatting issues             |
+| `mise run lint`     | Run all lints                                   |
+| `mise run check`    | Run all checks (test and lint)                  |
+| `mise run deps`     | Updates dependencies using `go mod tidy`        |
 
 ## Contribution Workflow
 
 1. Create a fork of the repository
 2. Create a new branch for your feature or bug fix
 3. Make your changes
-4. Run `mise run fmt` to format your code
+4. Run `mise run lint:fix` to format your code
 5. Run `mise run lint` to ensure code quality
 6. Run `mise run test` to make sure all tests pass
 7. Commit your changes with a descriptive message
@@ -106,7 +112,7 @@ Please ensure:
 
 1. Your code follows the project's style and conventions
 2. All tests pass (`mise run test`)
-3. Code is properly formatted (`mise run fmt`)
+3. Code is properly formatted (`mise run lint:fix`)
 4. Linting passes without issues (`mise run lint`)
 
 ## Code Review Process

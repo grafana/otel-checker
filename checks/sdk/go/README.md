@@ -4,7 +4,9 @@ This directory contains the configuration and checker for Go libraries that can 
 
 ## Supported Libraries File
 
-The `supported-libraries.yaml` file contains information about which Go libraries are supported by OpenTelemetry instrumentation, along with their version ranges and source paths.
+The `supported-libraries.yaml` file contains information about which Go
+libraries are supported by OpenTelemetry instrumentation, along with their
+version ranges and source paths.
 
 ### File Format
 
@@ -32,12 +34,15 @@ go.mongodb.org/mongo-driver:
 
 ## Generating the File
 
-The `supported-libraries.yaml` file is generated from the OpenTelemetry Go Contrib repository using the `generate_go_supported_libraries.py` script.
+The `supported-libraries.yaml` file is generated from the OpenTelemetry Go
+Contrib repository using the `generate_go_supported_libraries.py` script.
 
 ### Prerequisites
 
 - [Mise](https://mise.jdx.dev/)
-- A local clone of the [OpenTelemetry Go Contrib repository](https://github.com/open-telemetry/opentelemetry-go-contrib) in a sibling directory to this repository.
+- A local clone of the
+  [OpenTelemetry Go Contrib repository](https://github.com/open-telemetry/opentelemetry-go-contrib)
+  in a sibling directory to this repository.
 
 ### Usage
 
@@ -71,7 +76,10 @@ To update the file:
 
 ## Implementation Details
 
-The Go checker scans `go.mod` files in your project to identify dependencies and compares them against the supported libraries list. It checks whether your dependencies are supported by OpenTelemetry instrumentation and reports any unsupported or out-of-range versions.
+The Go checker scans `go.mod` files in your project to identify dependencies
+and compares them against the supported libraries list. It checks whether your
+dependencies are supported by OpenTelemetry instrumentation and reports any
+unsupported or out-of-range versions.
 
 ## Version Range Format
 

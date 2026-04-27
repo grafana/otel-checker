@@ -1,6 +1,8 @@
 # OTel Me If It's Right
 
-Checker for if the implementation of OpenTelemetry instrumentation is correct by scanning the code in your repository, checking environment variables, validating your Grafana token and more.
+Checker for if the implementation of OpenTelemetry instrumentation is correct
+by scanning the code in your repository, checking environment variables,
+validating your Grafana token and more.
 
 ## Usage
 
@@ -69,7 +71,10 @@ These checks are automatically performed for all languages and components.
     - `service.instance.id` (e.g., `checkout-123`)
     - `service.version` (e.g., `1.2`)
   - For missing attributes, provides specific recommendations with example values
-  - Follows the [OpenTelemetry specification](https://opentelemetry.io/docs/concepts/sdk-configuration/general-sdk-configuration/) for precedence (e.g., `OTEL_SERVICE_NAME` takes precedence over `service.name` in `OTEL_RESOURCE_ATTRIBUTES`)
+  - Follows the
+    [OpenTelemetry specification](https://opentelemetry.io/docs/concepts/sdk-configuration/general-sdk-configuration/)
+    for precedence (e.g., `OTEL_SERVICE_NAME` takes precedence over
+    `service.name` in `OTEL_RESOURCE_ATTRIBUTES`)
   - Example warning: `Set OTEL_RESOURCE_ATTRIBUTES="service.namespace=shop": An optional namespace for service.name`
 
 ### Grafana Cloud
@@ -116,10 +121,13 @@ Use `-components=sdk -language=dotnet` flag to check the following:
 Use `-components=sdk -language=java` flag to check the following:
 
 - Java version
-- Prints which libraries (as discovered from a locally running maven or gradle) are supported:
+- Prints which libraries (as discovered from a locally running maven or gradle)
+  are supported:
   - With `-manual-instrumentation`, the libraries for manual instrumentation are printed.
-  - Without `-manual-instrumentation`, it will print the libraries supported by the [Java Agent](https://github.com/open-telemetry/opentelemetry-java-instrumentation/).
-  - A maven or gradle wrapper will be used if found in the current directory or a parent directory.
+  - Without `-manual-instrumentation`, it will print the libraries supported by
+    the [Java Agent](https://github.com/open-telemetry/opentelemetry-java-instrumentation/).
+  - A maven or gradle wrapper will be used if found in the current directory or
+    a parent directory.
 
 #### Go
 

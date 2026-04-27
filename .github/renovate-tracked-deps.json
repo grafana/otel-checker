@@ -31,16 +31,23 @@
   },
   "mise.toml": {
     "mise": [
+      "actionlint",
+      "aqua:owenlamont/ryl",
+      "biome",
+      "editorconfig-checker",
+      "github:grafana/flint",
+      "github:koalaman/shellcheck",
       "go",
       "golangci-lint",
       "lychee",
       "node",
       "npm:renovate",
+      "pipx:codespell",
+      "ruff",
+      "rumdl",
+      "shfmt",
+      "taplo",
       "uv"
-    ],
-    "regex": [
-      "ghcr.io/super-linter/super-linter",
-      "grafana/flint"
     ]
   }
 }

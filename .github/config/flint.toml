@@ -1,0 +1,6 @@
+[settings]
+# Generated or JSONC files flint should ignore.
+exclude = [".vscode/launch.json", "**/supported-libraries.yaml"]
+
+[checks.renovate-deps]
+exclude_managers = ["github-actions", "github-runners"]

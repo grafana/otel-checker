@@ -1,0 +1,12 @@
+root = true
+
+[*]
+indent_size = 2
+max_line_length = 120
+
+[*.py]
+indent_size = 4
+
+[*.md]
+# Markdown line length is handled by rumdl
+max_line_length = off
