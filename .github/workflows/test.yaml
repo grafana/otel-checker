@@ -17,4 +17,10 @@ jobs:
           version: v2026.5.2
           sha256: 23e21feb6a561a2c2923c49473f9f21820f1cf3b9b2e5e8f8d7fafab80854dff
       - name: Run checks
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_BASE_REF: ${{ github.base_ref }}
+          GITHUB_HEAD_REF: ${{ github.head_ref }}
+          PR_HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
         run: mise run check
