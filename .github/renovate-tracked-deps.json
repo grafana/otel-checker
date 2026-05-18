@@ -1,53 +1,56 @@
 {
-  ".github/renovate.json5": {
-    "renovate-config-presets": [
-      "grafana/flint"
-    ]
-  },
-  ".github/workflows/lint.yml": {
-    "regex": [
-      "mise"
-    ]
-  },
-  ".github/workflows/test.yaml": {
-    "regex": [
-      "mise"
-    ]
-  },
-  "go.mod": {
-    "gomod": [
-      "github.com/davecgh/go-spew",
-      "github.com/fatih/color",
-      "github.com/mattn/go-colorable",
-      "github.com/mattn/go-isatty",
-      "github.com/pmezard/go-difflib",
-      "github.com/stretchr/testify",
-      "go",
-      "go.yaml.in/yaml/v3",
-      "golang.org/x/mod",
-      "golang.org/x/sys",
-      "gopkg.in/yaml.v3"
-    ]
-  },
-  "mise.toml": {
-    "mise": [
-      "actionlint",
-      "aqua:owenlamont/ryl",
-      "biome",
-      "editorconfig-checker",
-      "github:grafana/flint",
-      "github:koalaman/shellcheck",
-      "go",
-      "golangci-lint",
-      "lychee",
-      "node",
-      "npm:renovate",
-      "pipx:codespell",
-      "ruff",
-      "rumdl",
-      "shfmt",
-      "taplo",
-      "uv"
-    ]
+  "meta": {},
+  "files": {
+    ".github/renovate.json5": {
+      "renovate-config-presets": [
+        "grafana/flint"
+      ]
+    },
+    ".github/workflows/lint.yml": {
+      "regex": [
+        "mise"
+      ]
+    },
+    ".github/workflows/test.yaml": {
+      "regex": [
+        "mise"
+      ]
+    },
+    "go.mod": {
+      "gomod": [
+        "github.com/davecgh/go-spew",
+        "github.com/fatih/color",
+        "github.com/mattn/go-colorable",
+        "github.com/mattn/go-isatty",
+        "github.com/pmezard/go-difflib",
+        "github.com/stretchr/testify",
+        "go",
+        "go.yaml.in/yaml/v3",
+        "golang.org/x/mod",
+        "golang.org/x/sys",
+        "gopkg.in/yaml.v3"
+      ]
+    },
+    "mise.toml": {
+      "mise": [
+        "actionlint",
+        "aqua:grafana/flint",
+        "aqua:owenlamont/ryl",
+        "biome",
+        "editorconfig-checker",
+        "go",
+        "golangci-lint",
+        "lychee",
+        "node",
+        "npm:renovate",
+        "ruff",
+        "rumdl",
+        "shellcheck",
+        "shfmt",
+        "taplo",
+        "typos",
+        "uv"
+      ]
+    }
   }
 }
