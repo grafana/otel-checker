@@ -6,11 +6,6 @@
         "grafana/flint"
       ]
     },
-    ".github/workflows/lint.yml": {
-      "regex": [
-        "mise"
-      ]
-    },
     ".github/workflows/test.yaml": {
       "regex": [
         "mise"
