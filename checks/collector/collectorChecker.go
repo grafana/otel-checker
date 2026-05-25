@@ -3,6 +3,7 @@ package collector
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"regexp"
 	"slices"
 	"strings"
@@ -50,7 +51,7 @@ type configFile struct {
 }
 
 func checkCollectorConfig(reporter *utils.ComponentReporter, configPath string) {
-	filePath := configPath + "config.yaml"
+	filePath := filepath.Join(configPath, "config.yaml")
 	yamlFile, err := os.ReadFile(filePath)
 	if err != nil {
 		reporter.AddError(fmt.Sprintf("Could not check file %s: %s", filePath, err))
