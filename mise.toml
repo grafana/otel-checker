@@ -54,18 +54,24 @@ description = "Run all checks"
 depends = ["lint", "test"]
 
 [tasks.generate-go-supported-libraries]
+usage = 'flag "--clone-folders <path>" help="Parent directory containing the opentelemetry-{go,js}-contrib clones" default=".."'
 run = """
 uv run scripts/generate_go_supported_libraries.py \
-  ../opentelemetry-go-contrib \
+  ${usage_clone_folders}/opentelemetry-go-contrib \
   -o checks/sdk/go/supported-libraries.yaml
 """
 
 [tasks.generate-js-supported-libraries]
+usage = 'flag "--clone-folders <path>" help="Parent directory containing the opentelemetry-{go,js}-contrib clones" default=".."'
 run = """
 uv run scripts/generate_js_supported_libraries.py \
-  ../opentelemetry-js-contrib \
+  ${usage_clone_folders}/opentelemetry-js-contrib \
   -o checks/sdk/js/supported-libraries.yaml
 """
 
 [tasks.generate]
-depends = ["generate-go-supported-libraries", "generate-js-supported-libraries"]
+usage = 'flag "--clone-folders <path>" help="Parent directory containing the opentelemetry-{go,js}-contrib clones" default=".."'
+depends = [
+  "generate-go-supported-libraries --clone-folders {{usage.clone_folders}}",
+  "generate-js-supported-libraries --clone-folders {{usage.clone_folders}}",
+]

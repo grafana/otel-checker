@@ -25,8 +25,11 @@ mise run check
 # Update dependencies
 mise run deps
 
-# Regenerate supported library lists from upstream OTel contrib repos
+# Regenerate supported library lists from upstream OTel contrib repos.
+# Expects sibling clones of opentelemetry-{go,js}-contrib by default;
+# pass --clone-folders to point at a different parent directory.
 mise run generate
+mise run generate --clone-folders=/path/to/parent-of-clones
 ```
 
 ## Linting
@@ -97,6 +100,7 @@ otel-checker -language=python -components=sdk,grafana-cloud -web-server
 ## CI
 
 - `mise run check` (lint + test) on PRs
-- Linting via flint (shellcheck, shfmt, prettier, markdownlint,
-  typos, actionlint, editorconfig, lychee, renovate-deps, gofmt)
+- Linting via flint (shellcheck, shfmt, rumdl, ryl, taplo, actionlint,
+  typos, editorconfig-checker, golangci-lint, gofmt, ruff, ruff-format,
+  biome, biome-format, lychee, renovate-deps)
 - Python scripts use uv for dependencies
