@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -68,7 +69,7 @@ func checkJSAutoInstrumentation(
 	checkAutoInstrumentationNodeOptions(reporter)
 
 	// Dependencies for auto instrumentation on package.json
-	filePath := packageJsonPath + "package.json"
+	filePath := filepath.Join(packageJsonPath, "package.json")
 	dat, err := os.ReadFile(filePath)
 	if err != nil {
 		reporter.AddError(fmt.Sprintf("Could not check file %s: %s", filePath, err))
@@ -106,7 +107,7 @@ func checkJSCodeBasedInstrumentation(
 	}
 
 	// Dependencies for auto instrumentation on package.json
-	filePath := packageJsonPath + "package.json"
+	filePath := filepath.Join(packageJsonPath, "package.json")
 	packageJsonContent, err := os.ReadFile(filePath)
 	if err != nil {
 		reporter.AddError(fmt.Sprintf("Could not check file %s: %s", filePath, err))
@@ -123,7 +124,7 @@ func checkJSCodeBasedInstrumentation(
 	}
 
 	// Check Exporter
-	instrumentationFileContent, err := os.ReadFile(instrumentationFile)
+	instrumentationFileContent, err := os.ReadFile(filepath.Clean(instrumentationFile))
 	if err != nil {
 		reporter.AddError(fmt.Sprintf("Could not check file %s: %s", instrumentationFile, err))
 	} else {
