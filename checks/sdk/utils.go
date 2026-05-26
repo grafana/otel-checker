@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os/exec"
 	"strings"
+	"time"
 
 	"github.com/grafana/otel-checker/checks/utils"
 
@@ -129,8 +130,10 @@ func RunCommand(reporter *utils.ComponentReporter, cmd *exec.Cmd) string {
 	return string(output)
 }
 
+var loadUrlClient = &http.Client{Timeout: 10 * time.Second}
+
 func LoadUrl(url string) ([]byte, error) {
-	resp, err := http.Get(url)
+	resp, err := loadUrlClient.Get(url)
 	if err != nil {
 		return nil, fmt.Errorf("error fetching instrumentation list: %v", err)
 	}
