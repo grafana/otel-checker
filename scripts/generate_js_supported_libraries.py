@@ -23,13 +23,13 @@ def create_result(
         "name": library_name,
         "link": link,
         "version_range": version_range,
-        "source_path": f"plugins/node/{dir_name}",
+        "source_path": f"packages/{dir_name}",
     }
 
 
 def get_repo_link(dir_name: str) -> str:
     """Get the repository link for a library."""
-    return f"https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/{dir_name}"
+    return f"https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/packages/{dir_name}"
 
 
 def extract_supported_versions(readme_path: Path) -> Optional[Dict[str, Any]]:
@@ -146,14 +146,14 @@ def main():
     )
     args = parser.parse_args()
 
-    plugins_dir = Path(args.repo_dir) / "plugins/node"
-    if not plugins_dir.exists():
-        print(f"Error: {plugins_dir} does not exist", file=sys.stderr)
+    packages_dir = Path(args.repo_dir) / "packages"
+    if not packages_dir.exists():
+        print(f"Error: {packages_dir} does not exist", file=sys.stderr)
         sys.exit(1)
 
     supported_libraries = {}
-    for item in plugins_dir.iterdir():
-        if not item.is_dir():
+    for item in packages_dir.iterdir():
+        if not item.is_dir() or not item.name.startswith("instrumentation-"):
             continue
 
         readme_path = item / "README.md"
@@ -177,8 +177,18 @@ def main():
     output_path = Path(args.output)
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
+    class IndentedDumper(yaml.Dumper):
+        def increase_indent(self, flow=False, indentless=False):
+            return super().increase_indent(flow=flow, indentless=False)
+
     with open(output_path, "w") as f:
-        yaml.dump(supported_libraries, f, sort_keys=True)
+        yaml.dump(
+            supported_libraries,
+            f,
+            Dumper=IndentedDumper,
+            sort_keys=True,
+            default_flow_style=False,
+        )
 
     print(
         f"Generated {output_path} with {len(supported_libraries)} supported libraries"
