@@ -15,7 +15,10 @@ import (
 	"github.com/grafana/otel-checker/checks/utils"
 )
 
-func RunAllChecks(commands utils.Commands) map[string][]string {
+// Run executes all configured checks and returns the populated reporter.
+// It does not produce any output. Callers that want the CLI's colored
+// stdout rendering should call reporter.PrintResults() or use RunAllChecks.
+func Run(commands utils.Commands) *utils.Reporter {
 	reporter := utils.Reporter{}
 
 	env.CheckCommon(reporter.Component("Common Environment Variables"), commands.Language)
@@ -39,7 +42,13 @@ func RunAllChecks(commands utils.Commands) map[string][]string {
 		}
 	}
 
-	return reporter.PrintResults()
+	return &reporter
+}
+
+// RunAllChecks executes all configured checks and prints the colored summary
+// to stdout. Preserved as the CLI entry point; library callers should use Run.
+func RunAllChecks(commands utils.Commands) map[string][]string {
+	return Run(commands).PrintResults()
 }
 
 func SDKSetup(reporter *utils.ComponentReporter, commands utils.Commands) {

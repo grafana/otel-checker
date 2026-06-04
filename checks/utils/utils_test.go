@@ -3,7 +3,24 @@ package utils
 import (
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
+
+func TestReporterResults(t *testing.T) {
+	r := &Reporter{}
+	sdk := r.Component("SDK")
+	sdk.AddSuccessfulCheck("foo")
+	sdk.AddWarning("bar")
+	collector := r.Component("Collector")
+	collector.AddError("baz")
+
+	got := r.Results()
+
+	assert.ElementsMatch(t, []string{"SDK: foo"}, got[CHECKS])
+	assert.ElementsMatch(t, []string{"SDK: bar"}, got[WARNINGS])
+	assert.ElementsMatch(t, []string{"Collector: baz"}, got[ERRORS])
+}
 
 func TestValidate(t *testing.T) {
 	tests := []struct {
