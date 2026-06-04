@@ -122,7 +122,7 @@ func (r *Reporter) Component(name string) *ComponentReporter {
 
 // Results aggregates the checks, warnings, and errors across all components
 // without producing any output. Callers that want to render results their own
-// way (e.g. gcx) should use this; CLI callers should use PrintResults.
+// way should use this; CLI callers should use PrintResults.
 func (r *Reporter) Results() map[string][]string {
 	res := make(map[string][]string)
 	var checks []string
