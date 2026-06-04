@@ -120,7 +120,10 @@ func (r *Reporter) Component(name string) *ComponentReporter {
 	return c
 }
 
-func (r *Reporter) PrintResults() map[string][]string {
+// Results aggregates the checks, warnings, and errors across all components
+// without producing any output. Callers that want to render results their own
+// way should use this; CLI callers should use PrintResults.
+func (r *Reporter) Results() map[string][]string {
 	res := make(map[string][]string)
 	var checks []string
 	for _, component := range r.components {
@@ -137,6 +140,14 @@ func (r *Reporter) PrintResults() map[string][]string {
 		errors = append(errors, component.Errors...)
 	}
 	res[ERRORS] = errors
+	return res
+}
+
+func (r *Reporter) PrintResults() map[string][]string {
+	res := r.Results()
+	checks := res[CHECKS]
+	warnings := res[WARNINGS]
+	errors := res[ERRORS]
 
 	if len(checks) > 0 {
 		green := color.New(color.FgGreen)
