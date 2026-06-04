@@ -25,10 +25,31 @@ type Commands struct {
 	Debug                 bool
 }
 
+var (
+	SupportedLanguages  = []string{"dotnet", "go", "java", "js", "python", "ruby", "php"}
+	SupportedComponents = []string{"sdk", "beyla", "alloy", "collector", "grafana-cloud"}
+)
+
+func Validate(c Commands) error {
+	if !slices.Contains(SupportedLanguages, c.Language) {
+		return fmt.Errorf("language %q not supported. Possible values: %s", c.Language, strings.Join(SupportedLanguages, ", "))
+	}
+	if len(c.Components) == 0 {
+		return fmt.Errorf("at least one component required. Possible values: %s", strings.Join(SupportedComponents, ", "))
+	}
+	for _, comp := range c.Components {
+		if !slices.Contains(SupportedComponents, strings.TrimSpace(comp)) {
+			return fmt.Errorf("component %q not supported. Possible values: %s", comp, strings.Join(SupportedComponents, ", "))
+		}
+	}
+	if c.Language == "js" && c.ManualInstrumentation && c.InstrumentationFile == "" {
+		return fmt.Errorf(`when manual-instrumentation is set, an instrumentation file is required (InstrumentationFile or -instrumentation-file=path/to/file.js)`)
+	}
+	return nil
+}
+
 func GetArguments() Commands {
-	command := Commands{}
-	args := os.Args[1:]
-	if len(args) < 1 {
+	if len(os.Args[1:]) < 1 {
 		fmt.Println(color.RedString("You must pass a language used for your instrumentation, such as -language=js"))
 		os.Exit(1)
 	}
@@ -47,48 +68,33 @@ func GetArguments() Commands {
 	collectorConfigPath := flag.String("collector-config-path", "", `Path to collector's config.yaml file. Required if using Collector and the config file is not in the same location as the otel-checker is being executed from. E.g. "-collector-config-path=src/inst/"`)
 	flag.Parse()
 
-	possibleLanguages := []string{"dotnet", "go", "java", "js", "python", "ruby", "php"}
-	if !slices.Contains(possibleLanguages, *languageValue) {
-		fmt.Println(color.RedString(fmt.Sprintf("Language %s not supported. Possible values: dotnet, go, java, js, python, ruby", *languageValue)))
+	var components []string
+	if *componentsString != "" {
+		components = strings.Split(*componentsString, ",")
+	}
+
+	command := Commands{
+		Language:              *languageValue,
+		Components:            components,
+		WebServer:             *webServer,
+		ManualInstrumentation: *manualInstrumentation,
+		InstrumentationFile:   *instrumentationFile,
+		PackageJsonPath:       *packageJsonPath,
+		CollectorConfigPath:   *collectorConfigPath,
+		Debug:                 *debug,
+	}
+
+	if err := Validate(command); err != nil {
+		fmt.Println(color.RedString(err.Error()))
 		os.Exit(1)
 	}
 
-	if *componentsString == "" {
-		fmt.Println(color.RedString(`Component flag required. Possible values: sdk, beyla, alloy, collector. E.g. -components="sdk,collector"`))
-		os.Exit(1)
+	if command.PackageJsonPath != "" && !strings.HasSuffix(command.PackageJsonPath, "/") {
+		command.PackageJsonPath = command.PackageJsonPath + "/"
 	}
-
-	possibleComponents := []string{"sdk", "beyla", "alloy", "collector", "grafana-cloud"}
-	components := strings.Split(*componentsString, ",")
-	for _, c := range components {
-		if !slices.Contains(possibleComponents, strings.Trim(c, " ")) {
-			fmt.Println(color.RedString(fmt.Sprintf(`Component %s not supported. Possible values: sdk, collector, beyla, alloy. E.g. -components="sdk,collector"`, c)))
-			os.Exit(1)
-		}
+	if command.CollectorConfigPath != "" && !strings.HasSuffix(command.CollectorConfigPath, "/") {
+		command.CollectorConfigPath = command.CollectorConfigPath + "/"
 	}
-
-	// javascript
-	if *languageValue == "js" && *instrumentationFile == "" && *manualInstrumentation {
-		fmt.Println(color.RedString(`When manual-instrumentation is being used, a instrumentation file is required. Remove "-manual-instrumentation" or "-instrumentation-file=path/to/file/file.js"`))
-		os.Exit(1)
-	}
-	if *packageJsonPath != "" && !strings.HasSuffix(*packageJsonPath, "/") {
-		*packageJsonPath = *packageJsonPath + "/"
-	}
-
-	// collector
-	if *collectorConfigPath != "" && !strings.HasSuffix(*collectorConfigPath, "/") {
-		*collectorConfigPath = *collectorConfigPath + "/"
-	}
-
-	command.Language = *languageValue
-	command.Components = components
-	command.WebServer = *webServer
-	command.ManualInstrumentation = *manualInstrumentation
-	command.InstrumentationFile = *instrumentationFile
-	command.PackageJsonPath = *packageJsonPath
-	command.CollectorConfigPath = *collectorConfigPath
-	command.Debug = *debug
 	return command
 }
 
