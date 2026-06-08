@@ -20,11 +20,11 @@ func TestCheckEnvVarsBeyla(t *testing.T) {
 			Language:   "python",
 			Components: []string{"beyla"},
 			ExpectedChecks: []string{
-				"Beyla: BEYLA_SERVICE_NAME is set to 'test-service'",
-				"Beyla: BEYLA_OPEN_PORT is set to '8080'",
-				"Beyla: GRAFANA_CLOUD_SUBMIT is set to 'metrics,traces'",
-				"Beyla: GRAFANA_CLOUD_INSTANCE_ID is set to 'test-instance'",
-				"Beyla: GRAFANA_CLOUD_API_KEY is set to 'test-key'",
+				"BEYLA_SERVICE_NAME is set to 'test-service'",
+				"BEYLA_OPEN_PORT is set to '8080'",
+				"GRAFANA_CLOUD_SUBMIT is set to 'metrics,traces'",
+				"GRAFANA_CLOUD_INSTANCE_ID is set to 'test-instance'",
+				"GRAFANA_CLOUD_API_KEY is set to 'test-key'",
 			},
 		},
 		{
@@ -33,13 +33,13 @@ func TestCheckEnvVarsBeyla(t *testing.T) {
 			Language:   "python",
 			Components: []string{"beyla"},
 			ExpectedErrors: []string{
-				"Beyla: BEYLA_OPEN_PORT is not set",
-				"Beyla: GRAFANA_CLOUD_SUBMIT is not set",
-				"Beyla: GRAFANA_CLOUD_INSTANCE_ID is not set",
-				"Beyla: GRAFANA_CLOUD_API_KEY is not set",
+				"BEYLA_OPEN_PORT is not set",
+				"GRAFANA_CLOUD_SUBMIT is not set",
+				"GRAFANA_CLOUD_INSTANCE_ID is not set",
+				"GRAFANA_CLOUD_API_KEY is not set",
 			},
 			ExpectedChecks: []string{
-				"Beyla: BEYLA_SERVICE_NAME is set to ''",
+				"BEYLA_SERVICE_NAME is set to ''",
 			},
 		},
 	}

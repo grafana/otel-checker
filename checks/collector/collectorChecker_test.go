@@ -61,13 +61,13 @@ service:
 			expectedErrors:   []string{},
 			expectedWarnings: []string{},
 			expectedChecks: []string{
-				"collector: Value of exporter > otlphttp > endpoint on config.yaml set in the format similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp",
-				"collector: Value of service > pipelines > traces > exporters on config.yaml contains otlphttp",
-				"collector: Value of service > pipelines > traces > receivers on config.yaml contains otlp",
-				"collector: Value of service > pipelines > logs > exporters on config.yaml contains otlphttp",
-				"collector: Value of service > pipelines > logs > receivers on config.yaml contains otlp",
-				"collector: Value of service > pipelines > metrics > exporters on config.yaml contains otlphttp",
-				"collector: Value of service > pipelines > metrics > receivers on config.yaml contains otlp",
+				"Value of exporter > otlphttp > endpoint on config.yaml set in the format similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp",
+				"Value of service > pipelines > traces > exporters on config.yaml contains otlphttp",
+				"Value of service > pipelines > traces > receivers on config.yaml contains otlp",
+				"Value of service > pipelines > logs > exporters on config.yaml contains otlphttp",
+				"Value of service > pipelines > logs > receivers on config.yaml contains otlp",
+				"Value of service > pipelines > metrics > exporters on config.yaml contains otlphttp",
+				"Value of service > pipelines > metrics > receivers on config.yaml contains otlp",
 			},
 		},
 		{
@@ -98,15 +98,15 @@ service:
 `,
 			expectedErrors: []string{},
 			expectedWarnings: []string{
-				"collector: Value of exporter > otlphttp > endpoint on config.yaml is set to localhost. Update to a Grafana endpoint similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp to be able to send telemetry to your Grafana Cloud instance",
+				"Value of exporter > otlphttp > endpoint on config.yaml is set to localhost. Update to a Grafana endpoint similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp to be able to send telemetry to your Grafana Cloud instance",
 			},
 			expectedChecks: []string{
-				"collector: Value of service > pipelines > traces > exporters on config.yaml contains otlphttp",
-				"collector: Value of service > pipelines > traces > receivers on config.yaml contains otlp",
-				"collector: Value of service > pipelines > logs > exporters on config.yaml contains otlphttp",
-				"collector: Value of service > pipelines > logs > receivers on config.yaml contains otlp",
-				"collector: Value of service > pipelines > metrics > exporters on config.yaml contains otlphttp",
-				"collector: Value of service > pipelines > metrics > receivers on config.yaml contains otlp",
+				"Value of service > pipelines > traces > exporters on config.yaml contains otlphttp",
+				"Value of service > pipelines > traces > receivers on config.yaml contains otlp",
+				"Value of service > pipelines > logs > exporters on config.yaml contains otlphttp",
+				"Value of service > pipelines > logs > receivers on config.yaml contains otlp",
+				"Value of service > pipelines > metrics > exporters on config.yaml contains otlphttp",
+				"Value of service > pipelines > metrics > receivers on config.yaml contains otlp",
 			},
 		},
 		{
@@ -136,16 +136,16 @@ service:
       exporters: [otlphttp]
 `,
 			expectedErrors: []string{
-				"collector: Value of exporter > otlphttp > endpoint on config.yaml is not set in the format similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp",
+				"Value of exporter > otlphttp > endpoint on config.yaml is not set in the format similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp",
 			},
 			expectedWarnings: []string{},
 			expectedChecks: []string{
-				"collector: Value of service > pipelines > traces > exporters on config.yaml contains otlphttp",
-				"collector: Value of service > pipelines > traces > receivers on config.yaml contains otlp",
-				"collector: Value of service > pipelines > logs > exporters on config.yaml contains otlphttp",
-				"collector: Value of service > pipelines > logs > receivers on config.yaml contains otlp",
-				"collector: Value of service > pipelines > metrics > exporters on config.yaml contains otlphttp",
-				"collector: Value of service > pipelines > metrics > receivers on config.yaml contains otlp",
+				"Value of service > pipelines > traces > exporters on config.yaml contains otlphttp",
+				"Value of service > pipelines > traces > receivers on config.yaml contains otlp",
+				"Value of service > pipelines > logs > exporters on config.yaml contains otlphttp",
+				"Value of service > pipelines > logs > receivers on config.yaml contains otlp",
+				"Value of service > pipelines > metrics > exporters on config.yaml contains otlphttp",
+				"Value of service > pipelines > metrics > receivers on config.yaml contains otlp",
 			},
 		},
 		{
@@ -175,16 +175,16 @@ service:
 `,
 			expectedErrors: []string{},
 			expectedWarnings: []string{
-				"collector: The value of receivers > otlp > protocols > http is nil. Make sure the key exists on your config.yaml",
+				"The value of receivers > otlp > protocols > http is nil. Make sure the key exists on your config.yaml",
 			},
 			expectedChecks: []string{
-				"collector: Value of exporter > otlphttp > endpoint on config.yaml set in the format similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp",
-				"collector: Value of service > pipelines > traces > exporters on config.yaml contains otlphttp",
-				"collector: Value of service > pipelines > traces > receivers on config.yaml contains otlp",
-				"collector: Value of service > pipelines > logs > exporters on config.yaml contains otlphttp",
-				"collector: Value of service > pipelines > logs > receivers on config.yaml contains otlp",
-				"collector: Value of service > pipelines > metrics > exporters on config.yaml contains otlphttp",
-				"collector: Value of service > pipelines > metrics > receivers on config.yaml contains otlp",
+				"Value of exporter > otlphttp > endpoint on config.yaml set in the format similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp",
+				"Value of service > pipelines > traces > exporters on config.yaml contains otlphttp",
+				"Value of service > pipelines > traces > receivers on config.yaml contains otlp",
+				"Value of service > pipelines > logs > exporters on config.yaml contains otlphttp",
+				"Value of service > pipelines > logs > receivers on config.yaml contains otlp",
+				"Value of service > pipelines > metrics > exporters on config.yaml contains otlphttp",
+				"Value of service > pipelines > metrics > receivers on config.yaml contains otlp",
 			},
 		},
 		{
@@ -215,15 +215,15 @@ service:
 `,
 			expectedErrors: []string{},
 			expectedWarnings: []string{
-				"collector: Value of service > pipelines > traces > exporters on config.yaml does not contain otlphttp",
+				"Value of service > pipelines > traces > exporters on config.yaml does not contain otlphttp",
 			},
 			expectedChecks: []string{
-				"collector: Value of exporter > otlphttp > endpoint on config.yaml set in the format similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp",
-				"collector: Value of service > pipelines > traces > receivers on config.yaml contains otlp",
-				"collector: Value of service > pipelines > logs > exporters on config.yaml contains otlphttp",
-				"collector: Value of service > pipelines > logs > receivers on config.yaml contains otlp",
-				"collector: Value of service > pipelines > metrics > exporters on config.yaml contains otlphttp",
-				"collector: Value of service > pipelines > metrics > receivers on config.yaml contains otlp",
+				"Value of exporter > otlphttp > endpoint on config.yaml set in the format similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp",
+				"Value of service > pipelines > traces > receivers on config.yaml contains otlp",
+				"Value of service > pipelines > logs > exporters on config.yaml contains otlphttp",
+				"Value of service > pipelines > logs > receivers on config.yaml contains otlp",
+				"Value of service > pipelines > metrics > exporters on config.yaml contains otlphttp",
+				"Value of service > pipelines > metrics > receivers on config.yaml contains otlp",
 			},
 		},
 	}
@@ -304,13 +304,13 @@ service:
 
 	// Expected results
 	expectedChecks := []string{
-		"collector: Value of exporter > otlphttp > endpoint on config.yaml set in the format similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp",
-		"collector: Value of service > pipelines > traces > exporters on config.yaml contains otlphttp",
-		"collector: Value of service > pipelines > traces > receivers on config.yaml contains otlp",
-		"collector: Value of service > pipelines > logs > exporters on config.yaml contains otlphttp",
-		"collector: Value of service > pipelines > logs > receivers on config.yaml contains otlp",
-		"collector: Value of service > pipelines > metrics > exporters on config.yaml contains otlphttp",
-		"collector: Value of service > pipelines > metrics > receivers on config.yaml contains otlp",
+		"Value of exporter > otlphttp > endpoint on config.yaml set in the format similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp",
+		"Value of service > pipelines > traces > exporters on config.yaml contains otlphttp",
+		"Value of service > pipelines > traces > receivers on config.yaml contains otlp",
+		"Value of service > pipelines > logs > exporters on config.yaml contains otlphttp",
+		"Value of service > pipelines > logs > receivers on config.yaml contains otlp",
+		"Value of service > pipelines > metrics > exporters on config.yaml contains otlphttp",
+		"Value of service > pipelines > metrics > receivers on config.yaml contains otlp",
 	}
 
 	// Verify the results

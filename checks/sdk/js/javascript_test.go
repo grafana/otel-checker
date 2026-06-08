@@ -14,13 +14,13 @@ func TestCheckEnvVars(t *testing.T) {
 				"OTEL_NODE_RESOURCE_DETECTORS": "env,host,os,serviceinstance",
 			},
 			Language:       "js",
-			ExpectedChecks: []string{"js: OTEL_NODE_RESOURCE_DETECTORS has recommended values"},
+			ExpectedChecks: []string{"OTEL_NODE_RESOURCE_DETECTORS has recommended values"},
 		},
 		{
 			Name:             "missing recommended env vars",
 			EnvVars:          map[string]string{},
 			Language:         "js",
-			ExpectedWarnings: []string{"js: It's recommended the environment variable OTEL_NODE_RESOURCE_DETECTORS to be set to at least `env,host,os,serviceinstance`"},
+			ExpectedWarnings: []string{"It's recommended the environment variable OTEL_NODE_RESOURCE_DETECTORS to be set to at least `env,host,os,serviceinstance`"},
 		},
 		{
 			Name: "incomplete resource detectors",
@@ -28,7 +28,7 @@ func TestCheckEnvVars(t *testing.T) {
 				"OTEL_NODE_RESOURCE_DETECTORS": "env,host",
 			},
 			Language:         "js",
-			ExpectedWarnings: []string{"js: It's recommended the environment variable OTEL_NODE_RESOURCE_DETECTORS to be set to at least `env,host,os,serviceinstance`"},
+			ExpectedWarnings: []string{"It's recommended the environment variable OTEL_NODE_RESOURCE_DETECTORS to be set to at least `env,host,os,serviceinstance`"},
 		},
 	}
 
@@ -50,14 +50,14 @@ func TestCheckJSAutoInstrumentation(t *testing.T) {
 				"NODE_OPTIONS": "--require @opentelemetry/auto-instrumentations-node/register",
 			},
 			Language:       "js",
-			ExpectedChecks: []string{"js: NODE_OPTIONS is set to '--require @opentelemetry/auto-instrumentations-node/register'"},
+			ExpectedChecks: []string{"NODE_OPTIONS is set to '--require @opentelemetry/auto-instrumentations-node/register'"},
 		},
 		{
 			Name:     "NODE_OPTIONS not set",
 			EnvVars:  map[string]string{},
 			Language: "js",
 			ExpectedWarnings: []string{
-				"js: NODE_OPTIONS not set. You can set it by running 'export NODE_OPTIONS=\"--require @opentelemetry/auto-instrumentations-node/register\"' or add the same '--require ...' when starting your application",
+				"NODE_OPTIONS not set. You can set it by running 'export NODE_OPTIONS=\"--require @opentelemetry/auto-instrumentations-node/register\"' or add the same '--require ...' when starting your application",
 			},
 		},
 		{
@@ -67,7 +67,7 @@ func TestCheckJSAutoInstrumentation(t *testing.T) {
 			},
 			Language: "js",
 			ExpectedWarnings: []string{
-				"js: NODE_OPTIONS not set. You can set it by running 'export NODE_OPTIONS=\"--require @opentelemetry/auto-instrumentations-node/register\"' or add the same '--require ...' when starting your application",
+				"NODE_OPTIONS not set. You can set it by running 'export NODE_OPTIONS=\"--require @opentelemetry/auto-instrumentations-node/register\"' or add the same '--require ...' when starting your application",
 			},
 		},
 	}
