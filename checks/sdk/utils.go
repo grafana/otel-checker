@@ -1,6 +1,7 @@
 package sdk
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -132,8 +133,12 @@ func RunCommand(reporter *utils.ComponentReporter, cmd *exec.Cmd) string {
 
 var loadUrlClient = &http.Client{Timeout: 10 * time.Second}
 
-func LoadUrl(url string) ([]byte, error) {
-	resp, err := loadUrlClient.Get(url)
+func LoadUrl(ctx context.Context, url string) ([]byte, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return nil, fmt.Errorf("error building request: %v", err)
+	}
+	resp, err := loadUrlClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("error fetching instrumentation list: %v", err)
 	}

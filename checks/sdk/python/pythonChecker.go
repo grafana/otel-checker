@@ -1,6 +1,7 @@
 package python
 
 import (
+	"context"
 	_ "embed"
 	"fmt"
 	"os"
@@ -12,28 +13,28 @@ import (
 	"github.com/grafana/otel-checker/checks/utils"
 )
 
-func CheckSetup(reporter *utils.ComponentReporter, commands utils.Commands) {
+func CheckSetup(ctx context.Context, reporter *utils.ComponentReporter, commands utils.Commands) {
 	checkPythonVersion(reporter)
 	if commands.ManualInstrumentation {
-		checkCodeBasedInstrumentation(reporter, commands.Debug)
+		checkCodeBasedInstrumentation(ctx, reporter, commands.Debug)
 	} else {
-		checkAutoInstrumentation(reporter, commands.Debug)
+		checkAutoInstrumentation(ctx, reporter, commands.Debug)
 	}
 
 }
 
 func checkPythonVersion(reporter *utils.ComponentReporter) {}
 
-func checkAutoInstrumentation(reporter *utils.ComponentReporter, debug bool) {
-	reportSupportedLibraries(reporter, debug)
+func checkAutoInstrumentation(ctx context.Context, reporter *utils.ComponentReporter, debug bool) {
+	reportSupportedLibraries(ctx, reporter, debug)
 }
 
-func checkCodeBasedInstrumentation(reporter *utils.ComponentReporter, debug bool) {
-	reportSupportedLibraries(reporter, debug)
+func checkCodeBasedInstrumentation(ctx context.Context, reporter *utils.ComponentReporter, debug bool) {
+	reportSupportedLibraries(ctx, reporter, debug)
 }
 
-func reportSupportedLibraries(reporter *utils.ComponentReporter, debug bool) {
-	supported, err := supportedLibraries()
+func reportSupportedLibraries(ctx context.Context, reporter *utils.ComponentReporter, debug bool) {
+	supported, err := supportedLibraries(ctx)
 	if err != nil {
 		reporter.AddError(fmt.Sprintf("Error reading supported libraries: %v", err))
 	}
@@ -143,9 +144,9 @@ type SupportedLibrary struct {
 var linkRegex = regexp.MustCompile(`\[opentelemetry-instrumentation-(.*)]`)
 
 // supportedLibraries loads and parses the Python instrumentation libraries list from GitHub
-func supportedLibraries() ([]SupportedLibrary, error) {
+func supportedLibraries(ctx context.Context) ([]SupportedLibrary, error) {
 	// Load the README from GitHub that contains the supported libraries list
-	readme, err := loadSupportedLibrariesReadme()
+	readme, err := loadSupportedLibrariesReadme(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -155,9 +156,9 @@ func supportedLibraries() ([]SupportedLibrary, error) {
 }
 
 // loadSupportedLibrariesReadme loads the README file from GitHub that contains the list of supported Python libraries
-func loadSupportedLibrariesReadme() (string, error) {
+func loadSupportedLibrariesReadme(ctx context.Context) (string, error) {
 	url := "https://raw.githubusercontent.com/open-telemetry/opentelemetry-python-contrib/refs/heads/main/instrumentation/README.md"
-	bytes, err := sdk.LoadUrl(url)
+	bytes, err := sdk.LoadUrl(ctx, url)
 	if err != nil {
 		return "", fmt.Errorf("failed to load supported libraries: %w", err)
 	}

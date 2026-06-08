@@ -1,6 +1,7 @@
 package java
 
 import (
+	"context"
 	"fmt"
 	"path/filepath"
 	"regexp"
@@ -28,23 +29,23 @@ func (l *Library) String() string {
 	return fmt.Sprintf("%s:%s:%s", l.Group, l.Artifact, l.Version)
 }
 
-func reportSupportedInstrumentations(reporter *utils.ComponentReporter, debug bool, instrumentationType supported.InstrumentationType, javaVersion int) {
-	s, err := supportedLibraries()
+func reportSupportedInstrumentations(ctx context.Context, reporter *utils.ComponentReporter, debug bool, instrumentationType supported.InstrumentationType, javaVersion int) {
+	s, err := supportedLibraries(ctx)
 	if err != nil {
 		reporter.AddError(fmt.Sprintf("Error reading supported libraries: %v", err))
 	}
 
-	deps := readDependencies(reporter)
+	deps := readDependencies(ctx, reporter)
 	outputSupportedLibraries(deps, s, reporter, debug, instrumentationType, javaVersion)
 }
 
-func readDependencies(reporter *utils.ComponentReporter) []Library {
+func readDependencies(ctx context.Context, reporter *utils.ComponentReporter) []Library {
 	if utils.FileExists("pom.xml") {
-		return checkMaven(reporter)
+		return checkMaven(ctx, reporter)
 	}
 	for _, file := range gradleFiles {
 		if utils.FileExists(file) {
-			return checkGradle(file, reporter)
+			return checkGradle(ctx, file, reporter)
 		}
 	}
 	return nil
@@ -146,8 +147,8 @@ func matchVersion(moduleName string, version string, library Library, javaVersio
 	return false
 }
 
-func supportedLibraries() (supported.SupportedModules, error) {
-	bytes, err := sdk.LoadUrl("https://raw.githubusercontent.com/open-telemetry/opentelemetry-java-instrumentation/refs/heads/main/docs/instrumentation-list.yaml")
+func supportedLibraries(ctx context.Context) (supported.SupportedModules, error) {
+	bytes, err := sdk.LoadUrl(ctx, "https://raw.githubusercontent.com/open-telemetry/opentelemetry-java-instrumentation/refs/heads/main/docs/instrumentation-list.yaml")
 	if err != nil {
 		return nil, err
 	}

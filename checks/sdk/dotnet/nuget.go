@@ -1,6 +1,7 @@
 package dotnet
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"os/exec"
@@ -31,8 +32,8 @@ type NuGetPackageList struct {
 
 // ListPackageDependencies runs 'dotnet list package' to get all package dependencies (including transitive)
 // for the current project in the working directory
-func ReadDependenciesFromCli() (*NuGetPackageList, error) {
-	cmd := exec.Command("dotnet", "list", "package", "--format", "json", "--include-transitive")
+func ReadDependenciesFromCli(ctx context.Context) (*NuGetPackageList, error) {
+	cmd := exec.CommandContext(ctx, "dotnet", "list", "package", "--format", "json", "--include-transitive")
 	stdout, err := cmd.Output()
 
 	if err != nil {

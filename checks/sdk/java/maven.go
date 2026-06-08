@@ -1,6 +1,7 @@
 package java
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"os/exec"
@@ -10,10 +11,10 @@ import (
 	"github.com/grafana/otel-checker/checks/utils"
 )
 
-func checkMaven(reporter *utils.ComponentReporter) []Library {
+func checkMaven(ctx context.Context, reporter *utils.ComponentReporter) []Library {
 	println("Reading Maven dependencies")
 
-	out := sdk.RunCommand(reporter, exec.Command(searchWrapper("mvn", "mvnw"),
+	out := sdk.RunCommand(reporter, exec.CommandContext(ctx, searchWrapper("mvn", "mvnw"),
 		"dependency:tree", "-Dscope=runtime", "-DoutputType=json"))
 	if out == "" {
 		return []Library{}

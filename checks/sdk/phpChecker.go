@@ -1,6 +1,7 @@
 package sdk
 
 import (
+	"context"
 	"os"
 	"os/exec"
 	"strings"
@@ -8,9 +9,9 @@ import (
 	"github.com/grafana/otel-checker/checks/utils"
 )
 
-func CheckPHPSetup(reporter *utils.ComponentReporter, commands utils.Commands) {
-	checkPHPVersion(reporter)
-	checkComposerInstalled(reporter)
+func CheckPHPSetup(ctx context.Context, reporter *utils.ComponentReporter, commands utils.Commands) {
+	checkPHPVersion(ctx, reporter)
+	checkComposerInstalled(ctx, reporter)
 
 	composerFile, err := checkComposerFileExists(reporter)
 	if err != nil {
@@ -27,8 +28,8 @@ func CheckPHPSetup(reporter *utils.ComponentReporter, commands utils.Commands) {
 	}
 }
 
-func checkPHPVersion(reporter *utils.ComponentReporter) {
-	cmd := exec.Command("php", "-v")
+func checkPHPVersion(ctx context.Context, reporter *utils.ComponentReporter) {
+	cmd := exec.CommandContext(ctx, "php", "-v")
 	stdout, err := cmd.Output()
 
 	if err != nil {
@@ -43,8 +44,8 @@ func checkPHPVersion(reporter *utils.ComponentReporter) {
 	}
 }
 
-func checkComposerInstalled(reporter *utils.ComponentReporter) {
-	cmd := exec.Command("composer", "-v")
+func checkComposerInstalled(ctx context.Context, reporter *utils.ComponentReporter) {
+	cmd := exec.CommandContext(ctx, "composer", "-v")
 	_, err := cmd.Output()
 
 	if err != nil {

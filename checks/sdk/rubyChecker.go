@@ -1,6 +1,7 @@
 package sdk
 
 import (
+	"context"
 	"os"
 	"os/exec"
 	"strings"
@@ -10,9 +11,9 @@ import (
 	"golang.org/x/mod/semver"
 )
 
-func CheckRubySetup(reporter *utils.ComponentReporter, commands utils.Commands) {
-	checkRubyVersion(reporter)
-	checkBundlerInstalled(reporter)
+func CheckRubySetup(ctx context.Context, reporter *utils.ComponentReporter, commands utils.Commands) {
+	checkRubyVersion(ctx, reporter)
+	checkBundlerInstalled(ctx, reporter)
 
 	gemfile, err := checkGemfileExists(reporter)
 	if err != nil {
@@ -30,9 +31,9 @@ func CheckRubySetup(reporter *utils.ComponentReporter, commands utils.Commands) 
 }
 
 // While tested, support for jruby and truffleruby are on a best-effort basis at this time.
-func checkRubyVersion(reporter *utils.ComponentReporter) {
-	hasCRuby := checkCRubyVersion(reporter)
-	hasJRuby := checkJRubyVersion(reporter)
+func checkRubyVersion(ctx context.Context, reporter *utils.ComponentReporter) {
+	hasCRuby := checkCRubyVersion(ctx, reporter)
+	hasJRuby := checkJRubyVersion(ctx, reporter)
 	hasTruffleRuby := checkTruffleRubyVersion(reporter)
 
 	if hasCRuby || hasJRuby || hasTruffleRuby {
@@ -42,8 +43,8 @@ func checkRubyVersion(reporter *utils.ComponentReporter) {
 	}
 }
 
-func checkBundlerInstalled(reporter *utils.ComponentReporter) {
-	cmd := exec.Command("bundle", "-v")
+func checkBundlerInstalled(ctx context.Context, reporter *utils.ComponentReporter) {
+	cmd := exec.CommandContext(ctx, "bundle", "-v")
 	_, err := cmd.Output()
 
 	if err != nil {
@@ -72,8 +73,8 @@ func checkGemfileExists(reporter *utils.ComponentReporter) (string, error) {
 	return gemfile, nil
 }
 
-func checkCRubyVersion(reporter *utils.ComponentReporter) bool {
-	cmd := exec.Command("ruby", "-v")
+func checkCRubyVersion(ctx context.Context, reporter *utils.ComponentReporter) bool {
+	cmd := exec.CommandContext(ctx, "ruby", "-v")
 	stdout, err := cmd.Output()
 
 	if err != nil {
@@ -89,8 +90,8 @@ func checkCRubyVersion(reporter *utils.ComponentReporter) bool {
 	}
 }
 
-func checkJRubyVersion(reporter *utils.ComponentReporter) bool {
-	cmd := exec.Command("jruby", "--version")
+func checkJRubyVersion(ctx context.Context, reporter *utils.ComponentReporter) bool {
+	cmd := exec.CommandContext(ctx, "jruby", "--version")
 	stdout, err := cmd.Output()
 
 	if err != nil {

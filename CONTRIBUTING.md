@@ -37,7 +37,7 @@ provides guidelines and instructions for contributing to this project.
 1. Run
 
 ```bash
-go run main.go
+go run ./cmd/otel-checker
 ```
 
 ## Create binary and run from different directory
@@ -45,13 +45,13 @@ go run main.go
 1. Build binary
 
 ```bash
-go build
+go build ./cmd/otel-checker
 ```
 
 1. Install
 
 ```bash
-go install
+go install ./cmd/otel-checker
 ```
 
 1. You can confirm it was installed with:
@@ -72,7 +72,7 @@ otel-checker \
 Or start directly from the source code:
 
 ```bash
-go run otel-checker \
+go run ./cmd/otel-checker \
  -language=js \
  -components=sdk
 ```
@@ -87,7 +87,7 @@ quality and streamlines the development workflow.
 
 | Command             | Description                                     |
 | ------------------- | ----------------------------------------------- |
-| `mise run build`    | Builds the application using `go install`       |
+| `mise run build`    | Builds the application using `go install ./cmd/otel-checker` |
 | `mise run test`     | Runs all tests in the project                   |
 | `mise run clean`    | Removes build artifacts and cleans the Go cache |
 | `mise run lint:fix` | Auto-fix lint and formatting issues             |

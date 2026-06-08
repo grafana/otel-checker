@@ -1,13 +1,14 @@
 package dotnet
 
 import (
+	"context"
 	"fmt"
 	"os/exec"
 	"strings"
 )
 
-func readDotNetVersion() ([]string, error) {
-	cmd := exec.Command("dotnet", "--version")
+func readDotNetVersion(ctx context.Context) ([]string, error) {
+	cmd := exec.CommandContext(ctx, "dotnet", "--version")
 	stdout, err := cmd.Output()
 
 	if err != nil {

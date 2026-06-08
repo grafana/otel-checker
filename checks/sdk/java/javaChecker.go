@@ -1,6 +1,7 @@
 package java
 
 import (
+	"context"
 	_ "embed"
 	"fmt"
 	"os/exec"
@@ -12,17 +13,17 @@ import (
 	"github.com/grafana/otel-checker/checks/utils"
 )
 
-func CheckSetup(reporter *utils.ComponentReporter, commands utils.Commands) {
-	javaVersion := checkJavaVersion(reporter)
+func CheckSetup(ctx context.Context, reporter *utils.ComponentReporter, commands utils.Commands) {
+	javaVersion := checkJavaVersion(ctx, reporter)
 	if commands.ManualInstrumentation {
-		checkCodeBasedInstrumentation(reporter, commands.Debug, javaVersion)
+		checkCodeBasedInstrumentation(ctx, reporter, commands.Debug, javaVersion)
 	} else {
-		checkAutoInstrumentation(reporter, commands.Debug, javaVersion)
+		checkAutoInstrumentation(ctx, reporter, commands.Debug, javaVersion)
 	}
 }
 
-func checkJavaVersion(reporter *utils.ComponentReporter) int {
-	out := sdk.RunCommand(reporter, exec.Command("java", "-version"))
+func checkJavaVersion(ctx context.Context, reporter *utils.ComponentReporter) int {
+	out := sdk.RunCommand(reporter, exec.CommandContext(ctx, "java", "-version"))
 	if out != "" {
 		// openjdk version "21.0.2" 2024-01-16 LTS
 		line := strings.Split(out, "\n")[0]
@@ -45,10 +46,10 @@ func checkJavaVersion(reporter *utils.ComponentReporter) int {
 	return 0
 }
 
-func checkAutoInstrumentation(reporter *utils.ComponentReporter, debug bool, javaVersion int) {
-	reportSupportedInstrumentations(reporter, debug, supported.TypeJavaagent, javaVersion)
+func checkAutoInstrumentation(ctx context.Context, reporter *utils.ComponentReporter, debug bool, javaVersion int) {
+	reportSupportedInstrumentations(ctx, reporter, debug, supported.TypeJavaagent, javaVersion)
 }
 
-func checkCodeBasedInstrumentation(reporter *utils.ComponentReporter, debug bool, javaVersion int) {
-	reportSupportedInstrumentations(reporter, debug, supported.TypeLibrary, javaVersion)
+func checkCodeBasedInstrumentation(ctx context.Context, reporter *utils.ComponentReporter, debug bool, javaVersion int) {
+	reportSupportedInstrumentations(ctx, reporter, debug, supported.TypeLibrary, javaVersion)
 }

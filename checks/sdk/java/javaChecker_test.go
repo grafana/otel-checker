@@ -1,6 +1,7 @@
 package java
 
 import (
+	"context"
 	"testing"
 
 	"github.com/grafana/otel-checker/checks/sdk/supported"
@@ -36,7 +37,7 @@ libraries:
 }
 
 func TestFindSupportedLibrary(t *testing.T) {
-	modules, err := supportedLibraries()
+	modules, err := supportedLibraries(context.Background())
 	require.NoError(t, err)
 	assert.Equal(t,
 		[]string{

@@ -1,6 +1,7 @@
 package python
 
 import (
+	"context"
 	"testing"
 
 	"github.com/grafana/otel-checker/checks/sdk"
@@ -11,7 +12,7 @@ import (
 )
 
 func TestReadSupportedPythonLibraries(t *testing.T) {
-	libs, err := supportedLibraries()
+	libs, err := supportedLibraries(context.Background())
 	require.NoError(t, err)
 	assert.Equal(t,
 		[]string{"https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-botocore"},

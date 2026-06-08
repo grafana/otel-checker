@@ -1,6 +1,7 @@
 package dotnet
 
 import (
+	"context"
 	"fmt"
 	"strconv"
 
@@ -10,8 +11,8 @@ import (
 
 const minDotNetVersion = 8
 
-func CheckDotNetSetup(reporter *utils.ComponentReporter, commands utils.Commands) {
-	checkDotNetVersion(reporter)
+func CheckDotNetSetup(ctx context.Context, reporter *utils.ComponentReporter, commands utils.Commands) {
+	checkDotNetVersion(ctx, reporter)
 
 	project, err := findAndLoadProject()
 
@@ -22,7 +23,7 @@ func CheckDotNetSetup(reporter *utils.ComponentReporter, commands utils.Commands
 
 	reporter.AddSuccessfulCheck(fmt.Sprintf("Found project: %s", project.path))
 
-	reportDotNetSupportedInstrumentations(reporter, project.SDK)
+	reportDotNetSupportedInstrumentations(ctx, reporter, project.SDK)
 
 	if commands.ManualInstrumentation {
 		checkDotNetCodeBasedInstrumentation(reporter)
@@ -31,8 +32,8 @@ func CheckDotNetSetup(reporter *utils.ComponentReporter, commands utils.Commands
 	}
 }
 
-func checkDotNetVersion(reporter *utils.ComponentReporter) {
-	versionParts, err := readDotNetVersion()
+func checkDotNetVersion(ctx context.Context, reporter *utils.ComponentReporter) {
+	versionParts, err := readDotNetVersion(ctx)
 
 	if err != nil {
 		reporter.AddError(fmt.Sprintf("Could not check .NET version: %s", err))
@@ -95,8 +96,8 @@ func findAndLoadProject() (*CSharpProject, error) {
 	return project, nil
 }
 
-func reportDotNetSupportedInstrumentations(reporter *utils.ComponentReporter, sdk string) {
-	deps, err := ReadDependenciesFromCli()
+func reportDotNetSupportedInstrumentations(ctx context.Context, reporter *utils.ComponentReporter, sdk string) {
+	deps, err := ReadDependenciesFromCli(ctx)
 
 	if err != nil {
 		reporter.AddError(fmt.Sprintf("Failed to read dependencies: %s", err))
