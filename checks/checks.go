@@ -16,8 +16,8 @@ import (
 )
 
 // Run executes all configured checks and returns the populated reporter.
-// It does not produce any output. Callers that want the CLI's colored
-// stdout rendering should call reporter.PrintResults() or use RunAllChecks.
+// It does not produce any output; pair it with output.Render or
+// reporter.Results() to display or consume the results.
 func Run(commands utils.Commands) *utils.Reporter {
 	reporter := utils.Reporter{}
 
@@ -43,12 +43,6 @@ func Run(commands utils.Commands) *utils.Reporter {
 	}
 
 	return &reporter
-}
-
-// RunAllChecks executes all configured checks and prints the colored summary
-// to stdout. Preserved as the CLI entry point; library callers should use Run.
-func RunAllChecks(commands utils.Commands) map[string][]string {
-	return Run(commands).PrintResults()
 }
 
 func SDKSetup(reporter *utils.ComponentReporter, commands utils.Commands) {
