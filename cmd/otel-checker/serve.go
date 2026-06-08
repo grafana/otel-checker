@@ -69,6 +69,7 @@ func resolveDataPath(explicit string) string {
 			return name
 		}
 	}
+
 	return candidateNames[0]
 }
 
