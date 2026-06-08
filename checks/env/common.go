@@ -131,14 +131,17 @@ func exporterEnvVar(key string, name string) EnvVar {
 		Required:     false,
 		DefaultValue: "otlp",
 		Validator: func(value string, language string, reporter *utils.ComponentReporter) {
-			if value == "none" {
-				reporter.AddError(fmt.Sprintf("The value of %s cannot be 'none'. Change the value to 'otlp' or leave it unset", key))
-			} else {
-				if value == "" {
-					reporter.AddSuccessfulCheck(fmt.Sprintf("%s is unset, with a default value of 'otlp'", key))
-				} else {
-					reporter.AddSuccessfulCheck(fmt.Sprintf("The value of %s is set to '%s' (default value)", key, value))
-				}
+			switch value {
+			case "":
+				reporter.AddSuccessfulCheck(fmt.Sprintf("%s is unset, with a default value of 'otlp'", key))
+			case "otlp":
+				reporter.AddSuccessfulCheck(fmt.Sprintf("The value of %s is set to 'otlp' (default value)", key))
+			case "console":
+				reporter.AddSuccessfulCheck(fmt.Sprintf("The value of %s is set to 'console'", key))
+			case "none":
+				reporter.AddError(fmt.Sprintf("The value of %s cannot be 'none'. Change the value to 'otlp' or 'console', or leave it unset", key))
+			default:
+				reporter.AddError(fmt.Sprintf("The value of %s must be 'otlp' or 'console' (or unset). Got '%s'", key, value))
 			}
 		},
 		Description: name + " exporter configuration",

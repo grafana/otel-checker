@@ -198,9 +198,38 @@ func TestCheckExporterEnvVars(t *testing.T) {
 			}),
 			Language: "python",
 			ExpectedErrors: []string{
-				"The value of OTEL_METRICS_EXPORTER cannot be 'none'. Change the value to 'otlp' or leave it unset",
-				"The value of OTEL_TRACES_EXPORTER cannot be 'none'. Change the value to 'otlp' or leave it unset",
-				"The value of OTEL_LOGS_EXPORTER cannot be 'none'. Change the value to 'otlp' or leave it unset",
+				"The value of OTEL_METRICS_EXPORTER cannot be 'none'. Change the value to 'otlp' or 'console', or leave it unset",
+				"The value of OTEL_TRACES_EXPORTER cannot be 'none'. Change the value to 'otlp' or 'console', or leave it unset",
+				"The value of OTEL_LOGS_EXPORTER cannot be 'none'. Change the value to 'otlp' or 'console', or leave it unset",
+			},
+			IgnoreChecks: true,
+		},
+		{
+			Name: "exporters set to console",
+			EnvVars: correctWith(map[string]string{
+				"OTEL_METRICS_EXPORTER": "console",
+				"OTEL_TRACES_EXPORTER":  "console",
+				"OTEL_LOGS_EXPORTER":    "console",
+			}),
+			Language: "python",
+			ExpectedChecks: []string{
+				"The value of OTEL_METRICS_EXPORTER is set to 'console'",
+				"The value of OTEL_TRACES_EXPORTER is set to 'console'",
+				"The value of OTEL_LOGS_EXPORTER is set to 'console'",
+			},
+		},
+		{
+			Name: "exporters set to an unsupported value",
+			EnvVars: correctWith(map[string]string{
+				"OTEL_METRICS_EXPORTER": "prometheus",
+				"OTEL_TRACES_EXPORTER":  "jaeger",
+				"OTEL_LOGS_EXPORTER":    "syslog",
+			}),
+			Language: "python",
+			ExpectedErrors: []string{
+				"The value of OTEL_METRICS_EXPORTER must be 'otlp' or 'console' (or unset). Got 'prometheus'",
+				"The value of OTEL_TRACES_EXPORTER must be 'otlp' or 'console' (or unset). Got 'jaeger'",
+				"The value of OTEL_LOGS_EXPORTER must be 'otlp' or 'console' (or unset). Got 'syslog'",
 			},
 			IgnoreChecks: true,
 		},
