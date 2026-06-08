@@ -76,7 +76,7 @@ Linting is powered by [grafana/flint](https://github.com/grafana/flint).
 ## CLI Usage
 
 ```bash
-# Per-component verbs (preferred)
+# Per-component verbs
 otel-checker check sdk           --language=<lang> [--manual-instrumentation ...]
 otel-checker check collector     [--collector-config-path=<path>]
 otel-checker check beyla         --language=<lang>
