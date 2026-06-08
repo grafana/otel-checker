@@ -48,7 +48,9 @@
 
         {{if .Results.Warnings}}
         <section class="severity warnings">
-            <header><span class="icon">▲</span>Warnings <span class="count-pill">{{len .Results.Warnings}}</span></header>
+            <header><span class="icon">▲</span>Warnings 
+                <span class="count-pill">{{len .Results.Warnings}}</span>
+            </header>
             {{range .GroupedWarnings}}
             <div class="group">
                 <span class="component">{{.Component}}</span>
@@ -60,7 +62,9 @@
 
         {{if .Results.Checks}}
         <section class="severity checks">
-            <header><span class="icon">✓</span>Successful Checks <span class="count-pill">{{len .Results.Checks}}</span></header>
+            <header><span class="icon">✓</span>Successful Checks 
+                <span class="count-pill">{{len .Results.Checks}}</span>
+            </header>
             {{range .GroupedChecks}}
             <div class="group">
                 <span class="component">{{.Component}}</span>
@@ -74,7 +78,8 @@
         <div class="empty-state">
             <div class="empty-icon">◌</div>
             <p class="empty-title">No results in this snapshot</p>
-            <p class="empty-detail">The file at <code>{{.Source}}</code> parsed cleanly but contained no checks, warnings, or errors.</p>
+            <p class="empty-detail">The file at <code>{{.Source}}</code> parsed 
+            cleanly but contained no checks, warnings, or errors.</p>
         </div>
         {{end}}
 
