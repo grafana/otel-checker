@@ -39,21 +39,21 @@ func newServeCmd() *cobra.Command {
 	return cmd
 }
 
-func loadResults(path string) (map[string][]string, error) {
+func loadResults(path string) (utils.Results, error) {
 	var r io.Reader
 	if path == "-" {
 		r = os.Stdin
 	} else {
 		f, err := os.Open(path)
 		if err != nil {
-			return nil, fmt.Errorf("open %s: %w", path, err)
+			return utils.Results{}, fmt.Errorf("open %s: %w", path, err)
 		}
 		defer func() { _ = f.Close() }()
 		r = f
 	}
-	var msgs map[string][]string
-	if err := json.NewDecoder(r).Decode(&msgs); err != nil {
-		return nil, fmt.Errorf("decode results: %w", err)
+	var results utils.Results
+	if err := json.NewDecoder(r).Decode(&results); err != nil {
+		return utils.Results{}, fmt.Errorf("decode results: %w", err)
 	}
-	return msgs, nil
+	return results, nil
 }
