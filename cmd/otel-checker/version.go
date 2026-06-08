@@ -23,7 +23,7 @@ func newVersionCmd() *cobra.Command {
 		Args:         cobra.NoArgs,
 		SilenceUsage: true,
 		Run: func(cc *cobra.Command, _ []string) {
-			fmt.Fprintf(cc.OutOrStdout(), "otel-checker %s\n", currentVersion())
+			_, _ = fmt.Fprintf(cc.OutOrStdout(), "otel-checker %s\n", currentVersion())
 		},
 	}
 }
