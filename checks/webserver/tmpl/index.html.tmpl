@@ -3,39 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {{if .Reload}}<meta http-equiv="refresh" content="3">{{end}}
     <title>OTel Checker</title>
     <link href="/static/style.css" type="text/css" rel="stylesheet"/>
 </head>
 <body>
-    <section class="header">
-        <h1>OTel Checker</h1>
-    </section>
+    <header class="topbar">
+        <div class="topbar-inner">
+            <h1>OTel Checker</h1>
+            {{if .Available}}
+            <div class="status">
+                <span class="source" title="{{.Source}}">{{.Source}}</span>
+                <span class="counts">
+                    <span class="count error" title="Errors">✕ {{len .Results.Errors}}</span>
+                    <span class="count warn"  title="Warnings">▲ {{len .Results.Warnings}}</span>
+                    <span class="count check" title="Successful checks">✓ {{len .Results.Checks}}</span>
+                </span>
+            </div>
+            {{end}}
+        </div>
+    </header>
 
-    {{if .Results.Checks}}
-    <h2 class="checks">checks</h2>
-    <ul>
-    {{range .Results.Checks}}
-        <li>{{.Component}}: {{.Message}}</li>
-    {{end}}
-    </ul>
-    {{end}}
+    <main>
+        {{if not .Available}}
+        <div class="empty-state">
+            <div class="empty-icon">◌</div>
+            <p class="empty-title">No results to display yet</p>
+            <p class="empty-detail">Waiting for <code>{{.Source}}</code>.</p>
+            {{if .Reload}}<p class="empty-hint">The page will refresh automatically once the file appears.</p>{{end}}
+        </div>
+        {{else}}
 
-    {{if .Results.Warnings}}
-    <h2 class="warnings">warnings</h2>
-    <ul>
-    {{range .Results.Warnings}}
-        <li>{{.Component}}: {{.Message}}</li>
-    {{end}}
-    </ul>
-    {{end}}
+        {{if .Results.Errors}}
+        <section class="severity errors">
+            <header><span class="icon">✕</span>Errors <span class="count-pill">{{len .Results.Errors}}</span></header>
+            {{range .GroupedErrors}}
+            <div class="group">
+                <span class="component">{{.Component}}</span>
+                <ul>{{range .Messages}}<li>{{.}}</li>{{end}}</ul>
+            </div>
+            {{end}}
+        </section>
+        {{end}}
 
-    {{if .Results.Errors}}
-    <h2 class="errors">errors</h2>
-    <ul>
-    {{range .Results.Errors}}
-        <li>{{.Component}}: {{.Message}}</li>
-    {{end}}
-    </ul>
-    {{end}}
+        {{if .Results.Warnings}}
+        <section class="severity warnings">
+            <header><span class="icon">▲</span>Warnings 
+                <span class="count-pill">{{len .Results.Warnings}}</span>
+            </header>
+            {{range .GroupedWarnings}}
+            <div class="group">
+                <span class="component">{{.Component}}</span>
+                <ul>{{range .Messages}}<li>{{.}}</li>{{end}}</ul>
+            </div>
+            {{end}}
+        </section>
+        {{end}}
+
+        {{if .Results.Checks}}
+        <section class="severity checks">
+            <header><span class="icon">✓</span>Successful Checks 
+                <span class="count-pill">{{len .Results.Checks}}</span>
+            </header>
+            {{range .GroupedChecks}}
+            <div class="group">
+                <span class="component">{{.Component}}</span>
+                <ul>{{range .Messages}}<li>{{.}}</li>{{end}}</ul>
+            </div>
+            {{end}}
+        </section>
+        {{end}}
+
+        {{if and (not .Results.Errors) (not .Results.Warnings) (not .Results.Checks)}}
+        <div class="empty-state">
+            <div class="empty-icon">◌</div>
+            <p class="empty-title">No results in this snapshot</p>
+            <p class="empty-detail">The file at <code>{{.Source}}</code> parsed 
+            cleanly but contained no checks, warnings, or errors.</p>
+        </div>
+        {{end}}
+
+        {{end}}
+    </main>
 </body>
 </html>

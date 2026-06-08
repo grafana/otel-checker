@@ -33,7 +33,11 @@ func runChecks(ctx context.Context, c utils.Commands) error {
 	if !c.WebServer {
 		return nil
 	}
-	return webserver.Run(ctx, c.Listen, reporter.Results())
+	return webserver.Run(ctx, c.Listen, webserver.Static(webserver.Snapshot{
+		Results:   reporter.Results(),
+		Source:    "live check results",
+		Available: true,
+	}))
 }
 
 func staticCompletion(values []string) func(*cobra.Command, []string, string) ([]string, cobra.ShellCompDirective) {

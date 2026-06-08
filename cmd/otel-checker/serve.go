@@ -3,14 +3,20 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/grafana/otel-checker/checks/utils"
 	"github.com/grafana/otel-checker/checks/webserver"
 
 	"github.com/spf13/cobra"
+	"go.yaml.in/yaml/v3"
 )
+
+// candidateNames lists the default result-file names that `serve` searches
+// for when --data is not supplied, in priority order.
+var candidateNames = []string{"results.json", "results.yaml", "results.yml"}
 
 func newServeCmd() *cobra.Command {
 	var (
@@ -18,42 +24,82 @@ func newServeCmd() *cobra.Command {
 		listen string
 	)
 	cmd := &cobra.Command{
-		Use:          "serve",
-		Short:        "Serve a previously-captured set of check results via the web UI",
-		Long:         `Serve a previously-captured set of check results via the web UI. Reads the results map (JSON) from --data, or from stdin when --data=-. Pair it with "otel-checker check ... --format=json" to capture results, then serve them later.`,
+		Use:   "serve",
+		Short: "Serve a results file (JSON or YAML) via the web UI, polling for updates",
+		Long: `Serve a results file (JSON or YAML) via the web UI.
+
+If --data is not provided, looks for ./results.json, ./results.yaml, or ./results.yml
+in the current directory. The page auto-reloads every few seconds and picks up new
+content the moment the file is written, so capturing results into the watched path
+(e.g. "otel-checker check ... --format=json > results.json") refreshes the UI live.
+
+If the file does not exist yet, the server still starts and shows a placeholder
+message pointing at the expected path.`,
 		Args:         cobra.NoArgs,
 		SilenceUsage: true,
 		RunE: func(cc *cobra.Command, _ []string) error {
-			results, err := loadResults(data)
+			path := resolveDataPath(data)
+			abs, err := filepath.Abs(path)
 			if err != nil {
-				return err
+				abs = path
 			}
-			return webserver.Run(cc.Context(), listen, results)
+			loader := func() webserver.Snapshot {
+				return loadFileSnapshot(abs)
+			}
+			return webserver.Run(cc.Context(), listen, loader)
 		},
 	}
 	cmd.Flags().StringVar(&data, "data", "",
-		`Path to a JSON file with check results (as produced by --format=json). Use "-" to read from stdin.`)
+		"Path to a JSON or YAML results file. When omitted, looks for ./results.json, ./results.yaml, or ./results.yml.")
 	cmd.Flags().StringVar(&listen, "listen", utils.DefaultListen,
 		"host:port the web server binds to")
-	_ = cmd.MarkFlagRequired("data")
 	return cmd
 }
 
-func loadResults(path string) (utils.Results, error) {
-	var r io.Reader
-	if path == "-" {
-		r = os.Stdin
-	} else {
-		f, err := os.Open(path)
-		if err != nil {
-			return utils.Results{}, fmt.Errorf("open %s: %w", path, err)
+// resolveDataPath returns the path the server should watch. If explicit is
+// set, it wins. Otherwise we look for any of the default candidate names in
+// the current directory; if none exists yet, we still return the canonical
+// results.json so the placeholder page mentions a sensible path.
+func resolveDataPath(explicit string) string {
+	if explicit != "" {
+		return explicit
+	}
+	for _, name := range candidateNames {
+		if _, err := os.Stat(name); err == nil {
+			return name
 		}
-		defer func() { _ = f.Close() }()
-		r = f
 	}
+
+	return candidateNames[0]
+}
+
+// loadFileSnapshot reads path and decodes it as JSON or YAML based on its
+// extension. A missing file is not an error — the returned Snapshot has
+// Available=false and Source set to the path so the template can display
+// the placeholder.
+func loadFileSnapshot(path string) webserver.Snapshot {
+	snap := webserver.Snapshot{
+		Source: path,
+		Reload: true,
+	}
+	f, err := os.Open(path)
+	if err != nil {
+		return snap
+	}
+	defer func() { _ = f.Close() }()
+
 	var results utils.Results
-	if err := json.NewDecoder(r).Decode(&results); err != nil {
-		return utils.Results{}, fmt.Errorf("decode results: %w", err)
+	switch strings.ToLower(filepath.Ext(path)) {
+	case ".yaml", ".yml":
+		err = yaml.NewDecoder(f).Decode(&results)
+	default:
+		err = json.NewDecoder(f).Decode(&results)
 	}
-	return results, nil
+	if err != nil {
+		snap.Source = fmt.Sprintf("%s (parse error: %v)", path, err)
+		return snap
+	}
+	snap.Results = results
+	snap.Available = true
+	return snap
 }

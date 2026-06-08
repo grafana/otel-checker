@@ -75,14 +75,26 @@ Pass `--web-server` to any `check` invocation to also serve the results at
 the default binds to loopback only. Press `Ctrl-C` to shut the server down
 cleanly.
 
-To serve a previously captured result file (or stream it via stdin):
+### Serving a results file
+
+`otel-checker serve` watches a JSON or YAML results file on disk and renders it
+in the web UI. The page polls every few seconds, so the moment the file is
+created or rewritten the browser picks up the new content automatically.
+
+By default, `serve` looks for `./results.json`, then `./results.yaml`, then
+`./results.yml` in the current directory. If none exist yet, the server still
+starts and shows a placeholder pointing at the expected path — useful for
+keeping the UI open while a long-running pipeline writes results.
 
 ```bash
-otel-checker check sdk --language=go --format=json > results.json
-otel-checker serve --data=results.json
+# Start the server (looks for ./results.json by default)
+otel-checker serve
 
-# Or pipe directly
-otel-checker check sdk --language=go --format=json | otel-checker serve --data=-
+# In another terminal, write the file; the UI updates on the next poll
+otel-checker check sdk --language=go --format=json > results.json
+
+# Point at a specific file or a different format
+otel-checker serve --data=./out/results.yaml
 ```
 
 ## Checks
