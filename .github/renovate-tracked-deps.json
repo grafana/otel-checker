@@ -15,9 +15,12 @@
       "gomod": [
         "github.com/davecgh/go-spew",
         "github.com/fatih/color",
+        "github.com/inconshreveable/mousetrap",
         "github.com/mattn/go-colorable",
         "github.com/mattn/go-isatty",
         "github.com/pmezard/go-difflib",
+        "github.com/spf13/cobra",
+        "github.com/spf13/pflag",
         "github.com/stretchr/testify",
         "go",
         "go.yaml.in/yaml/v3",

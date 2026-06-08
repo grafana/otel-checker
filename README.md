@@ -23,53 +23,66 @@ Requirement: Golang
    otel-checker
    ```
 
-## Flags
-
-The available flags are shown below:
-
-<!-- markdownlint-disable MD010 -->
+## Commands
 
 ```terminal
-❯ otel-checker -h
-Usage of otel-checker:
-  -collector-config-path string
-    	Path to collector's config.yaml file. Required if using Collector and the config file is not in the same location as the otel-checker is being executed from. E.g. "-collector-config-path=src/inst/"
-  -components string
-    	Instrumentation components to test, separated by ',' (required). Possible values: sdk, collector, beyla, alloy, grafana-cloud
-  -debug
-    	Output debug information
-  -format string
-    	Output format. Possible values: text, json, yaml (default "text")
-  -instrumentation-file string
-    	Name (including path) to instrumentation file. Required if using manual-instrumentation. E.g."-instrumentation-file=src/inst/instrumentation.js"
-  -language string
-    	Language used for instrumentation (required). Possible values: dotnet, go, java, js, python, ruby, php
-  -listen string
-    	host:port the web server binds to when -web-server is set (default "127.0.0.1:8080")
-  -manual-instrumentation
-    	Provide if your application is using manual instrumentation (auto instrumentation as default)
-  -package-json-path string
-    	Path to package.json file. Required if instrumentation is in JavaScript and the file is not in the same location as the otel-checker is being executed from. E.g. "-package-json-path=src/inst/"
-  -web-server
-    	Set if you would like the results served in a web server in addition to console output
+otel-checker check                  # all components
+otel-checker check sdk              # SDK only
+otel-checker check collector        # Collector config only
+otel-checker check beyla            # Beyla only
+otel-checker check alloy            # Grafana Alloy only
+otel-checker check grafana-cloud    # Grafana Cloud connectivity only
+otel-checker serve                  # web UI for a previously-saved JSON result
+otel-checker completion <shell>     # generate shell completion script
 ```
 
-<!-- markdownlint-enable MD010 -->
+The `check` command takes an optional comma-separated list of components
+(`check sdk,collector,beyla`). With no argument, every component is checked.
+
+Run `otel-checker check --help` or `otel-checker check sdk --help` for the full
+flag set on each subcommand.
+
+## Examples
+
+```bash
+# Single-component checks
+otel-checker check sdk --language=js
+otel-checker check sdk --language=java --manual-instrumentation
+otel-checker check collector --collector-config-path=./otel/
+otel-checker check grafana-cloud --language=python
+
+# Multi-component (positional, comma-separated, no spaces)
+otel-checker check sdk,collector,beyla --language=js
+
+# Every component at once
+otel-checker check --language=js
+```
 
 ## Output formats
 
-By default results are printed as colored text. Use `-format=json` or
-`-format=yaml` for machine-readable output suitable for CI pipelines:
+By default results are printed as colored text. Use `--format=json` or
+`--format=yaml` for machine-readable output suitable for CI pipelines:
 
 ```bash
-otel-checker -language=go -components=sdk -format=json
+otel-checker check sdk --language=go --format=json
 ```
 
 ## Web UI
 
-Pass `-web-server` to also serve the results at `http://127.0.0.1:8080`. The
-listen address is configurable via `-listen=host:port`; the default binds to
-loopback only. Press `Ctrl-C` to shut the server down cleanly.
+Pass `--web-server` to any `check` invocation to also serve the results at
+`http://127.0.0.1:8080`. Override the bind address with `--listen=host:port`;
+the default binds to loopback only. Press `Ctrl-C` to shut the server down
+cleanly.
+
+To serve a previously captured result file (or stream it via stdin):
+
+```bash
+otel-checker check sdk --language=go --format=json > results.json
+otel-checker serve --data=results.json
+
+# Or pipe directly
+otel-checker check sdk --language=go --format=json | otel-checker serve --data=-
+```
 
 ## Checks
 
@@ -98,7 +111,8 @@ These checks are automatically performed for all languages and components.
 
 ### Grafana Cloud
 
-Use the `-components=grafana-cloud` flag to check the following:
+Run `otel-checker check grafana-cloud --language=<lang>` (or pass
+`--components=grafana-cloud` to `check`):
 
 - Endpoints
 - Authentication
@@ -107,7 +121,7 @@ Use the `-components=grafana-cloud` flag to check the following:
 
 #### JavaScript
 
-Use `-components=sdk -language=js` flag to check the following:
+Run `otel-checker check sdk --language=js`:
 
 - Node version
 - Required dependencies on package.json
@@ -119,14 +133,14 @@ Use `-components=sdk -language=js` flag to check the following:
 
 #### Python
 
-Use `-components=sdk -language=python` flag to check the following:
+Run `otel-checker check sdk --language=python`:
 
 - Prints which libraries are supported:
   - The used libraries are discovered from `requirements.txt` in the current directory.
 
 #### .NET
 
-Use `-components=sdk -language=dotnet` flag to check the following:
+Run `otel-checker check sdk --language=dotnet`:
 
 - .NET version
 - Available instrumentation for .NET libraries and dependencies
@@ -137,27 +151,27 @@ Use `-components=sdk -language=dotnet` flag to check the following:
 
 #### Java
 
-Use `-components=sdk -language=java` flag to check the following:
+Run `otel-checker check sdk --language=java`:
 
 - Java version
 - Prints which libraries (as discovered from a locally running maven or gradle)
   are supported:
-  - With `-manual-instrumentation`, the libraries for manual instrumentation are printed.
-  - Without `-manual-instrumentation`, it will print the libraries supported by
+  - With `--manual-instrumentation`, the libraries for manual instrumentation are printed.
+  - Without `--manual-instrumentation`, it will print the libraries supported by
     the [Java Agent](https://github.com/open-telemetry/opentelemetry-java-instrumentation/).
   - A maven or gradle wrapper will be used if found in the current directory or
     a parent directory.
 
 #### Go
 
-Use `-components=sdk -language=go` flag to check the following:
+Run `otel-checker check sdk --language=go`:
 
 - Prints which libraries are supported for manual instrumentation
   based on the `go.mod` in the current directory.
 
 #### Ruby
 
-Use `-components=sdk -language=ruby` flag to check the following:
+Run `otel-checker check sdk --language=ruby`:
 
 - Ruby version
 - Bundler installation
@@ -167,7 +181,7 @@ Use `-components=sdk -language=ruby` flag to check the following:
 
 #### PHP
 
-Use `-components=sdk -language=php` flag to check the following:
+Run `otel-checker check sdk --language=php`:
 
 - PHP version
 - Composer installation
@@ -177,13 +191,13 @@ Use `-components=sdk -language=php` flag to check the following:
 
 ### Collector
 
-Use `-components=collector` flag to check the following:
+Run `otel-checker check collector`:
 
 - Config receivers and exporters
 
 ### Beyla
 
-Use `-components=beyla` flag to check the following:
+Run `otel-checker check beyla --language=<lang>`:
 
 - Environment variables
 
@@ -191,11 +205,3 @@ Use `-components=beyla` flag to check the following:
 
 > [!NOTE]
 > TBD
-
-## Examples
-
-Application with auto-instrumentation
-![auto instrumentation example](./assets/auto.png)
-
-Application with custom instrumentation using SDKs and Collector
-![sdk and collector example](./assets/sdk.png)
