@@ -23,11 +23,13 @@ type Commands struct {
 	PackageJsonPath       string
 	CollectorConfigPath   string
 	Debug                 bool
+	Format                string
 }
 
 var (
 	SupportedLanguages  = []string{"dotnet", "go", "java", "js", "python", "ruby", "php"}
 	SupportedComponents = []string{"sdk", "beyla", "alloy", "collector", "grafana-cloud"}
+	SupportedFormats    = []string{"text", "json", "yaml"}
 )
 
 func Validate(c Commands) error {
@@ -45,6 +47,9 @@ func Validate(c Commands) error {
 	if c.Language == "js" && c.ManualInstrumentation && c.InstrumentationFile == "" {
 		return fmt.Errorf(`when manual-instrumentation is set, an instrumentation file is required (InstrumentationFile or -instrumentation-file=path/to/file.js)`)
 	}
+	if c.Format != "" && !slices.Contains(SupportedFormats, c.Format) {
+		return fmt.Errorf("format %q not supported. Possible values: %s", c.Format, strings.Join(SupportedFormats, ", "))
+	}
 	return nil
 }
 
@@ -59,6 +64,7 @@ func GetArguments() Commands {
 	manualInstrumentation := flag.Bool("manual-instrumentation", false, "Provide if your application is using manual instrumentation")
 	debug := flag.Bool("debug", false, "Output debug information")
 	webServer := flag.Bool("web-server", false, "Set if you would like the results served in a web server in addition to console output")
+	format := flag.String("format", "text", "Output format. Possible values: text, json, yaml")
 
 	// javascript
 	instrumentationFile := flag.String("instrumentation-file", "", `Name (including path) to instrumentation file. Required if using manual-instrumentation. E.g."-instrumentation-file=src/inst/instrumentation.js"`)
@@ -82,6 +88,7 @@ func GetArguments() Commands {
 		PackageJsonPath:       *packageJsonPath,
 		CollectorConfigPath:   *collectorConfigPath,
 		Debug:                 *debug,
+		Format:                *format,
 	}
 
 	if err := Validate(command); err != nil {
@@ -140,36 +147,6 @@ func (r *Reporter) Results() map[string][]string {
 		errors = append(errors, component.Errors...)
 	}
 	res[ERRORS] = errors
-	return res
-}
-
-func (r *Reporter) PrintResults() map[string][]string {
-	res := r.Results()
-	checks := res[CHECKS]
-	warnings := res[WARNINGS]
-	errors := res[ERRORS]
-
-	if len(checks) > 0 {
-		green := color.New(color.FgGreen)
-		_, _ = green.Printf("\n%d Successful Check(s)\n", len(checks))
-		for _, m := range checks {
-			_, _ = green.Printf("✔ %s \n", m)
-		}
-	}
-	if len(warnings) > 0 {
-		yellow := color.New(color.FgYellow)
-		_, _ = yellow.Printf("\n%d Warning(s)\n", len(warnings))
-		for _, m := range warnings {
-			_, _ = yellow.Printf("• %s \n", m)
-		}
-	}
-	if len(errors) > 0 {
-		red := color.New(color.FgRed)
-		_, _ = red.Printf("\n%d Error(s)\n", len(errors))
-		for _, m := range errors {
-			_, _ = red.Printf("✖ %s \n", m)
-		}
-	}
 	return res
 }
 
