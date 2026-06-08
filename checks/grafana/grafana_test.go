@@ -14,9 +14,9 @@ func TestCheckEnvVarsGrafana(t *testing.T) {
 			EnvVars:  correct,
 			Language: "python",
 			ExpectedChecks: []string{
-				"Grafana Cloud: OTEL_EXPORTER_OTLP_PROTOCOL is set to 'http/protobuf'",
-				"Grafana Cloud: OTEL_EXPORTER_OTLP_ENDPOINT set in the format similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp",
-				"Grafana Cloud: OTEL_EXPORTER_OTLP_HEADERS is set correctly",
+				"OTEL_EXPORTER_OTLP_PROTOCOL is set to 'http/protobuf'",
+				"OTEL_EXPORTER_OTLP_ENDPOINT set in the format similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp",
+				"OTEL_EXPORTER_OTLP_HEADERS is set correctly",
 			},
 		},
 		{
@@ -26,7 +26,7 @@ func TestCheckEnvVarsGrafana(t *testing.T) {
 			}),
 			Language: "python",
 			ExpectedErrors: []string{
-				"Grafana Cloud: OTEL_EXPORTER_OTLP_PROTOCOL must be set to 'http/protobuf'",
+				"OTEL_EXPORTER_OTLP_PROTOCOL must be set to 'http/protobuf'",
 			},
 			IgnoreChecks: true,
 		},
@@ -36,9 +36,9 @@ func TestCheckEnvVarsGrafana(t *testing.T) {
 			Language:   "python",
 			Components: []string{"beyla"},
 			ExpectedErrors: []string{
-				"Grafana Cloud: OTEL_EXPORTER_OTLP_PROTOCOL must be set to 'http/protobuf'",
-				"Grafana Cloud: OTEL_EXPORTER_OTLP_ENDPOINT is not set in the format similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp",
-				"Grafana Cloud: OTEL_EXPORTER_OTLP_HEADERS is not set. Value should have 'Authorization=Basic%20...'",
+				"OTEL_EXPORTER_OTLP_PROTOCOL must be set to 'http/protobuf'",
+				"OTEL_EXPORTER_OTLP_ENDPOINT is not set in the format similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp",
+				"OTEL_EXPORTER_OTLP_HEADERS is not set. Value should have 'Authorization=Basic%20...'",
 			},
 		},
 	}

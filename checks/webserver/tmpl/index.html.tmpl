@@ -10,12 +10,30 @@
     <section class="header">
         <h1>OTel Checker</h1>
     </section>
-    
-    {{range $k, $v := .Messages}}
-    <h2 class="{{$k}}">{{$k}}</h2>
+
+    {{if .Results.Checks}}
+    <h2 class="checks">checks</h2>
     <ul>
-    {{range $v}}
-        <li>{{.}}</li>
+    {{range .Results.Checks}}
+        <li>{{.Component}}: {{.Message}}</li>
+    {{end}}
+    </ul>
+    {{end}}
+
+    {{if .Results.Warnings}}
+    <h2 class="warnings">warnings</h2>
+    <ul>
+    {{range .Results.Warnings}}
+        <li>{{.Component}}: {{.Message}}</li>
+    {{end}}
+    </ul>
+    {{end}}
+
+    {{if .Results.Errors}}
+    <h2 class="errors">errors</h2>
+    <ul>
+    {{range .Results.Errors}}
+        <li>{{.Component}}: {{.Message}}</li>
     {{end}}
     </ul>
     {{end}}

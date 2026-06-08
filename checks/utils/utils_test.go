@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"errors"
 	"strings"
 	"testing"
 
@@ -17,9 +18,17 @@ func TestReporterResults(t *testing.T) {
 
 	got := r.Results()
 
-	assert.ElementsMatch(t, []string{"SDK: foo"}, got[CHECKS])
-	assert.ElementsMatch(t, []string{"SDK: bar"}, got[WARNINGS])
-	assert.ElementsMatch(t, []string{"Collector: baz"}, got[ERRORS])
+	assert.Equal(t, []ComponentResult{{Component: "SDK", Message: "foo"}}, got.Checks)
+	assert.Equal(t, []ComponentResult{{Component: "SDK", Message: "bar"}}, got.Warnings)
+	assert.Equal(t, []ComponentResult{{Component: "Collector", Message: "baz"}}, got.Errors)
+}
+
+func TestAddInternalErrorPrefixesMessage(t *testing.T) {
+	r := &Reporter{}
+	sdk := r.Component("SDK")
+	sdk.AddInternalError("boom")
+	got := r.Results()
+	assert.Equal(t, []ComponentResult{{Component: "SDK", Message: "Internal Error: boom"}}, got.Warnings)
 }
 
 func TestValidate(t *testing.T) {
@@ -44,7 +53,7 @@ func TestValidate(t *testing.T) {
 		{
 			name:    "empty language with sdk",
 			in:      Commands{Components: []string{"sdk"}},
-			wantErr: "language required for components",
+			wantErr: "language required",
 		},
 		{
 			name: "collector-only without language",
@@ -67,7 +76,7 @@ func TestValidate(t *testing.T) {
 				Components:            []string{"sdk"},
 				ManualInstrumentation: true,
 			},
-			wantErr: "manual-instrumentation is set",
+			wantErr: "manual-instrumentation requires",
 		},
 		{
 			name: "js manual with instrumentation file",
@@ -124,4 +133,87 @@ func TestValidate(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestValidateTypedErrors(t *testing.T) {
+	t.Run("ErrNoComponents", func(t *testing.T) {
+		err := Validate(Commands{Language: "go"})
+		if !errors.Is(err, ErrNoComponents) {
+			t.Errorf("errors.Is(err, ErrNoComponents) = false, want true; err = %v", err)
+		}
+	})
+
+	t.Run("ErrLanguageRequired", func(t *testing.T) {
+		err := Validate(Commands{Components: []string{"sdk"}})
+		if !errors.Is(err, ErrLanguageRequired) {
+			t.Errorf("errors.Is(err, ErrLanguageRequired) = false, want true; err = %v", err)
+		}
+	})
+
+	t.Run("ErrManualInstrumentationFile", func(t *testing.T) {
+		err := Validate(Commands{
+			Language:              "js",
+			Components:            []string{"sdk"},
+			ManualInstrumentation: true,
+		})
+		if !errors.Is(err, ErrManualInstrumentationFile) {
+			t.Errorf("errors.Is(err, ErrManualInstrumentationFile) = false, want true; err = %v", err)
+		}
+	})
+
+	t.Run("UnsupportedLanguageError", func(t *testing.T) {
+		err := Validate(Commands{Language: "rust", Components: []string{"sdk"}})
+		var ule *UnsupportedLanguageError
+		if !errors.As(err, &ule) {
+			t.Fatalf("errors.As did not extract *UnsupportedLanguageError; err = %v", err)
+		}
+		if ule.Language != "rust" {
+			t.Errorf("ule.Language = %q, want %q", ule.Language, "rust")
+		}
+	})
+
+	t.Run("UnsupportedComponentError", func(t *testing.T) {
+		err := Validate(Commands{Language: "go", Components: []string{"bogus"}})
+		var uce *UnsupportedComponentError
+		if !errors.As(err, &uce) {
+			t.Fatalf("errors.As did not extract *UnsupportedComponentError; err = %v", err)
+		}
+		if uce.Component != "bogus" {
+			t.Errorf("uce.Component = %q, want %q", uce.Component, "bogus")
+		}
+	})
+
+	t.Run("UnsupportedFormatError", func(t *testing.T) {
+		err := Validate(Commands{
+			Language:   "go",
+			Components: []string{"sdk"},
+			Format:     "xml",
+		})
+		var ufe *UnsupportedFormatError
+		if !errors.As(err, &ufe) {
+			t.Fatalf("errors.As did not extract *UnsupportedFormatError; err = %v", err)
+		}
+		if ufe.Format != "xml" {
+			t.Errorf("ufe.Format = %q, want %q", ufe.Format, "xml")
+		}
+	})
+
+	t.Run("InvalidListenError", func(t *testing.T) {
+		err := Validate(Commands{
+			Language:   "go",
+			Components: []string{"sdk"},
+			WebServer:  true,
+			Listen:     "no-port-here",
+		})
+		var ile *InvalidListenError
+		if !errors.As(err, &ile) {
+			t.Fatalf("errors.As did not extract *InvalidListenError; err = %v", err)
+		}
+		if ile.Listen != "no-port-here" {
+			t.Errorf("ile.Listen = %q, want %q", ile.Listen, "no-port-here")
+		}
+		if ile.Unwrap() == nil {
+			t.Error("ile.Unwrap() = nil, want underlying net.SplitHostPort error")
+		}
+	})
 }

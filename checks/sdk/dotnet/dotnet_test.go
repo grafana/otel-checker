@@ -18,10 +18,10 @@ func TestCheckDotNetAutoInstrumentation(t *testing.T) {
 			},
 			Language: "csharp",
 			ExpectedChecks: []string{
-				"dotnet: CORECLR_ENABLE_PROFILING is set to '1'",
-				"dotnet: CORECLR_PROFILER is set to '{918728DD-259F-4A6A-AC2B-B85E1B658318}'",
-				"dotnet: CORECLR_PROFILER_PATH is set to '/path/to/profiler'",
-				"dotnet: OTEL_DOTNET_AUTO_HOME is set to '/path/to/auto'",
+				"CORECLR_ENABLE_PROFILING is set to '1'",
+				"CORECLR_PROFILER is set to '{918728DD-259F-4A6A-AC2B-B85E1B658318}'",
+				"CORECLR_PROFILER_PATH is set to '/path/to/profiler'",
+				"OTEL_DOTNET_AUTO_HOME is set to '/path/to/auto'",
 			},
 		},
 		{
@@ -32,9 +32,9 @@ func TestCheckDotNetAutoInstrumentation(t *testing.T) {
 			Language:     "csharp",
 			IgnoreChecks: true,
 			ExpectedErrors: []string{
-				"dotnet: CORECLR_PROFILER must be set to '{918728DD-259F-4A6A-AC2B-B85E1B658318}'",
-				"dotnet: CORECLR_PROFILER_PATH is not set",
-				"dotnet: OTEL_DOTNET_AUTO_HOME is not set",
+				"CORECLR_PROFILER must be set to '{918728DD-259F-4A6A-AC2B-B85E1B658318}'",
+				"CORECLR_PROFILER_PATH is not set",
+				"OTEL_DOTNET_AUTO_HOME is not set",
 			},
 		},
 		{
@@ -48,8 +48,8 @@ func TestCheckDotNetAutoInstrumentation(t *testing.T) {
 			Language:     "csharp",
 			IgnoreChecks: true,
 			ExpectedErrors: []string{
-				"dotnet: CORECLR_ENABLE_PROFILING must be set to '1'",
-				"dotnet: CORECLR_PROFILER must be set to '{918728DD-259F-4A6A-AC2B-B85E1B658318}'",
+				"CORECLR_ENABLE_PROFILING must be set to '1'",
+				"CORECLR_PROFILER must be set to '{918728DD-259F-4A6A-AC2B-B85E1B658318}'",
 			},
 		},
 	}

@@ -1,16 +1,27 @@
 package utils
 
 import (
-	"fmt"
 	"net"
 	"os"
 	"slices"
 	"strings"
 )
 
-const ERRORS = "errors"
-const WARNINGS = "warnings"
-const CHECKS = "checks"
+// Results is the typed snapshot of a Reporter's aggregated state.
+// Library callers should consume this directly; the CLI marshals it as
+// JSON/YAML and renders it as text via the output package.
+type Results struct {
+	Checks   []ComponentResult `json:"checks" yaml:"checks"`
+	Warnings []ComponentResult `json:"warnings" yaml:"warnings"`
+	Errors   []ComponentResult `json:"errors" yaml:"errors"`
+}
+
+// ComponentResult is a single check/warning/error message, tagged with the
+// reporter component that produced it.
+type ComponentResult struct {
+	Component string `json:"component" yaml:"component"`
+	Message   string `json:"message" yaml:"message"`
+}
 
 type Commands struct {
 	Language              string
@@ -38,33 +49,33 @@ var (
 
 func Validate(c Commands) error {
 	if len(c.Components) == 0 {
-		return fmt.Errorf("at least one component required. Possible values: %s", strings.Join(SupportedComponents, ", "))
+		return ErrNoComponents
 	}
 	needsLanguage := false
 	for _, comp := range c.Components {
 		comp = strings.TrimSpace(comp)
 		if !slices.Contains(SupportedComponents, comp) {
-			return fmt.Errorf("component %q not supported. Possible values: %s", comp, strings.Join(SupportedComponents, ", "))
+			return &UnsupportedComponentError{Component: comp}
 		}
 		if slices.Contains(LanguageRequiredFor, comp) {
 			needsLanguage = true
 		}
 	}
 	if needsLanguage && c.Language == "" {
-		return fmt.Errorf("language required for components: %s", strings.Join(LanguageRequiredFor, ", "))
+		return ErrLanguageRequired
 	}
 	if c.Language != "" && !slices.Contains(SupportedLanguages, c.Language) {
-		return fmt.Errorf("language %q not supported. Possible values: %s", c.Language, strings.Join(SupportedLanguages, ", "))
+		return &UnsupportedLanguageError{Language: c.Language}
 	}
 	if c.Language == "js" && c.ManualInstrumentation && c.InstrumentationFile == "" {
-		return fmt.Errorf(`when manual-instrumentation is set, an instrumentation file is required (InstrumentationFile or -instrumentation-file=path/to/file.js)`)
+		return ErrManualInstrumentationFile
 	}
 	if c.Format != "" && !slices.Contains(SupportedFormats, c.Format) {
-		return fmt.Errorf("format %q not supported. Possible values: %s", c.Format, strings.Join(SupportedFormats, ", "))
+		return &UnsupportedFormatError{Format: c.Format}
 	}
 	if c.WebServer && c.Listen != "" {
 		if _, _, err := net.SplitHostPort(c.Listen); err != nil {
-			return fmt.Errorf("listen address %q is not a valid host:port: %w", c.Listen, err)
+			return &InvalidListenError{Listen: c.Listen, Err: err}
 		}
 	}
 	return nil
@@ -94,41 +105,37 @@ func (r *Reporter) Component(name string) *ComponentReporter {
 
 // Results aggregates the checks, warnings, and errors across all components
 // without producing any output. Callers that want to render results their own
-// way should use this; CLI callers should use PrintResults.
-func (r *Reporter) Results() map[string][]string {
-	res := make(map[string][]string)
-	var checks []string
+// way should use this; the CLI marshals it via the output package.
+func (r *Reporter) Results() Results {
+	var res Results
 	for _, component := range r.components {
-		checks = append(checks, component.Checks...)
+		for _, m := range component.Checks {
+			res.Checks = append(res.Checks, ComponentResult{Component: component.name, Message: m})
+		}
+		for _, m := range component.Warnings {
+			res.Warnings = append(res.Warnings, ComponentResult{Component: component.name, Message: m})
+		}
+		for _, m := range component.Errors {
+			res.Errors = append(res.Errors, ComponentResult{Component: component.name, Message: m})
+		}
 	}
-	res[CHECKS] = checks
-	var warnings []string
-	for _, component := range r.components {
-		warnings = append(warnings, component.Warnings...)
-	}
-	res[WARNINGS] = warnings
-	var errors []string
-	for _, component := range r.components {
-		errors = append(errors, component.Errors...)
-	}
-	res[ERRORS] = errors
 	return res
 }
 
 func (r *ComponentReporter) AddSuccessfulCheck(message string) {
-	r.Checks = append(r.Checks, fmt.Sprintf(`%s: %s`, r.name, message))
+	r.Checks = append(r.Checks, message)
 }
 
 func (r *ComponentReporter) AddWarning(message string) {
-	r.Warnings = append(r.Warnings, fmt.Sprintf(`%s: %s`, r.name, message))
+	r.Warnings = append(r.Warnings, message)
 }
 
 func (r *ComponentReporter) AddInternalError(message string) {
-	r.Warnings = append(r.Warnings, fmt.Sprintf(`%s: Internal Error: %s`, r.name, message))
+	r.Warnings = append(r.Warnings, "Internal Error: "+message)
 }
 
 func (r *ComponentReporter) AddError(message string) {
-	r.Errors = append(r.Errors, fmt.Sprintf(`%s: %s`, r.name, message))
+	r.Errors = append(r.Errors, message)
 }
 
 func FileExists(path string) bool {

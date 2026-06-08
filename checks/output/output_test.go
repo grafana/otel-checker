@@ -28,18 +28,18 @@ func TestRenderJSON(t *testing.T) {
 	if err := Render(&buf, newReporter(t), FormatJSON); err != nil {
 		t.Fatalf("Render(json): %v", err)
 	}
-	var got map[string][]string
+	var got utils.Results
 	if err := json.Unmarshal(buf.Bytes(), &got); err != nil {
 		t.Fatalf("invalid JSON: %v\n%s", err, buf.String())
 	}
-	if len(got[utils.CHECKS]) != 1 || !strings.Contains(got[utils.CHECKS][0], "foo") {
-		t.Errorf("checks = %v, want one entry containing %q", got[utils.CHECKS], "foo")
+	if len(got.Checks) != 1 || got.Checks[0].Component != "SDK" || got.Checks[0].Message != "foo" {
+		t.Errorf("checks = %+v, want one SDK/foo entry", got.Checks)
 	}
-	if len(got[utils.WARNINGS]) != 1 || !strings.Contains(got[utils.WARNINGS][0], "bar") {
-		t.Errorf("warnings = %v, want one entry containing %q", got[utils.WARNINGS], "bar")
+	if len(got.Warnings) != 1 || got.Warnings[0].Component != "SDK" || got.Warnings[0].Message != "bar" {
+		t.Errorf("warnings = %+v, want one SDK/bar entry", got.Warnings)
 	}
-	if len(got[utils.ERRORS]) != 1 || !strings.Contains(got[utils.ERRORS][0], "baz") {
-		t.Errorf("errors = %v, want one entry containing %q", got[utils.ERRORS], "baz")
+	if len(got.Errors) != 1 || got.Errors[0].Component != "Collector" || got.Errors[0].Message != "baz" {
+		t.Errorf("errors = %+v, want one Collector/baz entry", got.Errors)
 	}
 }
 
@@ -48,12 +48,12 @@ func TestRenderYAML(t *testing.T) {
 	if err := Render(&buf, newReporter(t), FormatYAML); err != nil {
 		t.Fatalf("Render(yaml): %v", err)
 	}
-	var got map[string][]string
+	var got utils.Results
 	if err := yaml.Unmarshal(buf.Bytes(), &got); err != nil {
 		t.Fatalf("invalid YAML: %v\n%s", err, buf.String())
 	}
-	if len(got[utils.CHECKS]) != 1 {
-		t.Errorf("checks = %v, want length 1", got[utils.CHECKS])
+	if len(got.Checks) != 1 || got.Checks[0].Message != "foo" {
+		t.Errorf("checks = %+v, want one entry with foo", got.Checks)
 	}
 }
 
