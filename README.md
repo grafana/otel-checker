@@ -33,6 +33,7 @@ otel-checker check beyla            # Beyla only
 otel-checker check alloy            # Grafana Alloy only
 otel-checker check grafana-cloud    # Grafana Cloud connectivity only
 otel-checker serve                  # web UI for a previously-saved JSON result
+otel-checker version                # print the binary version
 otel-checker completion <shell>     # generate shell completion script
 ```
 
