@@ -5,11 +5,14 @@
 package webserver
 
 import (
+	"context"
 	"embed"
+	"errors"
 	"fmt"
 	"html/template"
 	"log"
 	"net/http"
+	"time"
 )
 
 //go:embed static/*
@@ -19,8 +22,9 @@ var static embed.FS
 var tmpls embed.FS
 
 // Run starts an HTTP server on addr that renders the given messages.
-// Blocks until the server exits.
-func Run(addr string, messages map[string][]string) error {
+// Blocks until ctx is cancelled or the server exits. When ctx is cancelled,
+// the server is shut down with a 5-second grace window for in-flight requests.
+func Run(ctx context.Context, addr string, messages map[string][]string) error {
 	t, err := template.ParseFS(tmpls, "tmpl/*.tmpl")
 	if err != nil {
 		return fmt.Errorf("parse templates: %w", err)
@@ -36,6 +40,31 @@ func Run(addr string, messages map[string][]string) error {
 		}
 	})
 
-	log.Printf("Application available on http://%s", addr)
-	return http.ListenAndServe(addr, mux)
+	srv := &http.Server{
+		Addr:              addr,
+		Handler:           mux,
+		ReadHeaderTimeout: 10 * time.Second,
+	}
+
+	serveErr := make(chan error, 1)
+	go func() {
+		log.Printf("Application available on http://%s", addr)
+		err := srv.ListenAndServe()
+		if errors.Is(err, http.ErrServerClosed) {
+			err = nil
+		}
+		serveErr <- err
+	}()
+
+	select {
+	case <-ctx.Done():
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		if err := srv.Shutdown(shutdownCtx); err != nil {
+			return fmt.Errorf("server shutdown: %w", err)
+		}
+		return <-serveErr
+	case err := <-serveErr:
+		return err
+	}
 }

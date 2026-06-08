@@ -1,10 +1,12 @@
 package _go
 
 import (
+	"context"
+
 	"github.com/grafana/otel-checker/checks/utils"
 )
 
-func CheckGoSetup(reporter *utils.ComponentReporter, commands utils.Commands) {
+func CheckGoSetup(_ context.Context, reporter *utils.ComponentReporter, commands utils.Commands) {
 	checkGoVersion(reporter)
 	if commands.ManualInstrumentation {
 		checkGoCodeBasedInstrumentation(reporter)

@@ -1,6 +1,7 @@
 package java
 
 import (
+	"context"
 	"fmt"
 	"os/exec"
 	"slices"
@@ -15,10 +16,10 @@ var gradleFiles = []string{
 	"build.gradle.kts",
 }
 
-func checkGradle(file string, reporter *utils.ComponentReporter) []Library {
+func checkGradle(ctx context.Context, file string, reporter *utils.ComponentReporter) []Library {
 	println("Reading Gradle dependencies")
 
-	out := sdk.RunCommand(reporter, exec.Command(searchWrapper("gradle", "gradlew"),
+	out := sdk.RunCommand(reporter, exec.CommandContext(ctx, searchWrapper("gradle", "gradlew"),
 		fmt.Sprintf("--build-file=%s", file), "dependencies", "--configuration=runtimeClasspath"))
 	if out == "" {
 		return []Library{}

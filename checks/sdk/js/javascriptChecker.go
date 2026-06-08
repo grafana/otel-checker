@@ -1,6 +1,7 @@
 package js
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/exec"
@@ -12,9 +13,9 @@ import (
 	"github.com/grafana/otel-checker/checks/utils"
 )
 
-func CheckJSSetup(reporter *utils.ComponentReporter, commands utils.Commands) {
+func CheckJSSetup(ctx context.Context, reporter *utils.ComponentReporter, commands utils.Commands) {
 	checkResourceDetectors(reporter)
-	checkNodeVersion(reporter)
+	checkNodeVersion(ctx, reporter)
 	if commands.ManualInstrumentation {
 		checkJSCodeBasedInstrumentation(reporter, commands.PackageJsonPath, commands.InstrumentationFile)
 	} else {
@@ -41,8 +42,8 @@ func checkResourceDetectors(reporter *utils.ComponentReporter) {
 	}, reporter)
 }
 
-func checkNodeVersion(reporter *utils.ComponentReporter) {
-	cmd := exec.Command("node", "-v")
+func checkNodeVersion(ctx context.Context, reporter *utils.ComponentReporter) {
+	cmd := exec.CommandContext(ctx, "node", "-v")
 	stdout, err := cmd.Output()
 
 	if err != nil {

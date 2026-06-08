@@ -13,7 +13,7 @@ Requirement: Golang
 1. Install the `otel-checker` binary
 
    ```text
-   go install github.com/grafana/otel-checker@latest
+   go install github.com/grafana/otel-checker/cmd/otel-checker@latest
    ```
 
 2. You can confirm it was installed with:
@@ -32,25 +32,44 @@ The available flags are shown below:
 ```terminal
 ❯ otel-checker -h
 Usage of otel-checker:
-  -manual-instrumentation
-    	Provide if your application is using manual instrumentation (auto instrumentation as default)
   -collector-config-path string
     	Path to collector's config.yaml file. Required if using Collector and the config file is not in the same location as the otel-checker is being executed from. E.g. "-collector-config-path=src/inst/"
   -components string
     	Instrumentation components to test, separated by ',' (required). Possible values: sdk, collector, beyla, alloy, grafana-cloud
   -debug
-        Output debug information
+    	Output debug information
+  -format string
+    	Output format. Possible values: text, json, yaml (default "text")
   -instrumentation-file string
     	Name (including path) to instrumentation file. Required if using manual-instrumentation. E.g."-instrumentation-file=src/inst/instrumentation.js"
   -language string
     	Language used for instrumentation (required). Possible values: dotnet, go, java, js, python, ruby, php
+  -listen string
+    	host:port the web server binds to when -web-server is set (default "127.0.0.1:8080")
+  -manual-instrumentation
+    	Provide if your application is using manual instrumentation (auto instrumentation as default)
   -package-json-path string
     	Path to package.json file. Required if instrumentation is in JavaScript and the file is not in the same location as the otel-checker is being executed from. E.g. "-package-json-path=src/inst/"
   -web-server
-        Set if you would like the results served in a web server in addition to console output
+    	Set if you would like the results served in a web server in addition to console output
 ```
 
 <!-- markdownlint-enable MD010 -->
+
+## Output formats
+
+By default results are printed as colored text. Use `-format=json` or
+`-format=yaml` for machine-readable output suitable for CI pipelines:
+
+```bash
+otel-checker -language=go -components=sdk -format=json
+```
+
+## Web UI
+
+Pass `-web-server` to also serve the results at `http://127.0.0.1:8080`. The
+listen address is configurable via `-listen=host:port`; the default binds to
+loopback only. Press `Ctrl-C` to shut the server down cleanly.
 
 ## Checks
 

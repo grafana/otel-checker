@@ -32,7 +32,7 @@ run = "flint run --fix"
 
 [tasks.build]
 description = "Build the application"
-run = "go install"
+run = "go install ./cmd/otel-checker"
 
 [tasks.test]
 description = "Run tests"

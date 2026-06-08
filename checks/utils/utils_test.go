@@ -74,6 +74,33 @@ func TestValidate(t *testing.T) {
 				InstrumentationFile:   "src/inst.js",
 			},
 		},
+		{
+			name: "web-server with malformed listen address",
+			in: Commands{
+				Language:   "go",
+				Components: []string{"sdk"},
+				WebServer:  true,
+				Listen:     "no-port-here",
+			},
+			wantErr: "not a valid host:port",
+		},
+		{
+			name: "web-server with valid listen address",
+			in: Commands{
+				Language:   "go",
+				Components: []string{"sdk"},
+				WebServer:  true,
+				Listen:     "127.0.0.1:8080",
+			},
+		},
+		{
+			name: "listen address ignored when web-server is off",
+			in: Commands{
+				Language:   "go",
+				Components: []string{"sdk"},
+				Listen:     "bogus",
+			},
+		},
 	}
 
 	for _, tc := range tests {

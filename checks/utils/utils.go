@@ -3,6 +3,7 @@ package utils
 import (
 	"flag"
 	"fmt"
+	"net"
 	"os"
 	"slices"
 	"strings"
@@ -19,12 +20,15 @@ type Commands struct {
 	Components            []string
 	ManualInstrumentation bool
 	WebServer             bool
+	Listen                string
 	InstrumentationFile   string
 	PackageJsonPath       string
 	CollectorConfigPath   string
 	Debug                 bool
 	Format                string
 }
+
+const DefaultListen = "127.0.0.1:8080"
 
 var (
 	SupportedLanguages  = []string{"dotnet", "go", "java", "js", "python", "ruby", "php"}
@@ -50,6 +54,11 @@ func Validate(c Commands) error {
 	if c.Format != "" && !slices.Contains(SupportedFormats, c.Format) {
 		return fmt.Errorf("format %q not supported. Possible values: %s", c.Format, strings.Join(SupportedFormats, ", "))
 	}
+	if c.WebServer && c.Listen != "" {
+		if _, _, err := net.SplitHostPort(c.Listen); err != nil {
+			return fmt.Errorf("listen address %q is not a valid host:port: %w", c.Listen, err)
+		}
+	}
 	return nil
 }
 
@@ -64,6 +73,7 @@ func GetArguments() Commands {
 	manualInstrumentation := flag.Bool("manual-instrumentation", false, "Provide if your application is using manual instrumentation")
 	debug := flag.Bool("debug", false, "Output debug information")
 	webServer := flag.Bool("web-server", false, "Set if you would like the results served in a web server in addition to console output")
+	listen := flag.String("listen", DefaultListen, "host:port the web server binds to when -web-server is set")
 	format := flag.String("format", "text", "Output format. Possible values: text, json, yaml")
 
 	// javascript
@@ -83,6 +93,7 @@ func GetArguments() Commands {
 		Language:              *languageValue,
 		Components:            components,
 		WebServer:             *webServer,
+		Listen:                *listen,
 		ManualInstrumentation: *manualInstrumentation,
 		InstrumentationFile:   *instrumentationFile,
 		PackageJsonPath:       *packageJsonPath,

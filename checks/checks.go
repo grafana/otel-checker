@@ -1,6 +1,8 @@
 package checks
 
 import (
+	"context"
+
 	"github.com/grafana/otel-checker/checks/alloy"
 	"github.com/grafana/otel-checker/checks/beyla"
 	"github.com/grafana/otel-checker/checks/collector"
@@ -17,8 +19,9 @@ import (
 
 // Run executes all configured checks and returns the populated reporter.
 // It does not produce any output; pair it with output.Render or
-// reporter.Results() to display or consume the results.
-func Run(commands utils.Commands) *utils.Reporter {
+// reporter.Results() to display or consume the results. ctx is plumbed to
+// HTTP and exec calls so callers can cancel a slow check.
+func Run(ctx context.Context, commands utils.Commands) *utils.Reporter {
 	reporter := utils.Reporter{}
 
 	env.CheckCommon(reporter.Component("Common Environment Variables"), commands.Language)
@@ -26,7 +29,7 @@ func Run(commands utils.Commands) *utils.Reporter {
 	for _, c := range commands.Components {
 		switch c {
 		case "sdk":
-			SDKSetup(reporter.Component("SDK"), commands)
+			SDKSetup(ctx, reporter.Component("SDK"), commands)
 		case "beyla":
 			beyla.CheckBeylaSetup(reporter.Component("Beyla"), commands.Language)
 		case "alloy":
@@ -38,28 +41,28 @@ func Run(commands utils.Commands) *utils.Reporter {
 				commands.CollectorConfigPath,
 			)
 		case "grafana-cloud":
-			grafana.CheckGrafanaSetup(reporter, reporter.Component("Grafana Cloud"), commands)
+			grafana.CheckGrafanaSetup(ctx, reporter, reporter.Component("Grafana Cloud"), commands)
 		}
 	}
 
 	return &reporter
 }
 
-func SDKSetup(reporter *utils.ComponentReporter, commands utils.Commands) {
+func SDKSetup(ctx context.Context, reporter *utils.ComponentReporter, commands utils.Commands) {
 	switch commands.Language {
 	case "dotnet":
-		dotnet.CheckDotNetSetup(reporter, commands)
+		dotnet.CheckDotNetSetup(ctx, reporter, commands)
 	case "go":
-		_go.CheckGoSetup(reporter, commands)
+		_go.CheckGoSetup(ctx, reporter, commands)
 	case "java":
-		java.CheckSetup(reporter, commands)
+		java.CheckSetup(ctx, reporter, commands)
 	case "js":
-		js.CheckJSSetup(reporter, commands)
+		js.CheckJSSetup(ctx, reporter, commands)
 	case "python":
-		python.CheckSetup(reporter, commands)
+		python.CheckSetup(ctx, reporter, commands)
 	case "ruby":
-		sdk.CheckRubySetup(reporter, commands)
+		sdk.CheckRubySetup(ctx, reporter, commands)
 	case "php":
-		sdk.CheckPHPSetup(reporter, commands)
+		sdk.CheckPHPSetup(ctx, reporter, commands)
 	}
 }

@@ -1,15 +1,19 @@
 package grafana
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/grafana/otel-checker/checks/env"
 	"github.com/grafana/otel-checker/checks/utils"
 )
+
+var credentialCheckClient = &http.Client{Timeout: 10 * time.Second}
 
 var (
 	OtelExporterOTLPProtocol = env.EnvVar{
@@ -55,9 +59,9 @@ var (
 	}
 )
 
-func CheckGrafanaSetup(reporter utils.Reporter, grafanaReporter *utils.ComponentReporter, commands utils.Commands) {
+func CheckGrafanaSetup(ctx context.Context, reporter utils.Reporter, grafanaReporter *utils.ComponentReporter, commands utils.Commands) {
 	checkEnvVarsGrafana(reporter, grafanaReporter, commands.Language, commands.Components)
-	checkAuth(grafanaReporter)
+	checkAuth(ctx, grafanaReporter)
 }
 
 func checkEnvVarsGrafana(reporter utils.Reporter, grafana *utils.ComponentReporter, language string, components []string) {
@@ -71,7 +75,7 @@ func checkEnvVarsGrafana(reporter utils.Reporter, grafana *utils.ComponentReport
 	env.CheckEnvVars(grafana, language, commonVars...)
 }
 
-func checkAuth(reporter *utils.ComponentReporter) {
+func checkAuth(ctx context.Context, reporter *utils.ComponentReporter) {
 	endpoint := env.GetValue(OtelExporterOTLPEndpoint)
 	if strings.Contains(endpoint, "localhost") {
 		reporter.AddWarning("Credentials not checked, since OTEL_EXPORTER_OTLP_ENDPOINT is using localhost")
@@ -86,7 +90,7 @@ func checkAuth(reporter *utils.ComponentReporter) {
 
 	// Test credentials
 	testEndpoint := endpoint + "/v1/metrics"
-	req, err := http.NewRequest("POST", testEndpoint, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, testEndpoint, nil)
 	if err != nil {
 		reporter.AddError(fmt.Sprintf("Error while testing credentials of OTEL_EXPORTER_OTLP_ENDPOINT: %s", err))
 		return
@@ -102,7 +106,7 @@ func checkAuth(reporter *utils.ComponentReporter) {
 	}
 	req.Header.Set("Authorization", authValue)
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := credentialCheckClient.Do(req)
 	if err != nil {
 		reporter.AddError(fmt.Sprintf("Error while testing credentials of OTEL_EXPORTER_OTLP_ENDPOINT: %s", err))
 		return
