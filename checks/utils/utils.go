@@ -1,14 +1,11 @@
 package utils
 
 import (
-	"flag"
 	"fmt"
 	"net"
 	"os"
 	"slices"
 	"strings"
-
-	"github.com/fatih/color"
 )
 
 const ERRORS = "errors"
@@ -34,19 +31,30 @@ var (
 	SupportedLanguages  = []string{"dotnet", "go", "java", "js", "python", "ruby", "php"}
 	SupportedComponents = []string{"sdk", "beyla", "alloy", "collector", "grafana-cloud"}
 	SupportedFormats    = []string{"text", "json", "yaml"}
+	// LanguageRequiredFor lists the components whose checks need a language hint.
+	// "collector" is intentionally omitted — its YAML schema is language-agnostic.
+	LanguageRequiredFor = []string{"sdk", "beyla", "alloy", "grafana-cloud"}
 )
 
 func Validate(c Commands) error {
-	if !slices.Contains(SupportedLanguages, c.Language) {
-		return fmt.Errorf("language %q not supported. Possible values: %s", c.Language, strings.Join(SupportedLanguages, ", "))
-	}
 	if len(c.Components) == 0 {
 		return fmt.Errorf("at least one component required. Possible values: %s", strings.Join(SupportedComponents, ", "))
 	}
+	needsLanguage := false
 	for _, comp := range c.Components {
-		if !slices.Contains(SupportedComponents, strings.TrimSpace(comp)) {
+		comp = strings.TrimSpace(comp)
+		if !slices.Contains(SupportedComponents, comp) {
 			return fmt.Errorf("component %q not supported. Possible values: %s", comp, strings.Join(SupportedComponents, ", "))
 		}
+		if slices.Contains(LanguageRequiredFor, comp) {
+			needsLanguage = true
+		}
+	}
+	if needsLanguage && c.Language == "" {
+		return fmt.Errorf("language required for components: %s", strings.Join(LanguageRequiredFor, ", "))
+	}
+	if c.Language != "" && !slices.Contains(SupportedLanguages, c.Language) {
+		return fmt.Errorf("language %q not supported. Possible values: %s", c.Language, strings.Join(SupportedLanguages, ", "))
 	}
 	if c.Language == "js" && c.ManualInstrumentation && c.InstrumentationFile == "" {
 		return fmt.Errorf(`when manual-instrumentation is set, an instrumentation file is required (InstrumentationFile or -instrumentation-file=path/to/file.js)`)
@@ -60,60 +68,6 @@ func Validate(c Commands) error {
 		}
 	}
 	return nil
-}
-
-func GetArguments() Commands {
-	if len(os.Args[1:]) < 1 {
-		fmt.Println(color.RedString("You must pass a language used for your instrumentation, such as -language=js"))
-		os.Exit(1)
-	}
-
-	languageValue := flag.String("language", "", "Language used for instrumentation (required). Possible values: dotnet, go, java, js, python")
-	componentsString := flag.String("components", "", "Instrumentation components to test, separated by ',' (required). Possible values: sdk, collector, beyla, alloy")
-	manualInstrumentation := flag.Bool("manual-instrumentation", false, "Provide if your application is using manual instrumentation")
-	debug := flag.Bool("debug", false, "Output debug information")
-	webServer := flag.Bool("web-server", false, "Set if you would like the results served in a web server in addition to console output")
-	listen := flag.String("listen", DefaultListen, "host:port the web server binds to when -web-server is set")
-	format := flag.String("format", "text", "Output format. Possible values: text, json, yaml")
-
-	// javascript
-	instrumentationFile := flag.String("instrumentation-file", "", `Name (including path) to instrumentation file. Required if using manual-instrumentation. E.g."-instrumentation-file=src/inst/instrumentation.js"`)
-	packageJsonPath := flag.String("package-json-path", "", `Path to package.json file. Required if instrumentation is in JavaScript and the file is not in the same location as the otel-checker is being executed from. E.g. "-package-json-path=src/inst/"`)
-
-	// collector
-	collectorConfigPath := flag.String("collector-config-path", "", `Path to collector's config.yaml file. Required if using Collector and the config file is not in the same location as the otel-checker is being executed from. E.g. "-collector-config-path=src/inst/"`)
-	flag.Parse()
-
-	var components []string
-	if *componentsString != "" {
-		components = strings.Split(*componentsString, ",")
-	}
-
-	command := Commands{
-		Language:              *languageValue,
-		Components:            components,
-		WebServer:             *webServer,
-		Listen:                *listen,
-		ManualInstrumentation: *manualInstrumentation,
-		InstrumentationFile:   *instrumentationFile,
-		PackageJsonPath:       *packageJsonPath,
-		CollectorConfigPath:   *collectorConfigPath,
-		Debug:                 *debug,
-		Format:                *format,
-	}
-
-	if err := Validate(command); err != nil {
-		fmt.Println(color.RedString(err.Error()))
-		os.Exit(1)
-	}
-
-	if command.PackageJsonPath != "" && !strings.HasSuffix(command.PackageJsonPath, "/") {
-		command.PackageJsonPath = command.PackageJsonPath + "/"
-	}
-	if command.CollectorConfigPath != "" && !strings.HasSuffix(command.CollectorConfigPath, "/") {
-		command.CollectorConfigPath = command.CollectorConfigPath + "/"
-	}
-	return command
 }
 
 type Reporter struct {

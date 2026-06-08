@@ -76,16 +76,32 @@ Linting is powered by [grafana/flint](https://github.com/grafana/flint).
 ## CLI Usage
 
 ```bash
-# Required flags
-otel-checker -language=<lang> -components=<comp1,comp2>
+# Per-component verbs (preferred)
+otel-checker check sdk           --language=<lang> [--manual-instrumentation ...]
+otel-checker check collector     [--collector-config-path=<path>]
+otel-checker check beyla         --language=<lang>
+otel-checker check alloy         --language=<lang>
+otel-checker check grafana-cloud --language=<lang>
+
+# Multi-component in one invocation (positional, comma-separated, no spaces)
+otel-checker check <comp1,comp2> --language=<lang>
+
+# All components at once (no positional argument)
+otel-checker check --language=<lang>
+
+# Web UI replay of saved JSON results
+otel-checker serve --data=results.json
 
 # Languages: dotnet, go, java, js, python, ruby, php
 # Components: sdk, collector, beyla, alloy, grafana-cloud
+# Output formats (--format): text (default), json, yaml
 
 # Examples
-otel-checker -language=js -components=sdk
-otel-checker -language=java -components=sdk,collector -manual-instrumentation
-otel-checker -language=python -components=sdk,grafana-cloud -web-server
+otel-checker check sdk --language=js
+otel-checker check sdk --language=java --manual-instrumentation
+otel-checker check sdk,collector,beyla --language=js
+otel-checker check --language=js                                 # every component
+otel-checker check sdk --language=python --web-server --listen=127.0.0.1:9000
 ```
 
 ## Code Conventions

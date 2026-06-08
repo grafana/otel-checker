@@ -64,17 +64,13 @@ otel-checker
 1. Use from any other directory
 
 ```bash
-otel-checker \
- -language=js \
- -components=sdk
+otel-checker check sdk --language=js
 ```
 
 Or start directly from the source code:
 
 ```bash
-go run ./cmd/otel-checker \
- -language=js \
- -components=sdk
+go run ./cmd/otel-checker check sdk --language=js
 ```
 
 ## Using mise

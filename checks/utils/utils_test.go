@@ -42,9 +42,13 @@ func TestValidate(t *testing.T) {
 			wantErr: `language "rust" not supported`,
 		},
 		{
-			name:    "empty language",
+			name:    "empty language with sdk",
 			in:      Commands{Components: []string{"sdk"}},
-			wantErr: `language "" not supported`,
+			wantErr: "language required for components",
+		},
+		{
+			name: "collector-only without language",
+			in:   Commands{Components: []string{"collector"}},
 		},
 		{
 			name:    "no components",
