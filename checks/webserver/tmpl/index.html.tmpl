@@ -19,9 +19,18 @@
             <div class="status">
                 <span class="source" title="{{.Source}}">{{.Source}}</span>
                 <span class="counts">
-                    <span class="count error" title="Errors"><i class="fa-solid fa-circle-xmark"></i>{{len .Results.Errors}}</span>
-                    <span class="count warn"  title="Warnings"><i class="fa-solid fa-triangle-exclamation"></i>{{len .Results.Warnings}}</span>
-                    <span class="count check" title="Successful checks"><i class="fa-solid fa-circle-check"></i>{{len .Results.Checks}}</span>
+                    <span class="count error" title="Errors">
+                        <i class="fa-solid fa-circle-xmark"></i>
+                        {{len .Results.Errors}}
+                    </span>
+                    <span class="count warn"  title="Warnings">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        {{len .Results.Warnings}}
+                    </span>
+                    <span class="count check" title="Successful checks">
+                        <i class="fa-solid fa-circle-check"></i>
+                        {{len .Results.Checks}}
+                    </span>
                 </span>
             </div>
             {{end}}
