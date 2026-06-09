@@ -70,9 +70,9 @@ func TestParseRejectsMissingClosingDelimiter(t *testing.T) {
 
 func TestParseRejectsMissingFields(t *testing.T) {
 	cases := []string{
-		"---\ntitle: y\nseverity: warning\n---\nbody",     // no id
-		"---\nid: x\nseverity: warning\n---\nbody",        // no title
-		"---\nid: x\ntitle: y\n---\nbody",                 // no severity
+		"---\ntitle: y\nseverity: warning\n---\nbody", // no id
+		"---\nid: x\nseverity: warning\n---\nbody",    // no title
+		"---\nid: x\ntitle: y\n---\nbody",             // no severity
 	}
 	for i, src := range cases {
 		if _, err := parse([]byte(src)); err == nil {
