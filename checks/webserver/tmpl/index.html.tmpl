@@ -14,21 +14,21 @@
 <body>
     <header class="topbar">
         <div class="topbar-inner">
-            <h1><i class="fa-solid fa-magnifying-glass-chart brand"></i>OTel Checker</h1>
+            <h1><i class="fa-solid fa-magnifying-glass-chart brand" aria-hidden="true"></i>OTel Checker</h1>
             {{if .Available}}
             <div class="status">
                 <span class="source" title="{{.Source}}">{{.Source}}</span>
                 <span class="counts">
                     <span class="count error" title="Errors">
-                        <i class="fa-solid fa-circle-xmark"></i>
+                        <i class="fa-solid fa-circle-xmark" aria-hidden="true"></i>
                         {{len .Results.Errors}}
                     </span>
                     <span class="count warn"  title="Warnings">
-                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
                         {{len .Results.Warnings}}
                     </span>
                     <span class="count check" title="Successful checks">
-                        <i class="fa-solid fa-circle-check"></i>
+                        <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
                         {{len .Results.Checks}}
                     </span>
                 </span>
@@ -40,7 +40,7 @@
     <main>
         {{if not .Available}}
         <div class="empty-state">
-            <div class="empty-icon"><i class="fa-solid fa-hourglass-half"></i></div>
+            <div class="empty-icon" aria-hidden="true"><i class="fa-solid fa-hourglass-half"></i></div>
             <p class="empty-title">No results to display yet</p>
             <p class="empty-detail">Waiting for <code>{{.Source}}</code>.</p>
             {{if .Reload}}<p class="empty-hint">The page will refresh automatically once the file appears.</p>{{end}}
@@ -50,14 +50,14 @@
         {{if .Results.Errors}}
         <section class="severity errors">
             <header>
-                <span class="icon"><i class="fa-solid fa-circle-xmark"></i></span>
+                <span class="icon" aria-hidden="true"><i class="fa-solid fa-circle-xmark"></i></span>
                 <span class="title">Errors</span>
                 <span class="count-pill">{{len .Results.Errors}}</span>
             </header>
             {{range .GroupedErrors}}
             <div class="group">
                 <span class="component">{{.Component}}</span>
-                <ul>{{range .Messages}}<li><i class="fa-solid fa-xmark glyph"></i>{{.}}</li>{{end}}</ul>
+                <ul>{{range .Messages}}<li><i class="fa-solid fa-xmark glyph" aria-hidden="true"></i>{{.}}</li>{{end}}</ul>
             </div>
             {{end}}
         </section>
@@ -66,14 +66,14 @@
         {{if .Results.Warnings}}
         <section class="severity warnings">
             <header>
-                <span class="icon"><i class="fa-solid fa-triangle-exclamation"></i></span>
+                <span class="icon" aria-hidden="true"><i class="fa-solid fa-triangle-exclamation"></i></span>
                 <span class="title">Warnings</span>
                 <span class="count-pill">{{len .Results.Warnings}}</span>
             </header>
             {{range .GroupedWarnings}}
             <div class="group">
                 <span class="component">{{.Component}}</span>
-                <ul>{{range .Messages}}<li><i class="fa-solid fa-triangle-exclamation glyph"></i>{{.}}</li>{{end}}</ul>
+                <ul>{{range .Messages}}<li><i class="fa-solid fa-triangle-exclamation glyph" aria-hidden="true"></i>{{.}}</li>{{end}}</ul>
             </div>
             {{end}}
         </section>
@@ -82,14 +82,14 @@
         {{if .Results.Checks}}
         <section class="severity checks">
             <header>
-                <span class="icon"><i class="fa-solid fa-circle-check"></i></span>
+                <span class="icon" aria-hidden="true"><i class="fa-solid fa-circle-check"></i></span>
                 <span class="title">Successful Checks</span>
                 <span class="count-pill">{{len .Results.Checks}}</span>
             </header>
             {{range .GroupedChecks}}
             <div class="group">
                 <span class="component">{{.Component}}</span>
-                <ul>{{range .Messages}}<li><i class="fa-solid fa-check glyph"></i>{{.}}</li>{{end}}</ul>
+                <ul>{{range .Messages}}<li><i class="fa-solid fa-check glyph" aria-hidden="true"></i>{{.}}</li>{{end}}</ul>
             </div>
             {{end}}
         </section>
@@ -97,7 +97,7 @@
 
         {{if and (not .Results.Errors) (not .Results.Warnings) (not .Results.Checks)}}
         <div class="empty-state">
-            <div class="empty-icon"><i class="fa-solid fa-circle-info"></i></div>
+            <div class="empty-icon" aria-hidden="true"><i class="fa-solid fa-circle-info"></i></div>
             <p class="empty-title">No results in this snapshot</p>
             <p class="empty-detail">The file at <code>{{.Source}}</code> parsed
             cleanly but contained no checks, warnings, or errors.</p>
