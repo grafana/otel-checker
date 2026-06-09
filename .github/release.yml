@@ -4,3 +4,4 @@ changelog:
       - dependabot[bot]
       - github-actions[bot]
       - renovate[bot]
+      - renovate-sh-app[bot]
