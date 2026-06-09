@@ -33,6 +33,9 @@ otel-checker check beyla            # Beyla only
 otel-checker check alloy            # Grafana Alloy only
 otel-checker check grafana-cloud    # Grafana Cloud connectivity only
 otel-checker serve                  # web UI for a previously-saved JSON result
+otel-checker fix                    # show fixes for every finding from a saved results file
+otel-checker fix <id>               # show the fix guidance for a single ID
+otel-checker fix list               # list every available fix
 otel-checker version                # print the binary version
 otel-checker completion <shell>     # generate shell completion script
 ```
@@ -58,6 +61,44 @@ otel-checker check sdk,collector,beyla --language=js
 # Every component at once
 otel-checker check --language=js
 ```
+
+## Fixes
+
+Each actionable finding (errors and warnings) is tagged with a stable fix ID
+shown in square brackets at the end of the line:
+
+```text
+✖ SDK: package.json missing on path /src/inst [js.package-json.unreadable]
+```
+
+Look up the guidance for any fix with:
+
+```bash
+otel-checker fix js.package-json.unreadable
+```
+
+Or enumerate every available fix:
+
+```bash
+otel-checker fix list
+```
+
+To see fixes for **every** finding from a previous run, save the JSON output
+once and call `fix` with no ID:
+
+```bash
+otel-checker check --language=js --format=json > results.json
+otel-checker fix
+```
+
+With no ID, `fix` reads `./results.json` by default (also `./results.yaml` /
+`./results.yml`) — the same file `serve` watches — and prints each fix doc
+in turn, deduplicating repeated IDs and skipping findings that have none.
+Pass `--data=<path>` to point at a different file.
+
+The same IDs also appear as a `fix_id` field on every entry when using
+`--format=json` or `--format=yaml`, so downstream tooling can match findings
+against the fix catalog programmatically.
 
 ## Output formats
 
