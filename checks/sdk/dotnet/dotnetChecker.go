@@ -17,7 +17,8 @@ func CheckDotNetSetup(ctx context.Context, reporter *utils.ComponentReporter, co
 	project, err := findAndLoadProject()
 
 	if err != nil {
-		reporter.AddError(fmt.Sprintf("Failed to find and load project: %s", err))
+		reporter.AddErrorWithFix("dotnet.project.not-found",
+			fmt.Sprintf("Failed to find and load project: %s", err))
 		return
 	}
 
@@ -36,26 +37,30 @@ func checkDotNetVersion(ctx context.Context, reporter *utils.ComponentReporter) 
 	versionParts, err := readDotNetVersion(ctx)
 
 	if err != nil {
-		reporter.AddError(fmt.Sprintf("Could not check .NET version: %s", err))
+		reporter.AddErrorWithFix("dotnet.version.unknown",
+			fmt.Sprintf("Could not check .NET version: %s", err))
 		return
 	}
 
 	if len(versionParts) == 0 {
-		reporter.AddError("Could not parse .NET version: version string is empty")
+		reporter.AddErrorWithFix("dotnet.version.empty",
+			"Could not parse .NET version: version string is empty")
 		return
 	}
 	majorVersion := versionParts[0]
 	v, err := strconv.Atoi(majorVersion)
 
 	if err != nil {
-		reporter.AddError(fmt.Sprintf("Could not parse .NET version: %s", err))
+		reporter.AddErrorWithFix("dotnet.version.unknown",
+			fmt.Sprintf("Could not parse .NET version: %s", err))
 		return
 	}
 
 	if v >= minDotNetVersion {
 		reporter.AddSuccessfulCheck(fmt.Sprintf("Using .NET version equal or greater than minimum recommended (%d.0)", minDotNetVersion))
 	} else {
-		reporter.AddError(fmt.Sprintf("Not using recommended .NET version. Update your .NET SDK to at least version %d.0", minDotNetVersion))
+		reporter.AddErrorWithFix("dotnet.version.too-old",
+			fmt.Sprintf("Not using recommended .NET version. Update your .NET SDK to at least version %d.0", minDotNetVersion))
 	}
 }
 
@@ -64,18 +69,22 @@ func checkDotNetAutoInstrumentation(reporter *utils.ComponentReporter) {
 		env.EnvVar{
 			Name:          "CORECLR_ENABLE_PROFILING",
 			RequiredValue: "1",
+			FixID:         "env.envvar.value-mismatch",
 		},
 		env.EnvVar{
 			Name:          "CORECLR_PROFILER",
 			RequiredValue: "{918728DD-259F-4A6A-AC2B-B85E1B658318}",
+			FixID:         "env.envvar.value-mismatch",
 		},
 		env.EnvVar{
 			Name:     "CORECLR_PROFILER_PATH",
 			Required: true,
+			FixID:    "env.envvar.required-unset",
 		},
 		env.EnvVar{
 			Name:     "OTEL_DOTNET_AUTO_HOME",
 			Required: true,
+			FixID:    "env.envvar.required-unset",
 		})
 }
 
@@ -100,7 +109,8 @@ func reportDotNetSupportedInstrumentations(ctx context.Context, reporter *utils.
 	deps, err := ReadDependenciesFromCli(ctx)
 
 	if err != nil {
-		reporter.AddError(fmt.Sprintf("Failed to read dependencies: %s", err))
+		reporter.AddErrorWithFix("dotnet.dependencies.unreadable",
+			fmt.Sprintf("Failed to read dependencies: %s", err))
 		return
 	}
 
@@ -109,12 +119,14 @@ func reportDotNetSupportedInstrumentations(ctx context.Context, reporter *utils.
 	implicit, err := ImplicitPackagesForSdk(sdk)
 
 	if err != nil {
-		reporter.AddError(fmt.Sprintf("Unrecognized SDK: %s", sdk))
+		reporter.AddErrorWithFix("dotnet.sdk.unrecognized",
+			fmt.Sprintf("Unrecognized SDK: %s", sdk))
 		return
 	}
 
 	if len(implicit) == 0 {
-		reporter.AddWarning(fmt.Sprintf("No implicit packages found for SDK: %s", sdk))
+		reporter.AddWarningWithFix("dotnet.sdk.no-implicit-packages",
+			fmt.Sprintf("No implicit packages found for SDK: %s", sdk))
 	} else {
 		for _, pkg := range implicit {
 			lib, ok := instr[pkg]
@@ -142,7 +154,8 @@ func reportDotNetSupportedInstrumentations(ctx context.Context, reporter *utils.
 		}
 	}
 	if len(deps.Projects) == 0 {
-		reporter.AddError("No dependencies found in project")
+		reporter.AddErrorWithFix("dotnet.project.no-dependencies",
+			"No dependencies found in project")
 		return
 	}
 }

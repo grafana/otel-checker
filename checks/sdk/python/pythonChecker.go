@@ -36,7 +36,8 @@ func checkCodeBasedInstrumentation(ctx context.Context, reporter *utils.Componen
 func reportSupportedLibraries(ctx context.Context, reporter *utils.ComponentReporter, debug bool) {
 	supported, err := supportedLibraries(ctx)
 	if err != nil {
-		reporter.AddError(fmt.Sprintf("Error reading supported libraries: %v", err))
+		reporter.AddErrorWithFix("python.supported-libs.fetch-failed",
+			fmt.Sprintf("Error reading supported libraries: %v", err))
 	}
 
 	deps := readDependencies(reporter)
@@ -57,13 +58,15 @@ func readDependencies(reporter *utils.ComponentReporter) []Library {
 func readRequirementsTxt(reporter *utils.ComponentReporter, path string) []Library {
 	readFile, err := os.ReadFile(path)
 	if err != nil {
-		reporter.AddError(fmt.Sprintf("Could not read file %s: %v", path, err))
+		reporter.AddErrorWithFix("python.requirements.unreadable",
+			fmt.Sprintf("Could not read file %s: %v", path, err))
 		return nil
 	}
 
 	deps := parseRequirementsTxt(reporter, string(readFile))
 	if len(deps) == 0 {
-		reporter.AddWarning(fmt.Sprintf("No dependencies found in %s", path))
+		reporter.AddWarningWithFix("python.requirements.empty",
+			fmt.Sprintf("No dependencies found in %s", path))
 	}
 	return deps
 }
@@ -75,7 +78,8 @@ func parseRequirementsTxt(reporter *utils.ComponentReporter, lines string) []Lib
 		lib, ok := parseRequirementLine(line)
 		if !ok {
 			if line != "" {
-				reporter.AddWarning(fmt.Sprintf("Could not parse line: %s", line))
+				reporter.AddWarningWithFix("python.requirements.parse-error",
+					fmt.Sprintf("Could not parse line: %s", line))
 			}
 			continue
 		}
@@ -112,7 +116,8 @@ func outputSupportedLibraries(deps []Library, supported []SupportedLibrary, repo
 				fmt.Sprintf("Found supported library: %s:%s at %s",
 					dep.Name, dep.Version, strings.Join(links, ", ")))
 		} else if debug {
-			reporter.AddWarning(fmt.Sprintf("Found unsupported library: %s:%s", dep.Name, dep.Version))
+			reporter.AddWarningWithFix("python.library.unsupported",
+				fmt.Sprintf("Found unsupported library: %s:%s", dep.Name, dep.Version))
 		}
 	}
 }

@@ -23,6 +23,29 @@ func TestReporterResults(t *testing.T) {
 	assert.Equal(t, []ComponentResult{{Component: "Collector", Message: "baz"}}, got.Errors)
 }
 
+func TestReporterResultsWithFixIDs(t *testing.T) {
+	r := &Reporter{}
+	sdk := r.Component("SDK")
+	sdk.AddSuccessfulCheckWithFix("ok.fix", "passed")
+	sdk.AddWarningWithFix("warn.fix", "watch out")
+	sdk.AddError("no fix here") // legacy path → empty FixID
+	col := r.Component("Collector")
+	col.AddErrorWithFix("err.fix", "broken")
+	col.AddInternalErrorWithFix("oops.fix", "internal blip")
+
+	got := r.Results()
+
+	assert.Equal(t, []ComponentResult{{Component: "SDK", Message: "passed", FixID: "ok.fix"}}, got.Checks)
+	assert.Equal(t, []ComponentResult{
+		{Component: "SDK", Message: "watch out", FixID: "warn.fix"},
+		{Component: "Collector", Message: "Internal Error: internal blip", FixID: "oops.fix"},
+	}, got.Warnings)
+	assert.Equal(t, []ComponentResult{
+		{Component: "SDK", Message: "no fix here"},
+		{Component: "Collector", Message: "broken", FixID: "err.fix"},
+	}, got.Errors)
+}
+
 func TestAddInternalErrorPrefixesMessage(t *testing.T) {
 	r := &Reporter{}
 	sdk := r.Component("SDK")

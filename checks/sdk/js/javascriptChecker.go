@@ -33,7 +33,8 @@ func checkResourceDetectors(reporter *utils.ComponentReporter) {
 				!strings.Contains(value, "host") ||
 				!strings.Contains(value, "os") ||
 				!strings.Contains(value, "serviceinstance") {
-				reporter.AddWarning("It's recommended the environment variable OTEL_NODE_RESOURCE_DETECTORS to be set to at least `env,host,os,serviceinstance`")
+				reporter.AddWarningWithFix("env.envvar.recommended-unset",
+					"It's recommended the environment variable OTEL_NODE_RESOURCE_DETECTORS to be set to at least `env,host,os,serviceinstance`")
 			} else {
 				reporter.AddSuccessfulCheck("OTEL_NODE_RESOURCE_DETECTORS has recommended values")
 			}
@@ -47,19 +48,22 @@ func checkNodeVersion(ctx context.Context, reporter *utils.ComponentReporter) {
 	stdout, err := cmd.Output()
 
 	if err != nil {
-		reporter.AddError(fmt.Sprintf("Could not check minimum node version: %s", err))
+		reporter.AddErrorWithFix("js.node-version.unknown",
+			fmt.Sprintf("Could not check minimum node version: %s", err))
 		return
 	}
 	versionInfo := strings.Split(string(stdout), ".")
 	v, err := strconv.Atoi(versionInfo[0][1:])
 	if err != nil {
-		reporter.AddError(fmt.Sprintf("Could not check minimum node version: %s", err))
+		reporter.AddErrorWithFix("js.node-version.unknown",
+			fmt.Sprintf("Could not check minimum node version: %s", err))
 		return
 	}
 	if v >= 16 {
 		reporter.AddSuccessfulCheck("Using node version equal or greater than minimum recommended")
 	} else {
-		reporter.AddError("Not using recommended node version. Update your node to at least version 16")
+		reporter.AddErrorWithFix("js.node-version.too-old",
+			"Not using recommended node version. Update your node to at least version 16")
 	}
 }
 
@@ -73,18 +77,21 @@ func checkJSAutoInstrumentation(
 	filePath := filepath.Join(packageJsonPath, "package.json")
 	dat, err := os.ReadFile(filePath)
 	if err != nil {
-		reporter.AddError(fmt.Sprintf("Could not check file %s: %s", filePath, err))
+		reporter.AddErrorWithFix("js.package-json.unreadable",
+			fmt.Sprintf("Could not check file %s: %s", filePath, err))
 	} else {
 		if strings.Contains(string(dat), `"@opentelemetry/auto-instrumentations-node"`) {
 			reporter.AddSuccessfulCheck("Dependency @opentelemetry/auto-instrumentations-node added on package.json")
 		} else {
-			reporter.AddError("Dependency @opentelemetry/auto-instrumentations-node missing on package.json. Install the dependency with `npm install @opentelemetry/auto-instrumentations-node`")
+			reporter.AddErrorWithFix("js.auto-instrumentation.missing-dep",
+				"Dependency @opentelemetry/auto-instrumentations-node missing on package.json. Install the dependency with `npm install @opentelemetry/auto-instrumentations-node`")
 		}
 
 		if strings.Contains(string(dat), `"@opentelemetry/api"`) {
 			reporter.AddSuccessfulCheck("Dependency @opentelemetry/api added on package.json")
 		} else {
-			reporter.AddError("Dependency @opentelemetry/api missing on package.json. Install the dependency with `npm install @opentelemetry/auto-instrumentations-node`")
+			reporter.AddErrorWithFix("js.auto-instrumentation.missing-dep",
+				"Dependency @opentelemetry/api missing on package.json. Install the dependency with `npm install @opentelemetry/auto-instrumentations-node`")
 		}
 	}
 }
@@ -95,6 +102,7 @@ func checkAutoInstrumentationNodeOptions(reporter *utils.ComponentReporter) {
 		Recommended:   true,
 		RequiredValue: "--require @opentelemetry/auto-instrumentations-node/register",
 		Message:       `NODE_OPTIONS not set. You can set it by running 'export NODE_OPTIONS="--require @opentelemetry/auto-instrumentations-node/register"' or add the same '--require ...' when starting your application`,
+		FixID:         "env.envvar.recommended-unset",
 	}, reporter)
 }
 
@@ -104,36 +112,43 @@ func checkJSCodeBasedInstrumentation(
 	instrumentationFile string,
 ) {
 	if os.Getenv("NODE_OPTIONS") == "--require @opentelemetry/auto-instrumentations-node/register" {
-		reporter.AddError(`The flag "-manual-instrumentation" was set, but the value of NODE_OPTIONS is set to require auto-instrumentation. Run "unset NODE_OPTIONS" to remove the requirement that can cause a conflict with manual instrumentations`)
+		reporter.AddErrorWithFix("js.manual-instrumentation.node-options-conflict",
+			`The flag "-manual-instrumentation" was set, but the value of NODE_OPTIONS is set to require auto-instrumentation. Run "unset NODE_OPTIONS" to remove the requirement that can cause a conflict with manual instrumentations`)
 	}
 
 	// Dependencies for auto instrumentation on package.json
 	filePath := filepath.Join(packageJsonPath, "package.json")
 	packageJsonContent, err := os.ReadFile(filePath)
 	if err != nil {
-		reporter.AddError(fmt.Sprintf("Could not check file %s: %s", filePath, err))
+		reporter.AddErrorWithFix("js.package-json.unreadable",
+			fmt.Sprintf("Could not check file %s: %s", filePath, err))
 	} else {
 		if strings.Contains(string(packageJsonContent), `"@opentelemetry/api"`) {
 			reporter.AddSuccessfulCheck("Dependency @opentelemetry/api added on package.json")
 		} else {
-			reporter.AddError("Dependency @opentelemetry/api missing on package.json")
+			reporter.AddErrorWithFix("js.manual-instrumentation.missing-api",
+				"Dependency @opentelemetry/api missing on package.json")
 		}
 
 		if strings.Contains(string(packageJsonContent), `"@opentelemetry/exporter-trace-otlp-proto"`) {
-			reporter.AddError(`Dependency @opentelemetry/exporter-trace-otlp-proto added on package.json, which is not supported by Grafana. Switch the dependency to "@opentelemetry/exporter-trace-otlp-http" instead`)
+			reporter.AddErrorWithFix("js.exporter.unsupported-proto",
+				`Dependency @opentelemetry/exporter-trace-otlp-proto added on package.json, which is not supported by Grafana. Switch the dependency to "@opentelemetry/exporter-trace-otlp-http" instead`)
 		}
 	}
 
 	// Check Exporter
 	instrumentationFileContent, err := os.ReadFile(filepath.Clean(instrumentationFile))
 	if err != nil {
-		reporter.AddError(fmt.Sprintf("Could not check file %s: %s", instrumentationFile, err))
+		reporter.AddErrorWithFix("js.instrumentation-file.unreadable",
+			fmt.Sprintf("Could not check file %s: %s", instrumentationFile, err))
 	} else {
 		if strings.Contains(string(instrumentationFileContent), "ConsoleSpanExporter") {
-			reporter.AddWarning("Instrumentation file is using ConsoleSpanExporter. This exporter is useful during debugging, but replace with OTLPTraceExporter to send to Grafana Cloud")
+			reporter.AddWarningWithFix("js.exporter.console-debug",
+				"Instrumentation file is using ConsoleSpanExporter. This exporter is useful during debugging, but replace with OTLPTraceExporter to send to Grafana Cloud")
 		}
 		if strings.Contains(string(instrumentationFileContent), "ConsoleMetricExporter") {
-			reporter.AddWarning("Instrumentation file is using ConsoleMetricExporter. This exporter is useful during debugging, but replace with OTLPMetricExporter to send to Grafana Cloud")
+			reporter.AddWarningWithFix("js.exporter.console-debug",
+				"Instrumentation file is using ConsoleMetricExporter. This exporter is useful during debugging, but replace with OTLPMetricExporter to send to Grafana Cloud")
 		}
 	}
 }
