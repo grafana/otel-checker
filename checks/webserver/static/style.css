@@ -63,6 +63,14 @@ code, .source {
     font-size: 18px;
     font-weight: 600;
     letter-spacing: 0.2px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.topbar h1 .brand {
+    color: var(--accent);
+    font-size: 18px;
 }
 
 .status {
@@ -101,6 +109,8 @@ code, .source {
     border: 1px solid var(--border);
 }
 
+.count i { font-size: 11px; }
+
 .count.check { color: var(--check); }
 .count.warn  { color: var(--warn); }
 .count.error { color: var(--error); }
@@ -123,9 +133,10 @@ main {
 }
 
 .empty-icon {
-    font-size: 36px;
+    font-size: 32px;
     margin-bottom: 14px;
     color: var(--accent);
+    line-height: 1;
 }
 
 .empty-title {
@@ -173,14 +184,16 @@ main {
 }
 
 .severity .icon {
-    font-size: 14px;
-    width: 18px;
-    height: 18px;
+    font-size: 13px;
+    width: 22px;
+    height: 22px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     border-radius: 4px;
 }
+
+.severity .title { flex: 0 0 auto; }
 
 .severity.errors   .icon { background: var(--error-bg); color: var(--error); }
 .severity.warnings .icon { background: var(--warn-bg);  color: var(--warn); }
@@ -227,20 +240,24 @@ main {
 }
 
 .group li {
-    padding: 4px 0 4px 24px;
-    position: relative;
+    padding: 4px 0;
     font-size: 13.5px;
+    line-height: 1.55;
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+}
+
+.group li .glyph {
+    flex: 0 0 14px;
+    font-size: 11px;
+    text-align: center;
     line-height: 1.55;
 }
 
-.severity.errors   .group li::before { content: "✕"; color: var(--error); font-weight: 700; }
-.severity.warnings .group li::before { content: "▲"; color: var(--warn);  font-size: 11px; top: 6px; }
-.severity.checks   .group li::before { content: "✓"; color: var(--check); font-weight: 700; }
-
-.severity .group li::before {
-    position: absolute;
-    left: 0;
-}
+.severity.errors   .group li .glyph { color: var(--error); }
+.severity.warnings .group li .glyph { color: var(--warn); }
+.severity.checks   .group li .glyph { color: var(--check); }
 
 @media (max-width: 640px) {
     .topbar-inner, main { padding-left: 16px; padding-right: 16px; }
