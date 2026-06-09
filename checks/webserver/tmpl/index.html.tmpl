@@ -57,7 +57,11 @@
             {{range .GroupedErrors}}
             <div class="group">
                 <span class="component">{{.Component}}</span>
-                <ul>{{range .Messages}}<li><i class="fa-solid fa-xmark glyph" aria-hidden="true"></i>{{.}}</li>{{end}}</ul>
+                <ul>
+                    {{range .Messages}}
+                    <li><i class="fa-solid fa-xmark glyph" aria-hidden="true"></i>{{.}}</li>
+                    {{end}}
+                </ul>
             </div>
             {{end}}
         </section>
@@ -73,7 +77,11 @@
             {{range .GroupedWarnings}}
             <div class="group">
                 <span class="component">{{.Component}}</span>
-                <ul>{{range .Messages}}<li><i class="fa-solid fa-triangle-exclamation glyph" aria-hidden="true"></i>{{.}}</li>{{end}}</ul>
+                <ul>
+                    {{range .Messages}}
+                    <li><i class="fa-solid fa-triangle-exclamation glyph" aria-hidden="true"></i>{{.}}</li>
+                    {{end}}
+                </ul>
             </div>
             {{end}}
         </section>
@@ -89,7 +97,11 @@
             {{range .GroupedChecks}}
             <div class="group">
                 <span class="component">{{.Component}}</span>
-                <ul>{{range .Messages}}<li><i class="fa-solid fa-check glyph" aria-hidden="true"></i>{{.}}</li>{{end}}</ul>
+                <ul>
+                    {{range .Messages}}
+                    <li><i class="fa-solid fa-check glyph" aria-hidden="true"></i>{{.}}</li>
+                    {{end}}
+                </ul>
             </div>
             {{end}}
         </section>
