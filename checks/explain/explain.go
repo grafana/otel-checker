@@ -1,11 +1,11 @@
-// Package fixes is the registry of fix documentation for findings emitted
+// Package explain is the registry of fix documentation for findings emitted
 // by the checks/* packages. Each markdown file under docs/ describes a
 // single fix and is keyed by a stable kebab-namespaced ID
-// (e.g. "env.otel-service-name.unset"). The CLI's `fix` subcommand and the
-// web UI's `/fix/{id}` route both look up documents through this package;
-// downstream consumers can import Lookup and All to build
-// their own surfaces.
-package fixes
+// (e.g. "env.otel-service-name.unset"). The CLI's `explain` subcommand and
+// the web UI's `/explain/{id}` route both look up documents through this
+// package; downstream consumers can import Lookup and All to build their
+// own surfaces.
+package explain
 
 import (
 	"embed"
@@ -40,7 +40,7 @@ var registry = map[string]Doc{}
 
 func init() {
 	if err := load(docsFS); err != nil {
-		panic(fmt.Sprintf("fixes: failed to load doc registry: %v", err))
+		panic(fmt.Sprintf("explain: failed to load doc registry: %v", err))
 	}
 }
 
@@ -111,7 +111,7 @@ func Lookup(id string) (Doc, bool) {
 }
 
 // All returns every registered fix ID, sorted alphabetically. Useful for
-// shell completion and the `fix list` subcommand.
+// shell completion and the `explain list` subcommand.
 func All() []string {
 	out := make([]string, 0, len(registry))
 	for id := range registry {

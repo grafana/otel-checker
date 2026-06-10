@@ -1,4 +1,4 @@
-package fixes_test
+package explain_test
 
 import (
 	"os"
@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/grafana/otel-checker/checks/fixes"
+	"github.com/grafana/otel-checker/checks/explain"
 )
 
 // fixIDLiteral matches the string-literal first argument of any AddXWithFix
@@ -17,7 +17,7 @@ var fixIDLiteral = regexp.MustCompile(`Add(?:Successful|Internal)?(?:Check|Warni
 
 // TestEveryFixIDUsedInCodeIsRegistered walks the checks/ source tree, finds
 // every AddXxxWithFix call-site, and asserts the literal fix-ID argument
-// resolves through fixes.Lookup. Catches typos in call sites at test time
+// resolves through explain.Lookup. Catches typos in call sites at test time
 // instead of at runtime.
 func TestEveryFixIDUsedInCodeIsRegistered(t *testing.T) {
 	root, err := filepath.Abs("..")
@@ -35,9 +35,9 @@ func TestEveryFixIDUsedInCodeIsRegistered(t *testing.T) {
 		if !strings.HasSuffix(path, ".go") || strings.HasSuffix(path, "_test.go") {
 			return nil
 		}
-		// Skip the fixes package itself — it has no AddXxxWithFix callers,
+		// Skip the explain package itself — it has no AddXxxWithFix callers,
 		// and the regex would otherwise match anything resembling one.
-		if strings.Contains(path, "/checks/fixes/") {
+		if strings.Contains(path, "/checks/explain/") {
 			return nil
 		}
 		data, err := os.ReadFile(path)
@@ -56,7 +56,7 @@ func TestEveryFixIDUsedInCodeIsRegistered(t *testing.T) {
 		t.Fatal("regex matched no fix IDs anywhere — either no call sites were migrated or the regex is broken")
 	}
 	for id := range seen {
-		if _, ok := fixes.Lookup(id); !ok {
+		if _, ok := explain.Lookup(id); !ok {
 			t.Errorf("call-site references fix ID %q but no docs/%s.md is registered", id, id)
 		}
 	}
