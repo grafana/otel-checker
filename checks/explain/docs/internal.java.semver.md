@@ -1,6 +1,6 @@
 ---
 id: internal.java.semver
-title: 'Internal: invalid semver in the supported libraries data'
+title: 'Internal: invalid SemVer in the supported libraries data'
 severity: internal
 ---
 

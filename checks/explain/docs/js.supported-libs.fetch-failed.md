@@ -1,6 +1,6 @@
 ---
 id: js.supported-libs.fetch-failed
-title: 'Could not fetch the supported JS libraries list'
+title: 'Could not fetch the supported JavaScript libraries list'
 severity: error
 ---
 
