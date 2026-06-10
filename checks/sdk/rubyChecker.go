@@ -39,7 +39,8 @@ func checkRubyVersion(ctx context.Context, reporter *utils.ComponentReporter) {
 	if hasCRuby || hasJRuby || hasTruffleRuby {
 		reporter.AddSuccessfulCheck("Ruby setup successful")
 	} else {
-		reporter.AddError("No Ruby found, install CRuby >= 3.0, JRuby >= 9.3.2.0, or TruffleRuby >= 22.1")
+		reporter.AddErrorWithExplain("ruby.runtime.not-found",
+			"No Ruby found, install CRuby >= 3.0, JRuby >= 9.3.2.0, or TruffleRuby >= 22.1")
 	}
 }
 
@@ -48,7 +49,8 @@ func checkBundlerInstalled(ctx context.Context, reporter *utils.ComponentReporte
 	_, err := cmd.Output()
 
 	if err != nil {
-		reporter.AddError("Bundler not found. Run 'gem install bundler' to install it.")
+		reporter.AddErrorWithExplain("ruby.bundler.not-found",
+			"Bundler not found. Run 'gem install bundler' to install it.")
 	} else {
 		reporter.AddSuccessfulCheck("Bundler found. Run 'bundle install' to install dependencies.")
 	}
@@ -57,13 +59,15 @@ func checkBundlerInstalled(ctx context.Context, reporter *utils.ComponentReporte
 func checkGemfileExists(reporter *utils.ComponentReporter) (string, error) {
 	_, err := os.ReadFile("Gemfile")
 	if err != nil {
-		reporter.AddError("Could not find Gemfile, create one, add dependencies, and run 'bundle install'")
+		reporter.AddErrorWithExplain("ruby.gemfile.missing",
+			"Could not find Gemfile, create one, add dependencies, and run 'bundle install'")
 		return "", err
 	}
 
 	content, err := os.ReadFile("Gemfile.lock")
 	if err != nil {
-		reporter.AddError("Could not find Gemfile.lock run 'bundle install' to generate it")
+		reporter.AddErrorWithExplain("ruby.gemfile-lock.missing",
+			"Could not find Gemfile.lock run 'bundle install' to generate it")
 		return "", err
 	}
 
@@ -85,7 +89,8 @@ func checkCRubyVersion(ctx context.Context, reporter *utils.ComponentReporter) b
 		reporter.AddSuccessfulCheck("Using CRuby >= 3.0")
 		return true
 	} else {
-		reporter.AddError("Not using recommended CRuby version, update to CRuby >= 3.0")
+		reporter.AddErrorWithExplain("ruby.cruby.too-old",
+			"Not using recommended CRuby version, update to CRuby >= 3.0")
 		return false
 	}
 }
@@ -104,7 +109,8 @@ func checkJRubyVersion(ctx context.Context, reporter *utils.ComponentReporter) b
 		reporter.AddSuccessfulCheck("Using JRuby >= 9.3.2.0")
 		return true
 	} else {
-		reporter.AddError("Not using recommended JRuby version, update to JRuby >= 9.3.2.0")
+		reporter.AddErrorWithExplain("ruby.jruby.too-old",
+			"Not using recommended JRuby version, update to JRuby >= 9.3.2.0")
 		return false
 	}
 }
@@ -126,7 +132,8 @@ func checkRubyRequiredInstrumentation(reporter *utils.ComponentReporter, gemfile
 		if strings.Contains(*gemfile, gem) {
 			reporter.AddSuccessfulCheck("Found required dependency: " + gem)
 		} else {
-			reporter.AddError("Missing required dependency: " + gem + ", add it to your Gemfile and run 'bundle install'")
+			reporter.AddErrorWithExplain("ruby.gem.missing-required",
+				"Missing required dependency: "+gem+", add it to your Gemfile and run 'bundle install'")
 		}
 	}
 }
@@ -189,6 +196,7 @@ func checkRubyAutoInstrumentation(reporter *utils.ComponentReporter, gemfile *st
 
 	// if not allFound or not optionalFound then add error
 	if !allFound || !optionalFound {
-		reporter.AddError("Missing instrumentation dependencies, add them to your Gemfile and run 'bundle install'")
+		reporter.AddErrorWithExplain("ruby.gem.missing-instrumentation",
+			"Missing instrumentation dependencies, add them to your Gemfile and run 'bundle install'")
 	}
 }

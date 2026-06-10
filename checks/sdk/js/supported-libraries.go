@@ -29,7 +29,8 @@ func readDependencies(reporter *utils.ComponentReporter) []supported.Library {
 func readPackageLock(reporter *utils.ComponentReporter) []supported.Library {
 	dat, err := os.ReadFile("package-lock.json")
 	if err != nil {
-		reporter.AddError(fmt.Sprintf("Could not read package-lock.json: %v", err))
+		reporter.AddErrorWithExplain("js.package-lock-json.unreadable",
+			fmt.Sprintf("Could not read package-lock.json: %v", err))
 		return nil
 	}
 	return readPackageLockFromContent(dat)
@@ -66,7 +67,8 @@ func readPackageLockFromContent(content []byte) []supported.Library {
 func readPackageJson(reporter *utils.ComponentReporter) []supported.Library {
 	dat, err := os.ReadFile("package.json")
 	if err != nil {
-		reporter.AddError(fmt.Sprintf("Could not read package.json: %v", err))
+		reporter.AddErrorWithExplain("js.package-json.unreadable",
+			fmt.Sprintf("Could not read package.json: %v", err))
 		return nil
 	}
 	return readPackageJsonFromContent(dat)
@@ -113,7 +115,8 @@ func supportedLibraries() (supported.SupportedModules, error) {
 func CheckSupportedLibraries(reporter *utils.ComponentReporter, commands utils.Commands) {
 	supportedLibs, err := supportedLibraries()
 	if err != nil {
-		reporter.AddError(fmt.Sprintf("Error reading supported libraries: %v", err))
+		reporter.AddErrorWithExplain("js.supported-libs.fetch-failed",
+			fmt.Sprintf("Error reading supported libraries: %v", err))
 		return
 	}
 

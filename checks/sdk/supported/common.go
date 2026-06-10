@@ -27,7 +27,8 @@ func CheckLibraries(reporter *utils.ComponentReporter,
 				fmt.Sprintf("Found supported library: %s:%s at %s",
 					dep.Name, dep.Version, strings.Join(links, ", ")))
 		} else if commands.Debug {
-			reporter.AddWarning(fmt.Sprintf("Found unsupported library: %s:%s", dep.Name, dep.Version))
+			reporter.AddWarningWithExplain("sdk.library.unsupported",
+				fmt.Sprintf("Found unsupported library: %s:%s", dep.Name, dep.Version))
 		}
 	}
 }
@@ -48,8 +49,9 @@ func FindSupportedLibraries(library Library, supportedModules SupportedModules, 
 			for _, version := range versions {
 				versionRange, err := sdk.ParseVersionRange(version)
 				if err != nil {
-					reporter.AddInternalError(fmt.Sprintf("Parsing version range for module %s: %s",
-						moduleName, version))
+					reporter.AddInternalErrorWithExplain("internal.sdk.version-range",
+						fmt.Sprintf("Parsing version range for module %s: %s",
+							moduleName, version))
 					continue
 				}
 				if library.Name == instrumentation.Name {
