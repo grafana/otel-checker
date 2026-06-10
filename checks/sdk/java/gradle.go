@@ -26,7 +26,7 @@ func checkGradle(ctx context.Context, file string, reporter *utils.ComponentRepo
 	}
 	deps := parseGradleDeps(out)
 	if len(deps) == 0 {
-		reporter.AddWarningWithFix("java.gradle.no-dependencies",
+		reporter.AddWarningWithExplain("java.gradle.no-dependencies",
 			"No Gradle dependencies found")
 	}
 	return deps

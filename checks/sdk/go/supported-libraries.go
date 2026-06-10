@@ -23,7 +23,7 @@ func readGoModFile(reporter *utils.ComponentReporter) []supported.Library {
 func readGoMod(reporter *utils.ComponentReporter, path string) []supported.Library {
 	dat, err := os.ReadFile(path)
 	if err != nil {
-		reporter.AddErrorWithFix("go.go-mod.unreadable",
+		reporter.AddErrorWithExplain("go.go-mod.unreadable",
 			fmt.Sprintf("Could not read go.mod: %v", err))
 		return nil
 	}
@@ -70,7 +70,7 @@ func supportedLibraries() (supported.SupportedModules, error) {
 func CheckSupportedLibraries(reporter *utils.ComponentReporter, commands utils.Commands) {
 	supportedLibs, err := supportedLibraries()
 	if err != nil {
-		reporter.AddErrorWithFix("go.supported-libs.fetch-failed",
+		reporter.AddErrorWithExplain("go.supported-libs.fetch-failed",
 			fmt.Sprintf("Error reading supported libraries: %v", err))
 		return
 	}

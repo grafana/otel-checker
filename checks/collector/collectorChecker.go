@@ -54,19 +54,19 @@ func checkCollectorConfig(reporter *utils.ComponentReporter, configPath string) 
 	filePath := filepath.Join(configPath, "config.yaml")
 	yamlFile, err := os.ReadFile(filePath)
 	if err != nil {
-		reporter.AddErrorWithFix("collector.config.unreadable",
+		reporter.AddErrorWithExplain("collector.config.unreadable",
 			fmt.Sprintf("Could not check file %s: %s", filePath, err))
 	} else {
 		var c configFile
 		err = yaml.Unmarshal([]byte(yamlFile), &c)
 		if err != nil {
-			reporter.AddErrorWithFix("collector.config.parse-error",
+			reporter.AddErrorWithExplain("collector.config.parse-error",
 				fmt.Sprintf("Could not parse file %s: %s", filePath, err))
 			return
 		}
 
 		if c.Receivers.Otlp.Protocols["http"] == nil {
-			reporter.AddWarningWithFix("collector.receivers.http-protocol-missing",
+			reporter.AddWarningWithExplain("collector.receivers.http-protocol-missing",
 				"The value of receivers > otlp > protocols > http is nil. Make sure the key exists on your config.yaml")
 		}
 
@@ -75,10 +75,10 @@ func checkCollectorConfig(reporter *utils.ComponentReporter, configPath string) 
 			reporter.AddSuccessfulCheck("Value of exporter > otlphttp > endpoint on config.yaml set in the format similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp")
 		} else {
 			if strings.Contains(c.Exporters.Otlphttp.Endpoint, "localhost") {
-				reporter.AddWarningWithFix("collector.endpoint.localhost",
+				reporter.AddWarningWithExplain("collector.endpoint.localhost",
 					"Value of exporter > otlphttp > endpoint on config.yaml is set to localhost. Update to a Grafana endpoint similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp to be able to send telemetry to your Grafana Cloud instance")
 			} else {
-				reporter.AddErrorWithFix("collector.endpoint.invalid-format",
+				reporter.AddErrorWithExplain("collector.endpoint.invalid-format",
 					"Value of exporter > otlphttp > endpoint on config.yaml is not set in the format similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp")
 			}
 		}
@@ -87,7 +87,7 @@ func checkCollectorConfig(reporter *utils.ComponentReporter, configPath string) 
 		if slices.Contains(c.Service.Pipelines.Traces.Exporters, "otlphttp") {
 			reporter.AddSuccessfulCheck("Value of service > pipelines > traces > exporters on config.yaml contains otlphttp")
 		} else {
-			reporter.AddWarningWithFix("collector.pipelines.traces-otlphttp-missing",
+			reporter.AddWarningWithExplain("collector.pipelines.traces-otlphttp-missing",
 				"Value of service > pipelines > traces > exporters on config.yaml does not contain otlphttp")
 		}
 		if slices.Contains(c.Service.Pipelines.Traces.Receivers, "otlp") {
@@ -100,7 +100,7 @@ func checkCollectorConfig(reporter *utils.ComponentReporter, configPath string) 
 		if slices.Contains(c.Service.Pipelines.Logs.Exporters, "otlphttp") {
 			reporter.AddSuccessfulCheck("Value of service > pipelines > logs > exporters on config.yaml contains otlphttp")
 		} else {
-			reporter.AddWarningWithFix("collector.pipelines.logs-otlphttp-missing",
+			reporter.AddWarningWithExplain("collector.pipelines.logs-otlphttp-missing",
 				"Value of service > pipelines > logs > exporters on config.yaml does not contain otlphttp")
 		}
 		if slices.Contains(c.Service.Pipelines.Logs.Receivers, "otlp") {
@@ -113,7 +113,7 @@ func checkCollectorConfig(reporter *utils.ComponentReporter, configPath string) 
 		if slices.Contains(c.Service.Pipelines.Metrics.Exporters, "otlphttp") {
 			reporter.AddSuccessfulCheck("Value of service > pipelines > metrics > exporters on config.yaml contains otlphttp")
 		} else {
-			reporter.AddWarningWithFix("collector.pipelines.metrics-otlphttp-missing",
+			reporter.AddWarningWithExplain("collector.pipelines.metrics-otlphttp-missing",
 				"Value of service > pipelines > metrics > exporters on config.yaml does not contain otlphttp")
 		}
 		if slices.Contains(c.Service.Pipelines.Metrics.Receivers, "otlp") {
