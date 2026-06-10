@@ -99,15 +99,15 @@ func TestRenderUnknownFormat(t *testing.T) {
 	}
 }
 
-func TestRenderTextFixIDsAndFooter(t *testing.T) {
+func TestRenderTextExplainIDsAndFooter(t *testing.T) {
 	saved := color.NoColor
 	color.NoColor = true
 	t.Cleanup(func() { color.NoColor = saved })
 
 	r := &utils.Reporter{}
 	sdk := r.Component("SDK")
-	sdk.AddWarningWithFix("js.package-json.unreadable", "package.json missing")
-	sdk.AddErrorWithFix("js.node-version.too-old", "node too old")
+	sdk.AddWarningWithExplain("js.package-json.unreadable", "package.json missing")
+	sdk.AddErrorWithExplain("js.node-version.too-old", "node too old")
 	sdk.AddWarning("no fix here") // legacy path → no suffix expected
 
 	var buf bytes.Buffer
@@ -125,12 +125,12 @@ func TestRenderTextFixIDsAndFooter(t *testing.T) {
 	if strings.Contains(out, "no fix here [") {
 		t.Errorf("legacy line should not have a fix-id suffix.\nGot:\n%s", out)
 	}
-	if !strings.Contains(out, `Run "otel-checker fix <id>" for guidance`) {
+	if !strings.Contains(out, `Run "otel-checker explain <id>" for guidance`) {
 		t.Errorf("footer missing.\nGot:\n%s", out)
 	}
 }
 
-func TestRenderTextNoFooterWhenNoFixIDs(t *testing.T) {
+func TestRenderTextNoFooterWhenNoExplainIDs(t *testing.T) {
 	saved := color.NoColor
 	color.NoColor = true
 	t.Cleanup(func() { color.NoColor = saved })
@@ -143,7 +143,7 @@ func TestRenderTextNoFooterWhenNoFixIDs(t *testing.T) {
 	if err := Render(&buf, r, FormatText); err != nil {
 		t.Fatalf("Render(text): %v", err)
 	}
-	if strings.Contains(buf.String(), `otel-checker fix`) {
+	if strings.Contains(buf.String(), `otel-checker explain`) {
 		t.Errorf("footer should not appear when no result has a fix-id.\nGot:\n%s", buf.String())
 	}
 }

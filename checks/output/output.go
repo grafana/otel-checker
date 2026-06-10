@@ -39,12 +39,12 @@ func (TextRenderer) Render(w io.Writer, reporter *utils.Reporter) error {
 	yellow := color.New(color.FgYellow)
 	red := color.New(color.FgRed)
 
-	anyFixID := false
+	anyExplainID := false
 	renderLine := func(c *color.Color, prefix string, m utils.ComponentResult) {
 		suffix := ""
-		if m.FixID != "" {
-			suffix = " [" + m.FixID + "]"
-			anyFixID = true
+		if m.ExplainID != "" {
+			suffix = " [" + m.ExplainID + "]"
+			anyExplainID = true
 		}
 		_, _ = c.Fprintf(w, "%s %s: %s%s \n", prefix, m.Component, m.Message, suffix)
 	}
@@ -67,9 +67,9 @@ func (TextRenderer) Render(w io.Writer, reporter *utils.Reporter) error {
 			renderLine(red, "✖", m)
 		}
 	}
-	if anyFixID {
+	if anyExplainID {
 		_, _ = fmt.Fprintln(w, `
-Run "otel-checker fix <id>" for guidance on any finding above.`)
+Run "otel-checker explain <id>" for guidance on any finding above.`)
 	}
 	return nil
 }

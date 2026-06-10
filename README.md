@@ -33,11 +33,11 @@ otel-checker check beyla            # Beyla only
 otel-checker check alloy            # Grafana Alloy only
 otel-checker check grafana-cloud    # Grafana Cloud connectivity only
 otel-checker serve                  # web UI for a previously-saved JSON result
-otel-checker fix                    # show fixes for every finding from a saved results file
-otel-checker fix <id>               # show the fix guidance for a single ID
-otel-checker fix list               # list every available fix
-otel-checker version                # print the binary version
-otel-checker completion <shell>     # generate shell completion script
+otel-checker explain                    # show explanations for every finding from a saved results file
+otel-checker explain <id>               # show the explanation for a single ID
+otel-checker explain list               # list every available explain ID
+otel-checker version                    # print the binary version
+otel-checker completion <shell>         # generate shell completion script
 ```
 
 The `check` command takes an optional comma-separated list of components
@@ -62,43 +62,43 @@ otel-checker check sdk,collector,beyla --language=js
 otel-checker check --language=js
 ```
 
-## Fixes
+## Explanations
 
-Each actionable finding (errors and warnings) is tagged with a stable fix ID
+Each actionable finding (errors and warnings) is tagged with a stable explain ID
 shown in square brackets at the end of the line:
 
 ```text
 ✖ SDK: package.json missing on path /src/inst [js.package-json.unreadable]
 ```
 
-Look up the guidance for any fix with:
+Look up the guidance for any finding with:
 
 ```bash
-otel-checker fix js.package-json.unreadable
+otel-checker explain js.package-json.unreadable
 ```
 
-Or enumerate every available fix:
+Or enumerate every available explain ID:
 
 ```bash
-otel-checker fix list
+otel-checker explain list
 ```
 
-To see fixes for **every** finding from a previous run, save the JSON output
-once and call `fix` with no ID:
+To see explanations for **every** finding from a previous run, save the JSON output
+once and call `explain` with no ID:
 
 ```bash
 otel-checker check --language=js --format=json > results.json
-otel-checker fix
+otel-checker explain
 ```
 
-With no ID, `fix` reads `./results.json` by default (also `./results.yaml` /
-`./results.yml`) — the same file `serve` watches — and prints each fix doc
+With no ID, `explain` reads `./results.json` by default (also `./results.yaml` /
+`./results.yml`) — the same file `serve` watches — and prints each explain doc
 in turn, deduplicating repeated IDs and skipping findings that have none.
 Pass `--data=<path>` to point at a different file.
 
-The same IDs also appear as a `fix_id` field on every entry when using
+The same IDs also appear as a `explain_id` field on every entry when using
 `--format=json` or `--format=yaml`, so downstream tooling can match findings
-against the fix catalog programmatically.
+against the explain catalog programmatically.
 
 ## Output formats
 
