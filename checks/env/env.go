@@ -7,9 +7,9 @@ import (
 	"github.com/grafana/otel-checker/checks/utils"
 )
 
-// EnvVar represents an environment variable configuration. FixID, when set,
-// is the fix-doc ID surfaced on errors/warnings raised by this variable's
-// generic Required/Recommended validation path.
+// EnvVar represents an environment variable configuration. ExplainID, when
+// set, is the explain-doc ID surfaced on errors/warnings raised by this
+// variable's generic Required/Recommended validation path.
 type EnvVar struct {
 	Name          string
 	Required      bool
@@ -19,7 +19,7 @@ type EnvVar struct {
 	Validator     func(value string, language string, reporter *utils.ComponentReporter)
 	Description   string
 	Message       string
-	FixID         string
+	ExplainID     string
 }
 
 // CheckEnvVar validates an environment variable against its configuration and reports the result
@@ -34,9 +34,9 @@ func CheckEnvVar(language string, envVar EnvVar, reporter *utils.ComponentReport
 
 		report := func(msg string) {
 			if envVar.Required {
-				reporter.AddErrorWithFix(envVar.FixID, msg)
+				reporter.AddErrorWithExplain(envVar.ExplainID, msg)
 			} else {
-				reporter.AddWarningWithFix(envVar.FixID, msg)
+				reporter.AddWarningWithExplain(envVar.ExplainID, msg)
 			}
 		}
 
