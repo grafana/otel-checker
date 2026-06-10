@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/grafana/otel-checker/checks/fixes"
+	"github.com/grafana/otel-checker/checks/explain"
 )
 
 // helper: build a test server that uses the package's real templates +
@@ -21,8 +21,8 @@ func newTestServer(t *testing.T, loader Loader) *httptest.Server {
 	}
 	mux := http.NewServeMux()
 	mux.Handle("/static/", http.FileServer(http.FS(fs.FS(static))))
-	mux.HandleFunc("/fix/", func(w http.ResponseWriter, r *http.Request) {
-		serveFix(w, r, tmpl)
+	mux.HandleFunc("/explain/", func(w http.ResponseWriter, r *http.Request) {
+		serveExplain(w, r, tmpl)
 	})
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/" {
@@ -41,14 +41,14 @@ func TestFixPageKnownID(t *testing.T) {
 	defer srv.Close()
 
 	// Pick the first registered ID so the test stays valid as the registry grows.
-	ids := fixes.All()
+	ids := explain.All()
 	if len(ids) == 0 {
-		t.Fatal("no fix IDs registered")
+		t.Fatal("no explain IDs registered")
 	}
 	id := ids[0]
-	doc, _ := fixes.Lookup(id)
+	doc, _ := explain.Lookup(id)
 
-	resp, err := http.Get(srv.URL + "/fix/" + id)
+	resp, err := http.Get(srv.URL + "/explain/" + id)
 	if err != nil {
 		t.Fatalf("GET: %v", err)
 	}
@@ -69,7 +69,7 @@ func TestFixPageUnknownID(t *testing.T) {
 	srv := newTestServer(t, Static(Snapshot{Available: true}))
 	defer srv.Close()
 
-	resp, err := http.Get(srv.URL + "/fix/definitely.not.a.real.id")
+	resp, err := http.Get(srv.URL + "/explain/definitely.not.a.real.id")
 	if err != nil {
 		t.Fatalf("GET: %v", err)
 	}
@@ -84,7 +84,7 @@ func TestFixPathMissingID(t *testing.T) {
 	srv := newTestServer(t, Static(Snapshot{Available: true}))
 	defer srv.Close()
 
-	resp, err := http.Get(srv.URL + "/fix/")
+	resp, err := http.Get(srv.URL + "/explain/")
 	if err != nil {
 		t.Fatalf("GET: %v", err)
 	}

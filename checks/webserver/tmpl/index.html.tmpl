@@ -62,10 +62,10 @@
                     <li>
                         <i class="fa-solid fa-xmark glyph" aria-hidden="true"></i>
                         <span class="msg">{{.Message}}</span>
-                        {{if .FixID}}
-                        <a class="fix-btn" href="/fix/{{.FixID}}" title="Fix: {{.FixID}}">
+                        {{if .ExplainID}}
+                        <a class="explain-btn" href="/explain/{{.ExplainID}}" title="Explain: {{.ExplainID}}">
                             <i class="fa-solid fa-wrench" aria-hidden="true"></i>
-                            Fix
+                            Explain
                         </a>{{end}}
                     </li>
                     {{end}}
@@ -90,10 +90,10 @@
                     <li>
                         <i class="fa-solid fa-triangle-exclamation glyph" aria-hidden="true"></i>
                         <span class="msg">{{.Message}}</span>
-                        {{if .FixID}}
-                        <a class="fix-btn" href="/fix/{{.FixID}}" title="Fix: {{.FixID}}">
+                        {{if .ExplainID}}
+                        <a class="explain-btn" href="/explain/{{.ExplainID}}" title="Explain: {{.ExplainID}}">
                             <i class="fa-solid fa-wrench" aria-hidden="true"></i>
-                            Fix
+                            Explain
                         </a>{{end}}
                     </li>
                     {{end}}

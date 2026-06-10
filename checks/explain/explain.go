@@ -1,6 +1,6 @@
-// Package explain is the registry of fix documentation for findings emitted
-// by the checks/* packages. Each markdown file under docs/ describes a
-// single fix and is keyed by a stable kebab-namespaced ID
+// Package explain is the registry of explanation documents for findings
+// emitted by the checks/* packages. Each markdown file under docs/
+// describes a single finding and is keyed by a stable kebab-namespaced ID
 // (e.g. "env.otel-service-name.unset"). The CLI's `explain` subcommand and
 // the web UI's `/explain/{id}` route both look up documents through this
 // package; downstream consumers can import Lookup and All to build their
@@ -20,8 +20,8 @@ import (
 //go:embed docs/*.md
 var docsFS embed.FS
 
-// Doc is the structured form of a single fix entry. Body holds the raw
-// markdown beneath the front-matter block.
+// Doc is the structured form of a single explanation entry. Body holds the
+// raw markdown beneath the front-matter block.
 type Doc struct {
 	ID       string
 	Title    string
@@ -66,7 +66,7 @@ func load(fsys fs.FS) error {
 			return fmt.Errorf("parse %s: %w", path, err)
 		}
 		if _, dup := registry[doc.ID]; dup {
-			return fmt.Errorf("duplicate fix id %q (file %s)", doc.ID, path)
+			return fmt.Errorf("duplicate explain id %q (file %s)", doc.ID, path)
 		}
 		registry[doc.ID] = doc
 	}
@@ -104,13 +104,13 @@ func parse(data []byte) (Doc, error) {
 }
 
 // Lookup returns the registered Doc for id, or (Doc{}, false) if no such
-// fix is known.
+// explanation is known.
 func Lookup(id string) (Doc, bool) {
 	d, ok := registry[id]
 	return d, ok
 }
 
-// All returns every registered fix ID, sorted alphabetically. Useful for
+// All returns every registered explain ID, sorted alphabetically. Useful for
 // shell completion and the `explain list` subcommand.
 func All() []string {
 	out := make([]string, 0, len(registry))

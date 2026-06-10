@@ -15,7 +15,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/grafana/otel-checker/checks/fixes"
+	"github.com/grafana/otel-checker/checks/explain"
 	"github.com/grafana/otel-checker/checks/utils"
 
 	"github.com/gomarkdown/markdown"
@@ -45,8 +45,8 @@ type Snapshot struct {
 
 // ComponentGroup is a per-component bundle of findings, used by the
 // template to render section bodies without repeating the component name on
-// every line. Each Item carries its own Message and (optional) FixID so the
-// template can render a per-row "Fix" link.
+// every line. Each Item carries its own Message and (optional) ExplainID so the
+// template can render a per-row "Explain" link.
 type ComponentGroup struct {
 	Component string
 	Items     []utils.ComponentResult
@@ -88,33 +88,33 @@ type Loader func() Snapshot
 // per-request updates.
 func Static(s Snapshot) Loader { return func() Snapshot { return s } }
 
-// fixView is the data passed to the fix-detail template.
-type fixView struct {
+// explainView is the data passed to the explain-detail template.
+type explainView struct {
 	ID       string
 	Title    string
 	Severity string
 	Body     template.HTML // pre-rendered markdown → HTML
 }
 
-// serveFix handles GET /fix/<id>. Returns 404 if the ID is missing or unknown.
-func serveFix(w http.ResponseWriter, r *http.Request, t *template.Template) {
-	id := strings.TrimPrefix(r.URL.Path, "/fix/")
+// serveExplain handles GET /explain/<id>. Returns 404 if the ID is missing or unknown.
+func serveExplain(w http.ResponseWriter, r *http.Request, t *template.Template) {
+	id := strings.TrimPrefix(r.URL.Path, "/explain/")
 	if id == "" || strings.Contains(id, "/") {
 		http.NotFound(w, r)
 		return
 	}
-	doc, ok := fixes.Lookup(id)
+	doc, ok := explain.Lookup(id)
 	if !ok {
 		http.NotFound(w, r)
 		return
 	}
-	view := fixView{
+	view := explainView{
 		ID:       doc.ID,
 		Title:    doc.Title,
 		Severity: doc.Severity,
 		Body:     template.HTML(markdown.ToHTML([]byte(doc.Body), nil, nil)), //nolint:gosec // body is trusted; comes from embedded docs at build time
 	}
-	if err := t.ExecuteTemplate(w, "fix.html.tmpl", view); err != nil {
+	if err := t.ExecuteTemplate(w, "explain.html.tmpl", view); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
@@ -129,8 +129,8 @@ func Run(ctx context.Context, addr string, loader Loader) error {
 
 	mux := http.NewServeMux()
 	mux.Handle("/static/", http.FileServer(http.FS(static)))
-	mux.HandleFunc("/fix/", func(w http.ResponseWriter, r *http.Request) {
-		serveFix(w, r, t)
+	mux.HandleFunc("/explain/", func(w http.ResponseWriter, r *http.Request) {
+		serveExplain(w, r, t)
 	})
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/" {

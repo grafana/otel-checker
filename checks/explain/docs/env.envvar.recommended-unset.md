@@ -18,4 +18,4 @@ severity: warning
 
 ## Related
 
-<!-- TODO: links to OTel spec, Grafana docs, or related fix IDs. -->
+<!-- TODO: links to OTel spec, Grafana docs, or related explain IDs. -->
