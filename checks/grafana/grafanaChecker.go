@@ -21,13 +21,13 @@ var (
 		RequiredValue: "http/protobuf",
 		Description:   "Protocol for OTLP exporter",
 		Message:       "OTEL_EXPORTER_OTLP_PROTOCOL must be set to 'http/protobuf'",
-		ExplainID:         "grafana-cloud.protocol.invalid",
+		ExplainID:     "grafana-cloud.protocol.invalid",
 	}
 
 	OtelExporterOTLPEndpoint = env.EnvVar{
-		Name:     "OTEL_EXPORTER_OTLP_ENDPOINT",
-		Required: true,
-		ExplainID:    "grafana-cloud.endpoint.unset",
+		Name:      "OTEL_EXPORTER_OTLP_ENDPOINT",
+		Required:  true,
+		ExplainID: "grafana-cloud.endpoint.unset",
 		Validator: func(value string, language string, reporter *utils.ComponentReporter) {
 			match, _ := regexp.MatchString("https://.+\\.grafana\\.net/otlp", value)
 			if match {

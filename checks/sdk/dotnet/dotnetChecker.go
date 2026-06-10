@@ -69,22 +69,22 @@ func checkDotNetAutoInstrumentation(reporter *utils.ComponentReporter) {
 		env.EnvVar{
 			Name:          "CORECLR_ENABLE_PROFILING",
 			RequiredValue: "1",
-			ExplainID:         "env.envvar.value-mismatch",
+			ExplainID:     "env.envvar.value-mismatch",
 		},
 		env.EnvVar{
 			Name:          "CORECLR_PROFILER",
 			RequiredValue: "{918728DD-259F-4A6A-AC2B-B85E1B658318}",
-			ExplainID:         "env.envvar.value-mismatch",
+			ExplainID:     "env.envvar.value-mismatch",
 		},
 		env.EnvVar{
-			Name:     "CORECLR_PROFILER_PATH",
-			Required: true,
-			ExplainID:    "env.envvar.required-unset",
+			Name:      "CORECLR_PROFILER_PATH",
+			Required:  true,
+			ExplainID: "env.envvar.required-unset",
 		},
 		env.EnvVar{
-			Name:     "OTEL_DOTNET_AUTO_HOME",
-			Required: true,
-			ExplainID:    "env.envvar.required-unset",
+			Name:      "OTEL_DOTNET_AUTO_HOME",
+			Required:  true,
+			ExplainID: "env.envvar.required-unset",
 		})
 }
 

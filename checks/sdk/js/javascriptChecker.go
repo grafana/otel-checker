@@ -102,7 +102,7 @@ func checkAutoInstrumentationNodeOptions(reporter *utils.ComponentReporter) {
 		Recommended:   true,
 		RequiredValue: "--require @opentelemetry/auto-instrumentations-node/register",
 		Message:       `NODE_OPTIONS not set. You can set it by running 'export NODE_OPTIONS="--require @opentelemetry/auto-instrumentations-node/register"' or add the same '--require ...' when starting your application`,
-		ExplainID:         "env.envvar.recommended-unset",
+		ExplainID:     "env.envvar.recommended-unset",
 	}, reporter)
 }
 
