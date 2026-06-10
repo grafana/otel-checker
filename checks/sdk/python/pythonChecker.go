@@ -36,7 +36,7 @@ func checkCodeBasedInstrumentation(ctx context.Context, reporter *utils.Componen
 func reportSupportedLibraries(ctx context.Context, reporter *utils.ComponentReporter, debug bool) {
 	supported, err := supportedLibraries(ctx)
 	if err != nil {
-		reporter.AddErrorWithFix("python.supported-libs.fetch-failed",
+		reporter.AddErrorWithExplain("python.supported-libs.fetch-failed",
 			fmt.Sprintf("Error reading supported libraries: %v", err))
 	}
 
@@ -58,14 +58,14 @@ func readDependencies(reporter *utils.ComponentReporter) []Library {
 func readRequirementsTxt(reporter *utils.ComponentReporter, path string) []Library {
 	readFile, err := os.ReadFile(path)
 	if err != nil {
-		reporter.AddErrorWithFix("python.requirements.unreadable",
+		reporter.AddErrorWithExplain("python.requirements.unreadable",
 			fmt.Sprintf("Could not read file %s: %v", path, err))
 		return nil
 	}
 
 	deps := parseRequirementsTxt(reporter, string(readFile))
 	if len(deps) == 0 {
-		reporter.AddWarningWithFix("python.requirements.empty",
+		reporter.AddWarningWithExplain("python.requirements.empty",
 			fmt.Sprintf("No dependencies found in %s", path))
 	}
 	return deps
@@ -78,7 +78,7 @@ func parseRequirementsTxt(reporter *utils.ComponentReporter, lines string) []Lib
 		lib, ok := parseRequirementLine(line)
 		if !ok {
 			if line != "" {
-				reporter.AddWarningWithFix("python.requirements.parse-error",
+				reporter.AddWarningWithExplain("python.requirements.parse-error",
 					fmt.Sprintf("Could not parse line: %s", line))
 			}
 			continue
@@ -116,7 +116,7 @@ func outputSupportedLibraries(deps []Library, supported []SupportedLibrary, repo
 				fmt.Sprintf("Found supported library: %s:%s at %s",
 					dep.Name, dep.Version, strings.Join(links, ", ")))
 		} else if debug {
-			reporter.AddWarningWithFix("python.library.unsupported",
+			reporter.AddWarningWithExplain("python.library.unsupported",
 				fmt.Sprintf("Found unsupported library: %s:%s", dep.Name, dep.Version))
 		}
 	}

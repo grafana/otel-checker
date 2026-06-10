@@ -93,7 +93,7 @@ func CheckResourceAttributes(reporter *utils.ComponentReporter) {
 			reporter.AddSuccessfulCheck(
 				fmt.Sprintf("Resource attribute %s is set to '%s'", attr.Name, value))
 		} else {
-			reporter.AddWarningWithFix("env.resource-attributes.missing",
+			reporter.AddWarningWithExplain("env.resource-attributes.missing",
 				fmt.Sprintf("Set OTEL_RESOURCE_ATTRIBUTES=\"%s=%s\": %s", attr.Name, attr.ExampleValue, attr.Description))
 		}
 	}
@@ -108,7 +108,7 @@ func CheckResourceAttributes(reporter *utils.ComponentReporter) {
 	} else if serviceNameExists && serviceNameValue != "" {
 		reporter.AddSuccessfulCheck(fmt.Sprintf("Service name is set via OTEL_RESOURCE_ATTRIBUTES to '%s'", serviceNameValue))
 	} else {
-		reporter.AddWarningWithFix("env.otel-service-name.unset",
+		reporter.AddWarningWithExplain("env.otel-service-name.unset",
 			"Set OTEL_SERVICE_NAME=\"checkout\": The application name")
 	}
 }
@@ -140,10 +140,10 @@ func exporterEnvVar(key string, name string) EnvVar {
 			case "console":
 				reporter.AddSuccessfulCheck(fmt.Sprintf("The value of %s is set to 'console'", key))
 			case "none":
-				reporter.AddErrorWithFix("env.exporter.disabled",
+				reporter.AddErrorWithExplain("env.exporter.disabled",
 					fmt.Sprintf("The value of %s cannot be 'none'. Change the value to 'otlp' or 'console', or leave it unset", key))
 			default:
-				reporter.AddErrorWithFix("env.exporter.invalid-value",
+				reporter.AddErrorWithExplain("env.exporter.invalid-value",
 					fmt.Sprintf("The value of %s must be 'otlp' or 'console' (or unset). Got '%s'", key, value))
 			}
 		},
