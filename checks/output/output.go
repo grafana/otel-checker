@@ -39,23 +39,37 @@ func (TextRenderer) Render(w io.Writer, reporter *utils.Reporter) error {
 	yellow := color.New(color.FgYellow)
 	red := color.New(color.FgRed)
 
-	if len(res.Checks) > 0 {
-		_, _ = green.Fprintf(w, "\n%d Successful Check(s)\n", len(res.Checks))
-		for _, m := range res.Checks {
-			_, _ = green.Fprintf(w, "✔ %s: %s \n", m.Component, m.Message)
+	anyExplainID := false
+	renderLine := func(c *color.Color, prefix string, m utils.ComponentResult) {
+		suffix := ""
+		if m.ExplainID != "" {
+			suffix = " [" + m.ExplainID + "]"
+			anyExplainID = true
+		}
+		_, _ = c.Fprintf(w, "%s %s: %s%s \n", prefix, m.Component, m.Message, suffix)
+	}
+
+	if len(res.Errors) > 0 {
+		_, _ = red.Fprintf(w, "\n%d Error(s)\n", len(res.Errors))
+		for _, m := range res.Errors {
+			renderLine(red, "✖", m)
 		}
 	}
 	if len(res.Warnings) > 0 {
 		_, _ = yellow.Fprintf(w, "\n%d Warning(s)\n", len(res.Warnings))
 		for _, m := range res.Warnings {
-			_, _ = yellow.Fprintf(w, "• %s: %s \n", m.Component, m.Message)
+			renderLine(yellow, "•", m)
 		}
 	}
-	if len(res.Errors) > 0 {
-		_, _ = red.Fprintf(w, "\n%d Error(s)\n", len(res.Errors))
-		for _, m := range res.Errors {
-			_, _ = red.Fprintf(w, "✖ %s: %s \n", m.Component, m.Message)
+	if len(res.Checks) > 0 {
+		_, _ = green.Fprintf(w, "\n%d Successful Check(s)\n", len(res.Checks))
+		for _, m := range res.Checks {
+			renderLine(green, "✔", m)
 		}
+	}
+	if anyExplainID {
+		_, _ = fmt.Fprintln(w, `
+Run "otel-checker explain <id>" for guidance on any finding above.`)
 	}
 	return nil
 }

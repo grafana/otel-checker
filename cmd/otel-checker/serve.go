@@ -82,24 +82,38 @@ func loadFileSnapshot(path string) webserver.Snapshot {
 		Source: path,
 		Reload: true,
 	}
+	results, err := readResultsFile(path)
+	if err != nil {
+		if !os.IsNotExist(err) {
+			snap.Source = fmt.Sprintf("%s (parse error: %v)", path, err)
+		}
+		return snap
+	}
+	snap.Results = results
+	snap.Available = true
+	return snap
+}
+
+// readResultsFile opens path and decodes it as JSON or YAML based on its
+// extension. Returns os.IsNotExist-compatible errors when the file is
+// missing so callers can distinguish "no file" from "bad file".
+func readResultsFile(path string) (utils.Results, error) {
 	f, err := os.Open(path)
 	if err != nil {
-		return snap
+		return utils.Results{}, err
 	}
 	defer func() { _ = f.Close() }()
 
 	var results utils.Results
 	switch strings.ToLower(filepath.Ext(path)) {
 	case ".yaml", ".yml":
-		err = yaml.NewDecoder(f).Decode(&results)
+		if err := yaml.NewDecoder(f).Decode(&results); err != nil {
+			return utils.Results{}, fmt.Errorf("parse %s: %w", path, err)
+		}
 	default:
-		err = json.NewDecoder(f).Decode(&results)
+		if err := json.NewDecoder(f).Decode(&results); err != nil {
+			return utils.Results{}, fmt.Errorf("parse %s: %w", path, err)
+		}
 	}
-	if err != nil {
-		snap.Source = fmt.Sprintf("%s (parse error: %v)", path, err)
-		return snap
-	}
-	snap.Results = results
-	snap.Available = true
-	return snap
+	return results, nil
 }
