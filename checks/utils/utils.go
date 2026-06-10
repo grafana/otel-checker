@@ -17,10 +17,13 @@ type Results struct {
 }
 
 // ComponentResult is a single check/warning/error message, tagged with the
-// reporter component that produced it.
+// reporter component that produced it. ExplainID, when non-empty, references
+// a document in the explain package that describes the finding and how to
+// address it.
 type ComponentResult struct {
 	Component string `json:"component" yaml:"component"`
 	Message   string `json:"message" yaml:"message"`
+	ExplainID string `json:"explain_id,omitempty" yaml:"explain_id,omitempty"`
 }
 
 type Commands struct {
@@ -86,10 +89,20 @@ type Reporter struct {
 }
 
 type ComponentReporter struct {
-	name     string
+	name string
+	// Checks, Warnings, Errors hold the human-readable message for each
+	// finding. Public for back-compat with existing tests; new code should
+	// consume Reporter.Results() to get the typed ComponentResult with ExplainID.
 	Checks   []string
 	Warnings []string
 	Errors   []string
+	// checkIDs, warningIDs, errorIDs are parallel to the slices above and
+	// hold the explain-doc ID for each finding ("" when no explain applies).
+	// Kept unexported so the lockstep invariant (one ID per message) can only
+	// be maintained through the Add* methods.
+	checkIDs   []string
+	warningIDs []string
+	errorIDs   []string
 }
 
 func (r *Reporter) Component(name string) *ComponentReporter {
@@ -108,34 +121,68 @@ func (r *Reporter) Component(name string) *ComponentReporter {
 // way should use this; the CLI marshals it via the output package.
 func (r *Reporter) Results() Results {
 	var res Results
-	for _, component := range r.components {
-		for _, m := range component.Checks {
-			res.Checks = append(res.Checks, ComponentResult{Component: component.name, Message: m})
-		}
-		for _, m := range component.Warnings {
-			res.Warnings = append(res.Warnings, ComponentResult{Component: component.name, Message: m})
-		}
-		for _, m := range component.Errors {
-			res.Errors = append(res.Errors, ComponentResult{Component: component.name, Message: m})
-		}
+	for _, c := range r.components {
+		res.Checks = append(res.Checks, c.toResults(c.Checks, c.checkIDs)...)
+		res.Warnings = append(res.Warnings, c.toResults(c.Warnings, c.warningIDs)...)
+		res.Errors = append(res.Errors, c.toResults(c.Errors, c.errorIDs)...)
 	}
 	return res
 }
 
+// toResults zips a message slice with its parallel ID slice into a
+// []ComponentResult tagged with the component's name. The two slices are
+// always in lockstep because all mutation goes through AddXxxWithExplain.
+func (c *ComponentReporter) toResults(messages, ids []string) []ComponentResult {
+	out := make([]ComponentResult, len(messages))
+	for i, m := range messages {
+		out[i] = ComponentResult{Component: c.name, Message: m, ExplainID: ids[i]}
+	}
+	return out
+}
+
 func (r *ComponentReporter) AddSuccessfulCheck(message string) {
-	r.Checks = append(r.Checks, message)
+	r.AddSuccessfulCheckWithExplain("", message)
 }
 
 func (r *ComponentReporter) AddWarning(message string) {
-	r.Warnings = append(r.Warnings, message)
+	r.AddWarningWithExplain("", message)
 }
 
 func (r *ComponentReporter) AddInternalError(message string) {
-	r.Warnings = append(r.Warnings, "Internal Error: "+message)
+	r.AddInternalErrorWithExplain("", message)
 }
 
 func (r *ComponentReporter) AddError(message string) {
+	r.AddErrorWithExplain("", message)
+}
+
+// AddSuccessfulCheckWithExplain records a successful check with an optional
+// explain-doc ID. Successful checks rarely need explain docs, but the
+// variant is provided for symmetry.
+func (r *ComponentReporter) AddSuccessfulCheckWithExplain(explainID, message string) {
+	r.Checks = append(r.Checks, message)
+	r.checkIDs = append(r.checkIDs, explainID)
+}
+
+// AddWarningWithExplain records a warning with the given explain-doc ID.
+// Pass "" if no explain doc applies.
+func (r *ComponentReporter) AddWarningWithExplain(explainID, message string) {
+	r.Warnings = append(r.Warnings, message)
+	r.warningIDs = append(r.warningIDs, explainID)
+}
+
+// AddInternalErrorWithExplain records an internal-error message, prefixed
+// with "Internal Error: " and reported as a warning. The explain-doc ID, if
+// any, typically points at a "report this bug upstream" doc.
+func (r *ComponentReporter) AddInternalErrorWithExplain(explainID, message string) {
+	r.AddWarningWithExplain(explainID, "Internal Error: "+message)
+}
+
+// AddErrorWithExplain records an error with the given explain-doc ID. Pass
+// "" if no explain doc applies.
+func (r *ComponentReporter) AddErrorWithExplain(explainID, message string) {
 	r.Errors = append(r.Errors, message)
+	r.errorIDs = append(r.errorIDs, explainID)
 }
 
 func FileExists(path string) bool {

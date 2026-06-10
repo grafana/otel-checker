@@ -7,7 +7,9 @@ import (
 	"github.com/grafana/otel-checker/checks/utils"
 )
 
-// EnvVar represents an environment variable configuration
+// EnvVar represents an environment variable configuration. ExplainID, when
+// set, is the explain-doc ID surfaced on errors/warnings raised by this
+// variable's generic Required/Recommended validation path.
 type EnvVar struct {
 	Name          string
 	Required      bool
@@ -17,6 +19,7 @@ type EnvVar struct {
 	Validator     func(value string, language string, reporter *utils.ComponentReporter)
 	Description   string
 	Message       string
+	ExplainID     string
 }
 
 // CheckEnvVar validates an environment variable against its configuration and reports the result
@@ -29,10 +32,18 @@ func CheckEnvVar(language string, envVar EnvVar, reporter *utils.ComponentReport
 			envVar.Required = true
 		}
 
-		if envVar.Required && checkValue(envVar, value, reporter.AddError) {
+		report := func(msg string) {
+			if envVar.Required {
+				reporter.AddErrorWithExplain(envVar.ExplainID, msg)
+			} else {
+				reporter.AddWarningWithExplain(envVar.ExplainID, msg)
+			}
+		}
+
+		if envVar.Required && checkValue(envVar, value, report) {
 			return
 		}
-		if envVar.Recommended && checkValue(envVar, value, reporter.AddWarning) {
+		if envVar.Recommended && checkValue(envVar, value, report) {
 			return
 		}
 		reporter.AddSuccessfulCheck(fmt.Sprintf("%s is set to '%s'", envVar.Name, value))
