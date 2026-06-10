@@ -49,10 +49,10 @@ func (TextRenderer) Render(w io.Writer, reporter *utils.Reporter) error {
 		_, _ = c.Fprintf(w, "%s %s: %s%s \n", prefix, m.Component, m.Message, suffix)
 	}
 
-	if len(res.Checks) > 0 {
-		_, _ = green.Fprintf(w, "\n%d Successful Check(s)\n", len(res.Checks))
-		for _, m := range res.Checks {
-			renderLine(green, "✔", m)
+	if len(res.Errors) > 0 {
+		_, _ = red.Fprintf(w, "\n%d Error(s)\n", len(res.Errors))
+		for _, m := range res.Errors {
+			renderLine(red, "✖", m)
 		}
 	}
 	if len(res.Warnings) > 0 {
@@ -61,10 +61,10 @@ func (TextRenderer) Render(w io.Writer, reporter *utils.Reporter) error {
 			renderLine(yellow, "•", m)
 		}
 	}
-	if len(res.Errors) > 0 {
-		_, _ = red.Fprintf(w, "\n%d Error(s)\n", len(res.Errors))
-		for _, m := range res.Errors {
-			renderLine(red, "✖", m)
+	if len(res.Checks) > 0 {
+		_, _ = green.Fprintf(w, "\n%d Successful Check(s)\n", len(res.Checks))
+		for _, m := range res.Checks {
+			renderLine(green, "✔", m)
 		}
 	}
 	if anyExplainID {
