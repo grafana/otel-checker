@@ -32,7 +32,7 @@ func (l *Library) String() string {
 func reportSupportedInstrumentations(ctx context.Context, reporter *utils.ComponentReporter, debug bool, instrumentationType supported.InstrumentationType, javaVersion int) {
 	s, err := supportedLibraries(ctx)
 	if err != nil {
-		reporter.AddErrorWithFix("java.supported-libs.fetch-failed",
+		reporter.AddErrorWithExplain("java.supported-libs.fetch-failed",
 			fmt.Sprintf("Error reading supported libraries: %v", err))
 	}
 
@@ -80,7 +80,7 @@ func outputSupportedLibraries(deps []Library, supportedModules supported.Support
 				fmt.Sprintf("Found supported library: %s:%s:%s at %s",
 					dep.Group, dep.Artifact, dep.Version, strings.Join(links, ", ")))
 		} else if debug {
-			reporter.AddWarningWithFix("java.library.unsupported",
+			reporter.AddWarningWithExplain("java.library.unsupported",
 				fmt.Sprintf("Found unsupported library: %s:%s:%s", dep.Group, dep.Artifact, dep.Version))
 		}
 		outputSupportedLibraries(dep.Children, supportedModules, reporter, false, instrumentationType, 0)
@@ -121,7 +121,7 @@ func matchVersion(moduleName string, version string, library Library, javaVersio
 		// e.g. Java 8+
 		wantJavaVersion, err := strconv.Atoi(javaVersionMatch[1])
 		if err != nil {
-			reporter.AddErrorWithFix("java.version.parse-error",
+			reporter.AddErrorWithExplain("java.version.parse-error",
 				fmt.Sprintf("Error parsing Java version %s: %v", version, err))
 			return false
 		}
@@ -131,13 +131,13 @@ func matchVersion(moduleName string, version string, library Library, javaVersio
 	// e.g. com.amazonaws:aws-lambda-java-core:[1.0.0,)
 	split := strings.Split(version, ":")
 	if len(split) != 3 {
-		reporter.AddInternalErrorWithFix("internal.java.semver",
+		reporter.AddInternalErrorWithExplain("internal.java.semver",
 			fmt.Sprintf("Invalid java version for module %s: %s", moduleName, version))
 		return false
 	}
 	versionRange, err := sdk.ParseVersionRange(split[2])
 	if err != nil {
-		reporter.AddInternalErrorWithFix("internal.java.version-range",
+		reporter.AddInternalErrorWithExplain("internal.java.version-range",
 			fmt.Sprintf("Error parsing version range for module %s: %s", moduleName, version))
 		return false
 	}

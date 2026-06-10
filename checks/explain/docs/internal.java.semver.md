@@ -1,7 +1,7 @@
 ---
-id: js.supported-libs.fetch-failed
-title: 'Could not fetch the supported JS libraries list'
-severity: error
+id: internal.java.semver
+title: 'Internal: invalid SemVer in the supported libraries data'
+severity: internal
 ---
 
 ## Why this matters

@@ -33,7 +33,7 @@ func checkPHPVersion(ctx context.Context, reporter *utils.ComponentReporter) {
 	stdout, err := cmd.Output()
 
 	if err != nil {
-		reporter.AddErrorWithFix("php.runtime.not-found",
+		reporter.AddErrorWithExplain("php.runtime.not-found",
 			"PHP not found, install PHP >= 8.0")
 		return
 	}
@@ -41,7 +41,7 @@ func checkPHPVersion(ctx context.Context, reporter *utils.ComponentReporter) {
 	if strings.Contains(string(stdout), "PHP 8") {
 		reporter.AddSuccessfulCheck("Using PHP >= 8.0")
 	} else {
-		reporter.AddErrorWithFix("php.runtime.too-old",
+		reporter.AddErrorWithExplain("php.runtime.too-old",
 			"Not using recommended PHP version, update to PHP >= 8.0")
 	}
 }
@@ -51,7 +51,7 @@ func checkComposerInstalled(ctx context.Context, reporter *utils.ComponentReport
 	_, err := cmd.Output()
 
 	if err != nil {
-		reporter.AddErrorWithFix("php.composer.not-found",
+		reporter.AddErrorWithExplain("php.composer.not-found",
 			"Composer not found. Run 'curl -sS https://getcomposer.org/installer | php' to install it.")
 	} else {
 		reporter.AddSuccessfulCheck("Composer found. Run 'composer install' to install dependencies.")
@@ -61,14 +61,14 @@ func checkComposerInstalled(ctx context.Context, reporter *utils.ComponentReport
 func checkComposerFileExists(reporter *utils.ComponentReporter) (string, error) {
 	_, err := os.ReadFile("composer.json")
 	if err != nil {
-		reporter.AddErrorWithFix("php.composer-json.missing",
+		reporter.AddErrorWithExplain("php.composer-json.missing",
 			"Could not find composer.json, create one, add dependencies, and run 'composer install'")
 		return "", err
 	}
 
 	content, err := os.ReadFile("composer.lock")
 	if err != nil {
-		reporter.AddErrorWithFix("php.composer-lock.missing",
+		reporter.AddErrorWithExplain("php.composer-lock.missing",
 			"Could not find composer.lock, run 'composer install' to generate it")
 		return "", err
 	}
@@ -92,7 +92,7 @@ func checkPHPRequiredInstrumentation(reporter *utils.ComponentReporter, composer
 		if strings.Contains(*composerFile, pkg) {
 			reporter.AddSuccessfulCheck("Found required dependency: " + pkg)
 		} else {
-			reporter.AddErrorWithFix("php.composer.missing-required",
+			reporter.AddErrorWithExplain("php.composer.missing-required",
 				"Missing required dependency: "+pkg+", add it to your composer.json and run 'composer install'")
 		}
 	}
@@ -137,7 +137,7 @@ func checkPHPAutoInstrumentation(reporter *utils.ComponentReporter, composerFile
 
 	// if not optionalFound then add error
 	if !found {
-		reporter.AddErrorWithFix("php.composer.missing-instrumentation",
+		reporter.AddErrorWithExplain("php.composer.missing-instrumentation",
 			"Missing instrumentation dependencies, add them to your composer.json and run 'composer install'")
 	}
 }
