@@ -26,23 +26,23 @@ func TestReporterResults(t *testing.T) {
 func TestReporterResultsWithExplainIDs(t *testing.T) {
 	r := &Reporter{}
 	sdk := r.Component("SDK")
-	sdk.AddSuccessfulCheckWithExplain("ok.fix", "passed")
-	sdk.AddWarningWithExplain("warn.fix", "watch out")
-	sdk.AddError("no fix here") // legacy path → empty ExplainID
+	sdk.AddSuccessfulCheckWithExplain("ok.explain", "passed")
+	sdk.AddWarningWithExplain("warn.explain", "watch out")
+	sdk.AddError("no explain here") // legacy path → empty ExplainID
 	col := r.Component("Collector")
-	col.AddErrorWithExplain("err.fix", "broken")
-	col.AddInternalErrorWithExplain("oops.fix", "internal blip")
+	col.AddErrorWithExplain("err.explain", "broken")
+	col.AddInternalErrorWithExplain("oops.explain", "internal blip")
 
 	got := r.Results()
 
-	assert.Equal(t, []ComponentResult{{Component: "SDK", Message: "passed", ExplainID: "ok.fix"}}, got.Checks)
+	assert.Equal(t, []ComponentResult{{Component: "SDK", Message: "passed", ExplainID: "ok.explain"}}, got.Checks)
 	assert.Equal(t, []ComponentResult{
-		{Component: "SDK", Message: "watch out", ExplainID: "warn.fix"},
-		{Component: "Collector", Message: "Internal Error: internal blip", ExplainID: "oops.fix"},
+		{Component: "SDK", Message: "watch out", ExplainID: "warn.explain"},
+		{Component: "Collector", Message: "Internal Error: internal blip", ExplainID: "oops.explain"},
 	}, got.Warnings)
 	assert.Equal(t, []ComponentResult{
-		{Component: "SDK", Message: "no fix here"},
-		{Component: "Collector", Message: "broken", ExplainID: "err.fix"},
+		{Component: "SDK", Message: "no explain here"},
+		{Component: "Collector", Message: "broken", ExplainID: "err.explain"},
 	}, got.Errors)
 }
 

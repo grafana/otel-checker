@@ -12,9 +12,13 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
+	"github.com/grafana/otel-checker/checks/explain"
 	"github.com/grafana/otel-checker/checks/utils"
+
+	"github.com/gomarkdown/markdown"
 )
 
 //go:embed static/*
@@ -39,12 +43,13 @@ type Snapshot struct {
 	Reload bool
 }
 
-// ComponentGroup is a per-component bundle of messages, used by the
+// ComponentGroup is a per-component bundle of findings, used by the
 // template to render section bodies without repeating the component name on
-// every line.
+// every line. Each Item carries its own Message and (optional) ExplainID so the
+// template can render a per-row "Explain" link.
 type ComponentGroup struct {
 	Component string
-	Messages  []string
+	Items     []utils.ComponentResult
 }
 
 // GroupedChecks returns Results.Checks bucketed by component, preserving
@@ -67,10 +72,10 @@ func groupResults(items []utils.ComponentResult) []ComponentGroup {
 		idx, ok := indexByComponent[it.Component]
 		if !ok {
 			indexByComponent[it.Component] = len(groups)
-			groups = append(groups, ComponentGroup{Component: it.Component, Messages: []string{it.Message}})
+			groups = append(groups, ComponentGroup{Component: it.Component, Items: []utils.ComponentResult{it}})
 			continue
 		}
-		groups[idx].Messages = append(groups[idx].Messages, it.Message)
+		groups[idx].Items = append(groups[idx].Items, it)
 	}
 	return groups
 }
@@ -83,6 +88,37 @@ type Loader func() Snapshot
 // per-request updates.
 func Static(s Snapshot) Loader { return func() Snapshot { return s } }
 
+// explainView is the data passed to the explain-detail template.
+type explainView struct {
+	ID       string
+	Title    string
+	Severity string
+	Body     template.HTML // pre-rendered markdown → HTML
+}
+
+// serveExplain handles GET /explain/<id>. Returns 404 if the ID is missing or unknown.
+func serveExplain(w http.ResponseWriter, r *http.Request, t *template.Template) {
+	id := strings.TrimPrefix(r.URL.Path, "/explain/")
+	if id == "" || strings.Contains(id, "/") {
+		http.NotFound(w, r)
+		return
+	}
+	doc, ok := explain.Lookup(id)
+	if !ok {
+		http.NotFound(w, r)
+		return
+	}
+	view := explainView{
+		ID:       doc.ID,
+		Title:    doc.Title,
+		Severity: doc.Severity,
+		Body:     template.HTML(markdown.ToHTML([]byte(doc.Body), nil, nil)), //nolint:gosec // body is trusted; comes from embedded docs at build time
+	}
+	if err := t.ExecuteTemplate(w, "explain.html.tmpl", view); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
 // Run starts an HTTP server on addr that renders the snapshot returned by
 // loader on each request. Blocks until ctx is cancelled or the server exits.
 func Run(ctx context.Context, addr string, loader Loader) error {
@@ -93,7 +129,14 @@ func Run(ctx context.Context, addr string, loader Loader) error {
 
 	mux := http.NewServeMux()
 	mux.Handle("/static/", http.FileServer(http.FS(static)))
+	mux.HandleFunc("/explain/", func(w http.ResponseWriter, r *http.Request) {
+		serveExplain(w, r, t)
+	})
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/" {
+			http.NotFound(w, r)
+			return
+		}
 		snap := loader()
 		if err := t.ExecuteTemplate(w, "index.html.tmpl", snap); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)

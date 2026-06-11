@@ -108,7 +108,7 @@ func TestRenderTextExplainIDsAndFooter(t *testing.T) {
 	sdk := r.Component("SDK")
 	sdk.AddWarningWithExplain("js.package-json.unreadable", "package.json missing")
 	sdk.AddErrorWithExplain("js.node-version.too-old", "node too old")
-	sdk.AddWarning("no fix here") // legacy path → no suffix expected
+	sdk.AddWarning("no explain here") // legacy path → no suffix expected
 
 	var buf bytes.Buffer
 	if err := Render(&buf, r, FormatText); err != nil {
@@ -117,13 +117,13 @@ func TestRenderTextExplainIDsAndFooter(t *testing.T) {
 	out := buf.String()
 
 	if !strings.Contains(out, "package.json missing [js.package-json.unreadable]") {
-		t.Errorf("warning line missing [fix-id] suffix.\nGot:\n%s", out)
+		t.Errorf("warning line missing [explain-id] suffix.\nGot:\n%s", out)
 	}
 	if !strings.Contains(out, "node too old [js.node-version.too-old]") {
-		t.Errorf("error line missing [fix-id] suffix.\nGot:\n%s", out)
+		t.Errorf("error line missing [explain-id] suffix.\nGot:\n%s", out)
 	}
-	if strings.Contains(out, "no fix here [") {
-		t.Errorf("legacy line should not have a fix-id suffix.\nGot:\n%s", out)
+	if strings.Contains(out, "no explain here [") {
+		t.Errorf("legacy line should not have a explain-id suffix.\nGot:\n%s", out)
 	}
 	if !strings.Contains(out, `Run "otel-checker explain <id>" for guidance`) {
 		t.Errorf("footer missing.\nGot:\n%s", out)
@@ -144,6 +144,6 @@ func TestRenderTextNoFooterWhenNoExplainIDs(t *testing.T) {
 		t.Fatalf("Render(text): %v", err)
 	}
 	if strings.Contains(buf.String(), `otel-checker explain`) {
-		t.Errorf("footer should not appear when no result has a fix-id.\nGot:\n%s", buf.String())
+		t.Errorf("footer should not appear when no result has a explain-id.\nGot:\n%s", buf.String())
 	}
 }

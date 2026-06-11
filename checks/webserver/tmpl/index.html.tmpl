@@ -58,8 +58,16 @@
             <div class="group">
                 <span class="component">{{.Component}}</span>
                 <ul>
-                    {{range .Messages}}
-                    <li><i class="fa-solid fa-xmark glyph" aria-hidden="true"></i>{{.}}</li>
+                    {{range .Items}}
+                    <li>
+                        <i class="fa-solid fa-xmark glyph" aria-hidden="true"></i>
+                        <span class="msg">{{.Message}}</span>
+                        {{if .ExplainID}}
+                        <a class="explain-btn" href="/explain/{{.ExplainID}}" title="Explain: {{.ExplainID}}">
+                            <i class="fa-solid fa-wrench" aria-hidden="true"></i>
+                            Explain
+                        </a>{{end}}
+                    </li>
                     {{end}}
                 </ul>
             </div>
@@ -78,8 +86,16 @@
             <div class="group">
                 <span class="component">{{.Component}}</span>
                 <ul>
-                    {{range .Messages}}
-                    <li><i class="fa-solid fa-triangle-exclamation glyph" aria-hidden="true"></i>{{.}}</li>
+                    {{range .Items}}
+                    <li>
+                        <i class="fa-solid fa-triangle-exclamation glyph" aria-hidden="true"></i>
+                        <span class="msg">{{.Message}}</span>
+                        {{if .ExplainID}}
+                        <a class="explain-btn" href="/explain/{{.ExplainID}}" title="Explain: {{.ExplainID}}">
+                            <i class="fa-solid fa-wrench" aria-hidden="true"></i>
+                            Explain
+                        </a>{{end}}
+                    </li>
                     {{end}}
                 </ul>
             </div>
@@ -98,8 +114,11 @@
             <div class="group">
                 <span class="component">{{.Component}}</span>
                 <ul>
-                    {{range .Messages}}
-                    <li><i class="fa-solid fa-check glyph" aria-hidden="true"></i>{{.}}</li>
+                    {{range .Items}}
+                    <li>
+                        <i class="fa-solid fa-check glyph" aria-hidden="true"></i>
+                        <span class="msg">{{.Message}}</span>
+                    </li>
                     {{end}}
                 </ul>
             </div>
