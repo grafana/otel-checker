@@ -10,7 +10,9 @@ import (
 	"github.com/grafana/otel-checker/checks/explain"
 	"github.com/grafana/otel-checker/checks/utils"
 
+	"github.com/charmbracelet/glamour"
 	"github.com/spf13/cobra"
+	"golang.org/x/term"
 )
 
 // newExplainCmd returns the `explain` parent command:
@@ -67,9 +69,23 @@ func runExplainShow(w io.Writer, id string) error {
 	if !ok {
 		return fmt.Errorf("unknown explain ID %q. Run \"otel-checker explain list\" to see every available ID", id)
 	}
-	_, _ = fmt.Fprintf(w, "# %s\n\n", doc.Title)
-	_, _ = fmt.Fprint(w, doc.Body)
-	return nil
+	return renderMarkdown(w, fmt.Sprintf("# %s\n\n%s", doc.Title, doc.Body))
+}
+
+// renderMarkdown writes source to w. When w is a terminal, the markdown is
+// styled through glamour (headers, links, code blocks, lists). When w is a
+// pipe, file, or in-memory buffer, the raw markdown is written instead so
+// piping (`otel-checker explain id | grep`) and tests stay clean.
+func renderMarkdown(w io.Writer, source string) error {
+	if f, ok := w.(*os.File); ok && term.IsTerminal(int(f.Fd())) {
+		if out, err := glamour.Render(source, "auto"); err == nil {
+			_, err := fmt.Fprint(w, out)
+			return err
+		}
+		// Fall through to raw on render error.
+	}
+	_, err := fmt.Fprint(w, source)
+	return err
 }
 
 func runExplainList(w io.Writer) error {

@@ -28,18 +28,25 @@ func checkResourceDetectors(reporter *utils.ComponentReporter) {
 	env.CheckEnvVar("", env.EnvVar{
 		Name: "OTEL_NODE_RESOURCE_DETECTORS",
 		Validator: func(value string, language string, reporter *utils.ComponentReporter) {
-			if value == "" ||
-				!strings.Contains(value, "env") ||
-				!strings.Contains(value, "host") ||
-				!strings.Contains(value, "os") ||
-				!strings.Contains(value, "serviceinstance") {
-				reporter.AddWarningWithExplain("env.envvar.recommended-unset",
-					"It's recommended the environment variable OTEL_NODE_RESOURCE_DETECTORS to be set to at least `env,host,os,serviceinstance`")
-			} else {
+			required := []string{"env", "host", "os", "serviceinstance"}
+			hasAll := value == "all"
+			if !hasAll {
+				hasAll = true
+				for _, want := range required {
+					if !strings.Contains(value, want) {
+						hasAll = false
+						break
+					}
+				}
+			}
+			if hasAll {
 				reporter.AddSuccessfulCheck("OTEL_NODE_RESOURCE_DETECTORS has recommended values")
+			} else {
+				reporter.AddWarningWithExplain("env.node-resource-detectors.recommended-unset",
+					"It's recommended the environment variable OTEL_NODE_RESOURCE_DETECTORS to be set to `all`, or to a list containing at least `env,host,os,serviceinstance`")
 			}
 		},
-		Description: "at least `env,host,os,serviceinstance`",
+		Description: "`all` or at least `env,host,os,serviceinstance`",
 	}, reporter)
 }
 
@@ -102,7 +109,7 @@ func checkAutoInstrumentationNodeOptions(reporter *utils.ComponentReporter) {
 		Recommended:   true,
 		RequiredValue: "--require @opentelemetry/auto-instrumentations-node/register",
 		Message:       `NODE_OPTIONS not set. You can set it by running 'export NODE_OPTIONS="--require @opentelemetry/auto-instrumentations-node/register"' or add the same '--require ...' when starting your application`,
-		ExplainID:     "env.envvar.recommended-unset",
+		ExplainID:     "env.node-options.recommended-unset",
 	}, reporter)
 }
 
