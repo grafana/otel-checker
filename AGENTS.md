@@ -49,7 +49,8 @@ Linting is powered by [grafana/flint](https://github.com/grafana/flint).
 
 ### Package Organization
 
-- **`main.go`** — Entry point. Parses CLI args, runs checks, optional web server on `:8080`
+- **`cmd/otel-checker/`** — CLI entry point and cobra subcommand wiring
+  (`check`, `serve`, `explain`, `version`, etc.)
 - **`checks/checks.go`** — Orchestrator: always runs env checks first, then routes to component-specific checkers
 - **`checks/env/`** — Common OTel environment variable validation
 - **`checks/sdk/`** — Language-specific SDK checkers, each in its own
@@ -60,18 +61,37 @@ Linting is powered by [grafana/flint](https://github.com/grafana/flint).
 - **`checks/beyla/`** — Beyla-specific checks
 - **`checks/alloy/`** — Grafana Alloy checks
 - **`checks/grafana/`** — Grafana Cloud connectivity/auth validation
-- **`checks/utils/`** — CLI parsing, Reporter pattern (aggregates checks/warnings/errors)
+- **`checks/utils/`** — `Commands` struct, flag validation, typed errors,
+  `Reporter`/`ComponentReporter` pattern (aggregates checks/warnings/errors
+  plus per-finding explain IDs)
+- **`checks/output/`** — Pluggable result renderers (text/JSON/YAML) via a
+  `Renderer` interface
+- **`checks/explain/`** — Registry of explanation docs keyed by stable
+  kebab-namespaced IDs (`docs/*.md`, embedded). `Lookup`/`All` are the
+  public API
+- **`checks/webserver/`** — Embedded web UI (`tmpl/`, `static/`) for
+  `--web-server` and the `serve` subcommand
 - **`scripts/`** — Python scripts to generate `supported-libraries.yaml` from upstream OTel contrib repos
-- **`static/`, `tmpl/`** — Embedded web UI assets
 
 ### Key Patterns
 
-- **Reporter pattern**: `ComponentReporter` accumulates checks/warnings/errors,
-  `Reporter` aggregates multiple component reporters
+- **Reporter pattern**: `ComponentReporter` accumulates checks/warnings/errors;
+  `Reporter` aggregates multiple component reporters. Each finding carries
+  an optional explain ID via the `AddXxxWithExplain` family of methods.
+- **Explain IDs**: stable kebab-namespaced strings (e.g.
+  `env.otel-service-name.unset`) that point at a markdown doc in
+  `checks/explain/docs/`. The CLI's `explain <id>` subcommand and the web
+  UI's `/explain/{id}` route both look them up via `explain.Lookup`. A
+  coverage test asserts every literal ID in the source resolves to a
+  registered doc.
+- **Renderer interface**: `output.Renderer` lets callers plug in custom
+  output. Text output orders findings as Errors → Warnings → Successful
+  Checks, and appends `[explain.id]` to each line that has one.
 - **Generated files**: `supported-libraries.yaml` files in `checks/sdk/go/`
   and `checks/sdk/js/` — regenerate via `mise run generate`, don't edit
   manually
-- **Embedded resources**: Static files and templates use `//go:embed`
+- **Embedded resources**: Static files, templates, and the explain doc
+  registry use `//go:embed`
 
 ## CLI Usage
 
@@ -92,6 +112,11 @@ otel-checker check --language=<lang>
 # Web UI replay of saved JSON results
 otel-checker serve --data=results.json
 
+# Explain a finding (looked up against checks/explain/docs/*.md)
+otel-checker explain <id>            # single ID
+otel-checker explain                 # every flagged ID in ./results.json
+otel-checker explain list            # every registered ID
+
 # Languages: dotnet, go, java, js, python, ruby, php
 # Components: sdk, collector, beyla, alloy, grafana-cloud
 # Output formats (--format): text (default), json, yaml
@@ -102,6 +127,7 @@ otel-checker check sdk --language=java --manual-instrumentation
 otel-checker check sdk,collector,beyla --language=js
 otel-checker check --language=js                                 # every component
 otel-checker check sdk --language=python --web-server --listen=127.0.0.1:9000
+otel-checker check --language=js --format=json > results.json    # capture for explain/serve
 ```
 
 ## Code Conventions

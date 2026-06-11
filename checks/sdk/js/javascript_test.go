@@ -7,6 +7,7 @@ import (
 )
 
 func TestCheckEnvVars(t *testing.T) {
+	missingWarning := "It's recommended the environment variable OTEL_NODE_RESOURCE_DETECTORS to be set to `all`, or to a list containing at least `env,host,os,serviceinstance`"
 	tests := []utils.EnvVarTestCase{
 		{
 			Name: "all recommended env vars set correctly",
@@ -17,10 +18,18 @@ func TestCheckEnvVars(t *testing.T) {
 			ExpectedChecks: []string{"OTEL_NODE_RESOURCE_DETECTORS has recommended values"},
 		},
 		{
+			Name: "value all accepted",
+			EnvVars: map[string]string{
+				"OTEL_NODE_RESOURCE_DETECTORS": "all",
+			},
+			Language:       "js",
+			ExpectedChecks: []string{"OTEL_NODE_RESOURCE_DETECTORS has recommended values"},
+		},
+		{
 			Name:             "missing recommended env vars",
 			EnvVars:          map[string]string{},
 			Language:         "js",
-			ExpectedWarnings: []string{"It's recommended the environment variable OTEL_NODE_RESOURCE_DETECTORS to be set to at least `env,host,os,serviceinstance`"},
+			ExpectedWarnings: []string{missingWarning},
 		},
 		{
 			Name: "incomplete resource detectors",
@@ -28,7 +37,7 @@ func TestCheckEnvVars(t *testing.T) {
 				"OTEL_NODE_RESOURCE_DETECTORS": "env,host",
 			},
 			Language:         "js",
-			ExpectedWarnings: []string{"It's recommended the environment variable OTEL_NODE_RESOURCE_DETECTORS to be set to at least `env,host,os,serviceinstance`"},
+			ExpectedWarnings: []string{missingWarning},
 		},
 	}
 
