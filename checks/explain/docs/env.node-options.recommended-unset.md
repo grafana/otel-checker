@@ -15,7 +15,7 @@ source.
 
 If `NODE_OPTIONS` is unset — or set to something that doesn't include the
 register hook — the auto-instrumentation never installs, and no telemetry
-will be emitted from the popular libraries it would normally patch even 
+will be emitted from the popular libraries it would normally patch even
 though the SDK and instrumentation packages are installed.
 
 ## How to fix
