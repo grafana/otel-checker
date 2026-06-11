@@ -71,6 +71,88 @@ service:
 			},
 		},
 		{
+			name: "Valid Grafana Cloud configuration with named receiver and exporter",
+			configYAML: `
+receivers:
+  otlp/app:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+exporters:
+  otlphttp/grafana_cloud:
+    endpoint: https://otlp-gateway-prod-us-east-0.grafana.net/otlp
+  otlphttp/local:
+    endpoint: http://localhost:4318
+service:
+  pipelines:
+    traces:
+      receivers: [otlp/app]
+      processors: []
+      exporters: [otlphttp/grafana_cloud, otlphttp/local]
+    logs:
+      receivers: [otlp/app]
+      processors: []
+      exporters: [otlphttp/grafana_cloud]
+    metrics:
+      receivers: [otlp/app]
+      processors: []
+      exporters: [otlphttp/grafana_cloud]
+`,
+			expectedErrors:   []string{},
+			expectedWarnings: []string{},
+			expectedChecks: []string{
+				"Value of exporter > otlphttp/grafana_cloud > endpoint on config.yaml set in the format similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp",
+				"Value of service > pipelines > traces > exporters on config.yaml contains otlphttp",
+				"Value of service > pipelines > traces > receivers on config.yaml contains otlp",
+				"Value of service > pipelines > logs > exporters on config.yaml contains otlphttp",
+				"Value of service > pipelines > logs > receivers on config.yaml contains otlp",
+				"Value of service > pipelines > metrics > exporters on config.yaml contains otlphttp",
+				"Value of service > pipelines > metrics > receivers on config.yaml contains otlp",
+			},
+		},
+		{
+			name: "Valid Grafana Cloud configuration with legacy underscore exporter type",
+			configYAML: `
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+exporters:
+  otlp_http/grafana_cloud:
+    endpoint: https://otlp-gateway-prod-us-east-0.grafana.net/otlp
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: []
+      exporters: [otlp_http/grafana_cloud]
+    logs:
+      receivers: [otlp]
+      processors: []
+      exporters: [otlp_http/grafana_cloud]
+    metrics:
+      receivers: [otlp]
+      processors: []
+      exporters: [otlp_http/grafana_cloud]
+`,
+			expectedErrors:   []string{},
+			expectedWarnings: []string{},
+			expectedChecks: []string{
+				"Value of exporter > otlp_http/grafana_cloud > endpoint on config.yaml set in the format similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp",
+				"Value of service > pipelines > traces > exporters on config.yaml contains otlphttp",
+				"Value of service > pipelines > traces > receivers on config.yaml contains otlp",
+				"Value of service > pipelines > logs > exporters on config.yaml contains otlphttp",
+				"Value of service > pipelines > logs > receivers on config.yaml contains otlp",
+				"Value of service > pipelines > metrics > exporters on config.yaml contains otlphttp",
+				"Value of service > pipelines > metrics > receivers on config.yaml contains otlp",
+			},
+		},
+		{
 			name: "Localhost configuration",
 			configYAML: `
 receivers:
