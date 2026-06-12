@@ -50,6 +50,8 @@ type exporterConfig struct {
 	Auth     map[string]interface{} `yaml:"auth"`
 }
 
+var otlpHTTPGrafanaEndpointPattern = regexp.MustCompile(`https://.+\.grafana\.net/otlp`)
+
 func checkCollectorConfig(reporter *utils.ComponentReporter, configPath string) {
 	filePath := filepath.Join(configPath, "config.yaml")
 	yamlFile, err := os.ReadFile(filePath)
@@ -124,8 +126,7 @@ func checkOTLPReceiverHTTPProtocol(reporter *utils.ComponentReporter, receivers 
 func checkOTLPHTTPExporterEndpoint(reporter *utils.ComponentReporter, exporters map[string]exporterConfig) {
 	ids := otlpHTTPExporterIDs(exporters)
 	for _, id := range ids {
-		match, _ := regexp.MatchString("https:\\/\\/.+\\.grafana\\.net\\/otlp", exporters[id].Endpoint)
-		if match {
+		if otlpHTTPGrafanaEndpointPattern.MatchString(exporters[id].Endpoint) {
 			reporter.AddSuccessfulCheck(fmt.Sprintf("Value of exporter > %s > endpoint on config.yaml set in the format similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp", id))
 			return
 		}
