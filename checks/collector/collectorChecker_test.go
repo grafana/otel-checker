@@ -153,6 +153,42 @@ service:
 			},
 		},
 		{
+			name: "Invalid Grafana Cloud endpoint with named otlp_http exporter",
+			configYAML: `
+receivers:
+  otlp:
+    protocols:
+      grpc: ""
+      http: ""
+exporters:
+  otlp_http/invalid:
+    endpoint: invalid_endpoint
+service:
+  pipelines:
+    metrics:
+      receivers: [otlp]
+      exporters: [otlp_http/invalid]
+    logs:
+      receivers: [otlp]
+      exporters: [otlp_http/invalid]
+    traces:
+      receivers: [otlp]
+      exporters: [otlp_http/invalid]
+`,
+			expectedErrors: []string{
+				"Value of exporter > otlphttp > endpoint on config.yaml is not set in the format similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp",
+			},
+			expectedWarnings: []string{},
+			expectedChecks: []string{
+				"Value of service > pipelines > traces > exporters on config.yaml contains otlphttp",
+				"Value of service > pipelines > traces > receivers on config.yaml contains otlp",
+				"Value of service > pipelines > logs > exporters on config.yaml contains otlphttp",
+				"Value of service > pipelines > logs > receivers on config.yaml contains otlp",
+				"Value of service > pipelines > metrics > exporters on config.yaml contains otlphttp",
+				"Value of service > pipelines > metrics > receivers on config.yaml contains otlp",
+			},
+		},
+		{
 			name: "Localhost configuration",
 			configYAML: `
 receivers:
