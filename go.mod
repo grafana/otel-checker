@@ -3,7 +3,7 @@ module github.com/grafana/otel-checker
 go 1.25.0
 
 require (
-	github.com/charmbracelet/glamour v1.0.0
+	github.com/charmbracelet/glamour/v2 v2.0.1
 	github.com/fatih/color v1.19.0
 	github.com/gomarkdown/markdown v0.0.0-20260417124207-7d523f7318df
 	github.com/spf13/cobra v1.10.2
