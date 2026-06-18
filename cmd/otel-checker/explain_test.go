@@ -110,6 +110,21 @@ func TestExplainAll(t *testing.T) {
 	}
 }
 
+func TestStyleMarkdown(t *testing.T) {
+	// Catches glamour API regressions that renderMarkdown's silent fallback
+	// would otherwise hide — e.g. passing "auto" to glamour v2, which no longer
+	// recognizes it and returns an error, dropping us back to raw markdown with
+	// no styling. The ANSI-escape check also catches a degenerate render where
+	// the call succeeds but produces unstyled output.
+	out, err := styleMarkdown("# Heading\n\nsome **bold** text\n")
+	if err != nil {
+		t.Fatalf("styleMarkdown returned err: %v", err)
+	}
+	if !strings.Contains(out, "\x1b[") {
+		t.Errorf("expected ANSI escape sequences in styled output, got:\n%s", out)
+	}
+}
+
 func TestExplainAllMissingFile(t *testing.T) {
 	dir := t.TempDir()
 	missing := filepath.Join(dir, "nope.json")

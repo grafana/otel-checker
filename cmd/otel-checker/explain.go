@@ -10,7 +10,7 @@ import (
 	"github.com/grafana/otel-checker/checks/explain"
 	"github.com/grafana/otel-checker/checks/utils"
 
-	"github.com/charmbracelet/glamour"
+	"charm.land/glamour/v2"
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
 )
@@ -78,7 +78,7 @@ func runExplainShow(w io.Writer, id string) error {
 // piping (`otel-checker explain id | grep`) and tests stay clean.
 func renderMarkdown(w io.Writer, source string) error {
 	if f, ok := w.(*os.File); ok && term.IsTerminal(int(f.Fd())) {
-		if out, err := glamour.Render(source, "auto"); err == nil {
+		if out, err := styleMarkdown(source); err == nil {
 			_, err := fmt.Fprint(w, out)
 			return err
 		}
@@ -86,6 +86,13 @@ func renderMarkdown(w io.Writer, source string) error {
 	}
 	_, err := fmt.Fprint(w, source)
 	return err
+}
+
+// styleMarkdown is split out so tests can assert the glamour call still
+// works — renderMarkdown swallows errors and falls back to raw output, which
+// would otherwise hide a glamour API break (e.g. a removed style name).
+func styleMarkdown(source string) (string, error) {
+	return glamour.RenderWithEnvironmentConfig(source)
 }
 
 func runExplainList(w io.Writer) error {
