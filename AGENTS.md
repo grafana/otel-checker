@@ -45,6 +45,14 @@ mise run lint
 
 Linting is powered by [grafana/flint](https://github.com/grafana/flint).
 
+Run `mise run lint:fix` before committing changes.
+If output includes `fixed`, keep those changes.
+If output includes `partial` or `review`, address the remaining issues and
+run `mise run lint:fix` again.
+
+Example output:
+flint: fixed: gofmt — commit before pushing | partial: cargo-clippy
+
 ## Architecture
 
 ### Package Organization

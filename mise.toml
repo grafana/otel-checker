@@ -18,6 +18,7 @@ shellcheck = "0.11.0"
 shfmt = "3.12.0"
 taplo = "0.10.0"
 typos = "1.46.0"
+zizmor = "1.25.2"
 
 [env]
 FLINT_CONFIG_DIR = ".github/config"
