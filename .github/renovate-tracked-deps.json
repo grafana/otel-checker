@@ -6,6 +6,11 @@
         "grafana/flint"
       ]
     },
+    ".github/workflows/lint.yml": {
+      "regex": [
+        "mise"
+      ]
+    },
     ".github/workflows/test.yaml": {
       "regex": [
         "mise"
@@ -13,16 +18,19 @@
     },
     "go.mod": {
       "gomod": [
+        "charm.land/glamour/v2",
+        "charm.land/lipgloss/v2",
         "github.com/alecthomas/chroma/v2",
-        "github.com/aymanbagabas/go-osc52/v2",
         "github.com/aymerick/douceur",
         "github.com/charmbracelet/colorprofile",
-        "github.com/charmbracelet/glamour",
-        "github.com/charmbracelet/lipgloss",
+        "github.com/charmbracelet/ultraviolet",
         "github.com/charmbracelet/x/ansi",
-        "github.com/charmbracelet/x/cellbuf",
         "github.com/charmbracelet/x/exp/slice",
         "github.com/charmbracelet/x/term",
+        "github.com/charmbracelet/x/termios",
+        "github.com/charmbracelet/x/windows",
+        "github.com/clipperhouse/displaywidth",
+        "github.com/clipperhouse/uax29/v2",
         "github.com/davecgh/go-spew",
         "github.com/dlclark/regexp2",
         "github.com/fatih/color",
@@ -34,8 +42,7 @@
         "github.com/mattn/go-isatty",
         "github.com/mattn/go-runewidth",
         "github.com/microcosm-cc/bluemonday",
-        "github.com/muesli/reflow",
-        "github.com/muesli/termenv",
+        "github.com/muesli/cancelreader",
         "github.com/pmezard/go-difflib",
         "github.com/rivo/uniseg",
         "github.com/spf13/cobra",
@@ -48,6 +55,7 @@
         "go.yaml.in/yaml/v3",
         "golang.org/x/mod",
         "golang.org/x/net",
+        "golang.org/x/sync",
         "golang.org/x/sys",
         "golang.org/x/term",
         "golang.org/x/text",
@@ -72,7 +80,8 @@
         "shfmt",
         "taplo",
         "typos",
-        "uv"
+        "uv",
+        "zizmor"
       ]
     }
   }
