@@ -7,18 +7,18 @@ severity: error
 ## Why this matters
 
 `otel-checker` reads the local Node.js version via `node -v` and expects
-at least Node 16. Recent versions of `@opentelemetry/api`,
+at least Node 22. Current versions of `@opentelemetry/api`,
 `@opentelemetry/sdk-node`, and `@opentelemetry/auto-instrumentations-node`
-target Node 16+ (many now target 18+ or 20+): they use ES2022 syntax and
-runtime APIs that older versions don't provide. Installing them on Node 14
-or older either fails outright at `npm install` or throws at startup with
-unhelpful `SyntaxError` / `ReferenceError` messages that don't point at
-OpenTelemetry as the culprit.
+target Node 22+: they use modern syntax and runtime APIs that older
+versions don't provide. Installing them on Node 20 or older either fails
+outright at `npm install` or throws at startup with unhelpful
+`SyntaxError` / `ReferenceError` messages that don't point at OpenTelemetry
+as the culprit.
 
 ## How to fix
 
-Upgrade Node to a supported LTS release (18, 20, or 22 at the time of
-writing). The mechanism depends on your setup:
+Upgrade Node to a supported LTS release (22 or newer). The mechanism
+depends on your setup:
 
 - Local development with a version manager:
 
@@ -32,7 +32,7 @@ writing). The mechanism depends on your setup:
   fnm use lts-latest
   ```
 
-- Docker: bump the base image, e.g. `FROM node:20-alpine`.
+- Docker: bump the base image, e.g. `FROM node:22-alpine`.
 - CI: update the `node-version` input on `actions/setup-node`, GitLab
   `image:`, etc.
 - System package: install a current release from
@@ -42,7 +42,7 @@ After upgrading, verify:
 
 ```bash
 node -v
-# v20.19.0
+# v22.11.0
 ```
 
 ## Example
@@ -50,7 +50,7 @@ node -v
 `.nvmrc` pinning a supported version for the repo:
 
 ```text
-20
+22
 ```
 
 GitHub Actions:

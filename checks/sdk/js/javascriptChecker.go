@@ -66,11 +66,11 @@ func checkNodeVersion(ctx context.Context, reporter *utils.ComponentReporter) {
 			fmt.Sprintf("Could not check minimum node version: %s", err))
 		return
 	}
-	if v >= 16 {
+	if v >= 22 {
 		reporter.AddSuccessfulCheck("Using node version equal or greater than minimum recommended")
 	} else {
 		reporter.AddErrorWithExplain("js.node-version.too-old",
-			"Not using recommended node version. Update your node to at least version 16")
+			"Not using recommended node version. Update your node to at least version 22")
 	}
 }
 
