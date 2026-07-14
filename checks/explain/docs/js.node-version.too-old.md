@@ -6,16 +6,70 @@ severity: error
 
 ## Why this matters
 
-<!-- TODO: explain the problem in 1-3 sentences. -->
+`otel-checker` reads the local Node.js version via `node -v` and expects
+an Active LTS release — currently Node 22, 24, or 26. Everything below
+Node 22 has reached end-of-life
+([endoflife.date/nodejs](https://endoflife.date/nodejs)), and current
+versions of `@opentelemetry/api`, `@opentelemetry/sdk-node`, and
+`@opentelemetry/auto-instrumentations-node` target Node 22+: they use
+modern syntax and runtime APIs that older versions don't provide.
+Installing them on Node 20 or older either fails outright at
+`npm install` or throws at startup with unhelpful `SyntaxError` /
+`ReferenceError` messages that don't point at OpenTelemetry as the
+culprit.
 
 ## How to fix
 
-<!-- TODO: step-by-step, with concrete commands or code. -->
+Upgrade Node to an Active LTS release — 22, 24, or 26 at the time of
+writing. The mechanism depends on your setup:
+
+- Local development with a version manager:
+
+  ```bash
+  # nvm — installs the latest LTS
+  nvm install --lts
+  nvm use --lts
+
+  # fnm — installs the latest LTS
+  fnm install --lts
+  fnm use lts-latest
+  ```
+
+- Docker: bump the base image, e.g. `FROM node:22-alpine` (or `24`, `26`).
+- CI: update the `node-version` input on `actions/setup-node`, GitLab
+  `image:`, etc.
+- System package: install an Active LTS release from
+  [nodejs.org](https://nodejs.org/) or your distro's up-to-date repo.
+
+After upgrading, verify:
+
+```bash
+node -v
+# v22.11.0
+```
 
 ## Example
 
-<!-- TODO: minimal worked example. -->
+`.nvmrc` pinning a supported version for the repo:
+
+```text
+22
+```
+
+GitHub Actions:
+
+```yaml
+- uses: actions/setup-node@v7
+  with:
+    node-version-file: '.nvmrc'
+```
 
 ## Related
 
-<!-- TODO: links to OTel spec, Grafana docs, or related explain IDs. -->
+- [Node.js release schedule](https://github.com/nodejs/release#release-schedule)
+- [endoflife.date/nodejs](https://endoflife.date/nodejs) — current status
+  of every Node major.
+- `js.node-version.not-lts` — related check when Node is at or above 22
+  but on an odd-major (Current) release rather than LTS.
+- `js.node-version.unknown` — related failure when `node` isn't callable
+  at all.
