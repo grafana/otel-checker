@@ -144,10 +144,10 @@ otel-checker serve --data=./out/results.yaml
 
 These checks are automatically performed for all languages and components.
 
-- Best practices for setting common environment variables:
-  - Service name
-  - Exporter protocol
-
+- Signal exporters (`OTEL_TRACES_EXPORTER`, `OTEL_METRICS_EXPORTER`,
+  `OTEL_LOGS_EXPORTER`): must be `otlp`, `console`, or unset; `none` is rejected.
+- Service name: `OTEL_SERVICE_NAME` (or `service.name` in
+  `OTEL_RESOURCE_ATTRIBUTES`).
 - Resource attributes checks:
   - Validates the presence of recommended OpenTelemetry resource attributes
   - Checks for the following attributes:
@@ -168,8 +168,11 @@ These checks are automatically performed for all languages and components.
 Run `otel-checker check grafana-cloud --language=<lang>` (or pass
 `--components=grafana-cloud` to `check`):
 
-- Endpoints
-- Authentication
+- `OTEL_EXPORTER_OTLP_ENDPOINT` matches
+  `https://otlp-gateway-<zone>.grafana.net/otlp`.
+- `OTEL_EXPORTER_OTLP_PROTOCOL` is `http/protobuf`.
+- `OTEL_EXPORTER_OTLP_HEADERS` contains an `Authorization=Basic <token>` entry.
+- Credential validation: tests the endpoint with the provided token.
 
 ### SDK
 
@@ -177,28 +180,41 @@ Run `otel-checker check grafana-cloud --language=<lang>` (or pass
 
 Run `otel-checker check sdk --language=js`:
 
-- Node version
-- Required dependencies on package.json
-- Required environment variables
-- Resource detectors
-- Dependencies compatible with Grafana Cloud
-- Usage of Console Exporter
-- Prints which libraries are supported based on the `package.json` in the current directory.
+- Node version (>= 16).
+- `@opentelemetry/api` dependency in `package.json`.
+- Auto-instrumentation mode (default):
+  - `@opentelemetry/auto-instrumentations-node` dependency.
+  - `NODE_OPTIONS` includes
+    `--require @opentelemetry/auto-instrumentations-node/register`.
+  - `OTEL_NODE_RESOURCE_DETECTORS` set to `all` or covers
+    `env,host,os,serviceinstance`.
+- Manual-instrumentation mode (`--manual-instrumentation`):
+  - No concurrent auto-instrumentation via `NODE_OPTIONS`.
+  - Uses `@opentelemetry/exporter-trace-otlp-http` (not `-otlp-proto`).
+  - Warns when `ConsoleSpanExporter` / `ConsoleMetricExporter` is used
+    outside debugging.
+- Supported libraries: `package.json` dependencies are matched against the
+  OpenTelemetry JS contrib registry.
 
 #### Python
 
 Run `otel-checker check sdk --language=python`:
 
-- Prints which libraries are supported:
-  - The used libraries are discovered from `requirements.txt` in the current directory.
+- Supported libraries: `requirements.txt` dependencies are matched against the
+  OpenTelemetry Python contrib registry.
 
 #### .NET
 
 Run `otel-checker check sdk --language=dotnet`:
 
-- .NET version
-- Available instrumentation for .NET libraries and dependencies
-- Auto-instrumentation environment variables
+- .NET version (>= 8.0).
+- Auto-instrumentation environment variables:
+  - `CORECLR_ENABLE_PROFILING` = `1`
+  - `CORECLR_PROFILER` = `{918728DD-259F-4A6A-AC2B-B85E1B658318}`
+  - `CORECLR_PROFILER_PATH` is set
+  - `OTEL_DOTNET_AUTO_HOME` is set
+- Supported instrumentations: `.csproj` NuGet dependencies are matched against
+  the OpenTelemetry .NET auto-instrumentation library list.
 
 > [!NOTE]
 > Only .NET 8.0 and higher are supported
@@ -207,53 +223,68 @@ Run `otel-checker check sdk --language=dotnet`:
 
 Run `otel-checker check sdk --language=java`:
 
-- Java version
-- Prints which libraries (as discovered from a locally running maven or gradle)
-  are supported:
-  - With `--manual-instrumentation`, the libraries for manual instrumentation are printed.
-  - Without `--manual-instrumentation`, it will print the libraries supported by
-    the [Java Agent](https://github.com/open-telemetry/opentelemetry-java-instrumentation/).
-  - A maven or gradle wrapper will be used if found in the current directory or
-    a parent directory.
+- Java version (>= 8).
+- Supported libraries (discovered from a locally running Maven or Gradle,
+  including a wrapper if found in the current directory or a parent):
+  - Without `--manual-instrumentation`: libraries supported by the
+    [Java Agent](https://github.com/open-telemetry/opentelemetry-java-instrumentation/).
+  - With `--manual-instrumentation`: libraries with manual instrumentation
+    support.
 
 #### Go
 
 Run `otel-checker check sdk --language=go`:
 
-- Prints which libraries are supported for manual instrumentation
-  based on the `go.mod` in the current directory.
+- Supported libraries for manual instrumentation, based on `go.mod` in the
+  current directory.
 
 #### Ruby
 
 Run `otel-checker check sdk --language=ruby`:
 
-- Ruby version
-- Bundler installation
-- `Gemfile` and `Gemfile.lock` exist
-- Required dependencies installed
-- Optional auto-instrumentation dependencies installed
+- Ruby version (CRuby >= 3.0, JRuby >= 9.3.2.0, or TruffleRuby >= 22.1).
+- Bundler installed.
+- `Gemfile` and `Gemfile.lock` exist.
+- Required gems: `opentelemetry-api`, `opentelemetry-sdk`,
+  `opentelemetry-exporter-otlp`.
+- Auto-instrumentation (default): `opentelemetry-instrumentation-all` or at
+  least one specific instrumentation gem (e.g. `-rack`, `-rails`).
 
 #### PHP
 
 Run `otel-checker check sdk --language=php`:
 
-- PHP version
-- Composer installation
-- `composer.json` and `composer.lock` exist
-- Required dependencies in `composer.lock`
-- Some auto-instrumentation dependencies installed
+- PHP version (>= 8.0).
+- Composer installed.
+- `composer.json` and `composer.lock` exist.
+- Required packages: `open-telemetry/api`, `open-telemetry/sem-conv`,
+  `open-telemetry/sdk`, `open-telemetry/exporter-otlp`.
+- Auto-instrumentation (default): at least one instrumentation package (e.g.
+  `symfony`, `pdo`, `laravel`, `wordpress`, `guzzle`).
 
 ### Collector
 
 Run `otel-checker check collector`:
 
-- Config receivers and exporters
+- `config.yaml` exists and is readable, and parses as valid YAML.
+- At least one `otlp` receiver has the `http` protocol configured.
+- At least one `otlphttp` / `otlp_http` exporter has an endpoint matching the
+  Grafana Cloud format (`https://*.grafana.net/otlp`); warns when set to
+  `localhost`.
+- For each of the `traces`, `metrics`, and `logs` pipelines: the exporter list
+  contains an `otlphttp` / `otlp_http` exporter, and the receiver list
+  contains an `otlp` receiver.
+
+Named components (e.g. `otlphttp/grafana_cloud`, `otlp/app`) are supported.
 
 ### Beyla
 
 Run `otel-checker check beyla --language=<lang>`:
 
-- Environment variables
+- `BEYLA_SERVICE_NAME` (optional).
+- `BEYLA_OPEN_PORT` (required).
+- Grafana Cloud submission env vars: `GRAFANA_CLOUD_SUBMIT`,
+  `GRAFANA_CLOUD_INSTANCE_ID`, `GRAFANA_CLOUD_API_KEY`.
 
 ### Alloy
 
