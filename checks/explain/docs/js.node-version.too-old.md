@@ -56,7 +56,7 @@ node -v
 GitHub Actions:
 
 ```yaml
-- uses: actions/setup-node@v4
+- uses: actions/setup-node@v7
   with:
     node-version-file: '.nvmrc'
 ```

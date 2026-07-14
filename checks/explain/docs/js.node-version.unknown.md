@@ -9,7 +9,7 @@ severity: error
 `otel-checker` runs `node -v` and parses the output to verify the minimum
 Node.js version. This error means either the `node` binary isn't on the
 current `PATH`, the command exited non-zero, or the output didn't look
-like a version string (`v20.x.y`). Without a version to check, the tool
+like a version string (`v22.x.y`). Without a version to check, the tool
 can't tell you whether your runtime is compatible with the OpenTelemetry
 Node.js packages you're about to install — a version mismatch is one of
 the most common reasons instrumentation appears to install cleanly but
@@ -39,9 +39,9 @@ never emits telemetry.
 GitHub Actions workflow that makes Node visible to `otel-checker`:
 
 ```yaml
-- uses: actions/setup-node@v4
+- uses: actions/setup-node@v7
   with:
-    node-version: '20'
+    node-version: '22'
 - run: otel-checker check sdk --language=js
 ```
 
