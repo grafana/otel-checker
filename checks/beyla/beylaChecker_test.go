@@ -38,8 +38,8 @@ func TestCheckEnvVarsBeyla(t *testing.T) {
 				"GRAFANA_CLOUD_INSTANCE_ID is not set",
 				"GRAFANA_CLOUD_API_KEY is not set",
 			},
-			ExpectedChecks: []string{
-				"BEYLA_SERVICE_NAME is set to ''",
+			ExpectedWarnings: []string{
+				"BEYLA_SERVICE_NAME is not set",
 			},
 		},
 	}
