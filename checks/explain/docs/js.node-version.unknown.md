@@ -26,7 +26,7 @@ never emits telemetry.
    ```
 
 2. If `node` isn't found, install it. Use a version manager like `nvm` or
-   `fnm` so you don't need `sudo`, or install a current release from
+   `fnm` so you don't need `sudo`, or install a supported release from
    [nodejs.org](https://nodejs.org/).
 
 3. If Node is installed but only in another user's environment (common

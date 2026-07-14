@@ -180,7 +180,8 @@ Run `otel-checker check grafana-cloud --language=<lang>` (or pass
 
 Run `otel-checker check sdk --language=js`:
 
-- Node version (>= 22).
+- Node version — must be an Active LTS release (even-major, currently 22,
+  24, or 26). Odd-major Current releases (23, 25) are flagged as well.
 - `@opentelemetry/api` dependency in `package.json`.
 - Auto-instrumentation mode (default):
   - `@opentelemetry/auto-instrumentations-node` dependency.
