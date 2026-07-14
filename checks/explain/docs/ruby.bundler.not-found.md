@@ -6,16 +6,55 @@ severity: error
 
 ## Why this matters
 
-<!-- TODO: explain the problem in 1-3 sentences. -->
+`otel-checker` runs `bundle -v` to confirm Bundler is available. Bundler
+is the standard tool for resolving `Gemfile` dependencies and generating
+`Gemfile.lock` — without it, the OpenTelemetry gems your service depends
+on can't be installed reproducibly, and every teammate or CI runner ends
+up with a slightly different set of versions.
 
 ## How to fix
 
-<!-- TODO: step-by-step, with concrete commands or code. -->
+Install Bundler with the standard `gem` command:
+
+```bash
+gem install bundler
+```
+
+Verify:
+
+```bash
+bundle -v
+# Bundler version 2.6.x
+```
+
+If your project pins a specific Bundler version in `Gemfile.lock` (the
+`BUNDLED WITH` section), install that version too:
+
+```bash
+gem install bundler:2.6.2
+```
+
+In Docker, install Bundler in your image:
+
+```dockerfile
+FROM ruby:3.3-alpine
+RUN gem install bundler
+```
 
 ## Example
 
-<!-- TODO: minimal worked example. -->
+Complete gem-install flow from a fresh clone:
+
+```bash
+gem install bundler
+bundle install
+otel-checker check sdk --language=ruby
+```
 
 ## Related
 
-<!-- TODO: links to OTel spec, Grafana docs, or related explain IDs. -->
+- [Bundler installation guide](https://bundler.io/)
+- `ruby.runtime.not-found` — related failure when Ruby itself isn't on
+  PATH.
+- `ruby.gemfile-lock.missing` — related failure when Bundler is
+  installed but hasn't produced a lock file yet.

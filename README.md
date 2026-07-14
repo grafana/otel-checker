@@ -243,7 +243,7 @@ Run `otel-checker check sdk --language=go`:
 
 Run `otel-checker check sdk --language=ruby`:
 
-- Ruby version (CRuby >= 3.0, JRuby >= 9.3.2.0, or TruffleRuby >= 22.1).
+- Ruby version (CRuby >= 3.3, JRuby >= 9.4, or TruffleRuby >= 22.1).
 - Bundler installed.
 - `Gemfile` and `Gemfile.lock` exist.
 - Required gems: `opentelemetry-api`, `opentelemetry-sdk`,
