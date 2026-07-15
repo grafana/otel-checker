@@ -43,13 +43,21 @@ Common causes:
    dotnet --list-sdks
    ```
 
+   Or in PowerShell:
+
+   ```powershell
+   Select-String -Pattern "version" -Path global.json
+   dotnet --list-sdks
+   ```
+
    Adjust `global.json` to a version you have, or use `rollForward` to
-   allow newer feature bands:
+   allow newer feature bands (see the
+   [roll-forward reference](https://learn.microsoft.com/dotnet/core/versions/selection#control-roll-forward-behavior)):
 
    ```json
    {
      "sdk": {
-       "version": "8.0.100",
+       "version": "10.0.100",
        "rollForward": "latestFeature"
      }
    }
@@ -60,13 +68,13 @@ Common causes:
 
 ## Example
 
-Healthy output after installing .NET 8:
+Healthy output after installing a supported .NET SDK:
 
 ```bash
 $ dotnet --version
-8.0.401
+10.0.100
 $ dotnet --list-sdks
-8.0.401 [/usr/share/dotnet/sdk]
+10.0.100 [/usr/share/dotnet/sdk]
 ```
 
 ## Related

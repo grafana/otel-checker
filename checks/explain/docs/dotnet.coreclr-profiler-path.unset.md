@@ -6,12 +6,13 @@ severity: error
 
 ## Why this matters
 
-`CORECLR_PROFILER_PATH` tells the .NET CLR where on disk to find the
-OpenTelemetry native profiler shared library that corresponds to the GUID
-you selected via `CORECLR_PROFILER`. The CLR loads that library at process
-startup and hands it profiling callbacks — without a path, the CLR has
-nothing to load and the profiler is silently skipped, even if
-`CORECLR_ENABLE_PROFILING=1` and `CORECLR_PROFILER` are set correctly.
+`CORECLR_PROFILER_PATH` tells the .NET Common Language Runtime (CLR)
+where on disk to find the OpenTelemetry native profiler shared library
+that corresponds to the GUID you selected via `CORECLR_PROFILER`. The
+CLR loads that library at process startup and hands it profiling
+callbacks — without a path, the CLR has nothing to load and the profiler
+is silently skipped, even if `CORECLR_ENABLE_PROFILING=1` and
+`CORECLR_PROFILER` are set correctly.
 
 The correct value depends on your OS and CPU architecture: the
 OpenTelemetry .NET distribution ships one native library per platform.
@@ -45,6 +46,9 @@ inside your OpenTelemetry .NET auto-instrumentation distribution
   ```powershell
   $env:CORECLR_PROFILER_PATH = "$env:OTEL_DOTNET_AUTO_HOME\win-x64\OpenTelemetry.AutoInstrumentation.Native.dll"
   ```
+
+  On Windows only x64 is supported by the OpenTelemetry .NET distribution —
+  there is no x86 or ARM64 build.
 
 Verify the file exists and is readable by the process user:
 

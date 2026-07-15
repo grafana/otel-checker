@@ -44,7 +44,7 @@ where it's set so a future reader knows it's intentional.
 Enable OTLP for every signal:
 
 ```bash
-export OTEL_EXPORTER_OTLP_ENDPOINT="https://otlp-gateway-prod-us-east-0.grafana.net/otlp"
+export OTEL_EXPORTER_OTLP_ENDPOINT="https://otlp-gateway-<zone>.grafana.net/otlp"
 export OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
 export OTEL_EXPORTER_OTLP_HEADERS="Authorization=Basic <token>"
 

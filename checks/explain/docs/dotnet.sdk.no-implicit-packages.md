@@ -32,8 +32,9 @@ implicit-package mapping for this SDK isn't populated yet. Two paths:
 2. **If you believe the SDK *should* bundle instrumentable packages**
    (worker services and Razor libraries do bundle
    `Microsoft.Extensions.Hosting`, for example): open an issue on the
-   `otel-checker` repo pointing at the SDK. Adding the mapping is a
-   small change to `checks/sdk/dotnet/instrumentations.go`.
+   [`grafana/otel-checker`](https://github.com/grafana/otel-checker/issues)
+   repo pointing at the SDK. Adding the mapping is a small change to
+   `checks/sdk/dotnet/instrumentations.go`.
 
 ## Example
 

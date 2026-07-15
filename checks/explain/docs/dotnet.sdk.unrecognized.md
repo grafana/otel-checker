@@ -47,7 +47,7 @@ Standard ASP.NET Core project header:
 ```xml
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
   </PropertyGroup>
   <!-- ... -->
 </Project>

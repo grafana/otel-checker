@@ -15,12 +15,16 @@ parseable JSON.
 
 Common causes:
 
+- **`dotnet` isn't installed** or isn't on the current `PATH`, so the
+  `dotnet list package` invocation itself errors before it can read the
+  project.
 - **No restore yet**: `dotnet list package` requires `project.assets.json`,
   which `dotnet restore` (or an implicit restore on `build`/`run`)
   produces. On a freshly-cloned repo the command errors until NuGet
   packages have been restored.
-- **Old SDK**: `--format json` was added in .NET SDK 7.0.200. Older SDKs
-  emit human-readable text that the checker can't parse.
+- **Unsupported (old) SDK**: `--format json` is available in every
+  currently-supported .NET SDK, so this is only relevant if you're
+  running an SDK that has already reached end-of-life.
 - **Broken project state**: a partial build, a corrupt
   `obj/project.assets.json`, or a `.csproj` that references missing
   targets can make `dotnet list package` fail.
@@ -45,20 +49,19 @@ packages have OpenTelemetry instrumentation available.
    If it errors, the error message points at the underlying problem
    (missing target, broken NuGet source, unauthenticated feed, etc.).
 
-3. Check your SDK is new enough for `--format json`:
+3. Confirm you're on a still-supported .NET SDK:
 
    ```bash
    dotnet --version
-   # 7.0.200 or later
    ```
 
-   If it's older, upgrade to a supported SDK — see
+   If it's older than a currently-supported release, upgrade — see
    `dotnet.version.too-old`.
 
-4. If a corrupt `obj/` is the cause, wipe it and re-restore:
+4. If a corrupt build output is the cause, clean and re-restore:
 
    ```bash
-   rm -rf obj bin
+   dotnet clean
    dotnet restore
    ```
 
@@ -76,5 +79,5 @@ otel-checker check sdk --language=dotnet
 
 - `dotnet.project.no-dependencies` — related check when the command
   succeeds but returns an empty list.
-- `dotnet.version.too-old` — related check when the SDK predates
-  `--format json` support.
+- `dotnet.version.too-old` — related check when the SDK is older than
+  the currently-supported minimum.

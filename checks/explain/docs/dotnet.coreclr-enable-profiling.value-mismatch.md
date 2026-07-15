@@ -23,10 +23,16 @@ looks correctly configured.
 Set `CORECLR_ENABLE_PROFILING` to exactly `1` in the environment that runs
 the .NET process (not the shell that builds it).
 
-- Local shell:
+- Local shell (Linux / macOS):
 
   ```bash
   export CORECLR_ENABLE_PROFILING=1
+  ```
+
+- PowerShell (Windows):
+
+  ```powershell
+  $env:CORECLR_ENABLE_PROFILING="1"
   ```
 
 - Dockerfile:
@@ -49,16 +55,31 @@ Verify the value the process actually sees:
 printenv CORECLR_ENABLE_PROFILING
 ```
 
+Or in PowerShell:
+
+```powershell
+Write-Output $env:CORECLR_ENABLE_PROFILING
+```
+
 ## Example
 
 Complete set of env vars the OpenTelemetry .NET auto-instrumentation
-requires:
+requires (Linux / macOS):
 
 ```bash
 export CORECLR_ENABLE_PROFILING=1
 export CORECLR_PROFILER='{918728DD-259F-4A6A-AC2B-B85E1B658318}'
 export CORECLR_PROFILER_PATH=/opt/opentelemetry/linux-x64/OpenTelemetry.AutoInstrumentation.Native.so
 export OTEL_DOTNET_AUTO_HOME=/opt/opentelemetry
+```
+
+Same set in PowerShell (Windows):
+
+```powershell
+$env:CORECLR_ENABLE_PROFILING="1"
+$env:CORECLR_PROFILER="{918728DD-259F-4A6A-AC2B-B85E1B658318}"
+$env:CORECLR_PROFILER_PATH="$env:OTEL_DOTNET_AUTO_HOME\win-x64\OpenTelemetry.AutoInstrumentation.Native.dll"
+$env:OTEL_DOTNET_AUTO_HOME="$env:PROGRAMFILES\OpenTelemetry\.NET AutoInstrumentation"
 ```
 
 ## Related
