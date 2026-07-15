@@ -20,8 +20,8 @@ vars like `OTEL_EXPORTER_OTLP_HEADERS`), Beyla ignores the
 
 ## How to fix
 
-Generate an API token with metrics- and traces-write scopes in the
-Grafana Cloud UI (**Home → Configuration → API keys** or **Access
+Generate an API token with `metrics:write` and `traces:write` scopes in
+the Grafana Cloud UI (**Home → Configuration → API keys** or **Access
 Policies**), then set:
 
 ```bash

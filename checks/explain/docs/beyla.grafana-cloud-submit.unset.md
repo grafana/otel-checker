@@ -10,7 +10,7 @@ When Beyla ships telemetry directly to Grafana Cloud (rather than through
 a local OpenTelemetry Collector), `GRAFANA_CLOUD_SUBMIT` tells it which
 signals to send. It's a comma-separated list — typical values are
 `metrics`, `traces`, or `metrics,traces`. Without it, Beyla doesn't know
-which pipelines to enable and refuses to submit anything to Grafana
+which pipelines to enable and will not submit anything to Grafana
 Cloud.
 
 Note: this variable is part of Beyla's built-in Grafana Cloud submission
