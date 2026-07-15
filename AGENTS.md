@@ -66,8 +66,8 @@ flint: fixed: gofmt — commit before pushing | partial: cargo-clippy
   `rubyChecker.go`, `phpChecker.go`)
 - **`checks/sdk/supported/`** — Shared library support checking logic
 - **`checks/collector/`** — OTel Collector YAML config validation
-- **`checks/beyla/`** — Beyla-specific checks
-- **`checks/alloy/`** — Grafana Alloy checks
+- **`checks/beyla/`** — Beyla-specific checks (stub — no checks yet)
+- **`checks/alloy/`** — Grafana Alloy checks (stub — no checks yet)
 - **`checks/grafana/`** — Grafana Cloud connectivity/auth validation
 - **`checks/utils/`** — `Commands` struct, flag validation, typed errors,
   `Reporter`/`ComponentReporter` pattern (aggregates checks/warnings/errors
@@ -132,7 +132,7 @@ otel-checker explain list            # every registered ID
 # Examples
 otel-checker check sdk --language=js
 otel-checker check sdk --language=java --manual-instrumentation
-otel-checker check sdk,collector,beyla --language=js
+otel-checker check sdk,collector --language=js
 otel-checker check --language=js                                 # every component
 otel-checker check sdk --language=python --web-server --listen=127.0.0.1:9000
 otel-checker check --language=js --format=json > results.json    # capture for explain/serve
