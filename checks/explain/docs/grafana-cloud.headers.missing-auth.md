@@ -18,13 +18,22 @@ Grafana Cloud.
 
 ## How to fix
 
-Generate the token from your Grafana Cloud stack's OTLP page (or build
-it yourself with `printf '%s:%s' "$INSTANCE_ID" "$API_KEY" | base64`),
-then export it:
+Generate the token from your Grafana Cloud stack's OTLP page, then
+export it. Linux / macOS:
 
 ```bash
 export OTEL_EXPORTER_OTLP_HEADERS="Authorization=Basic <base64-token>"
 ```
+
+Windows (PowerShell):
+
+```powershell
+$env:OTEL_EXPORTER_OTLP_HEADERS = "Authorization=Basic <base64-token>"
+```
+
+To build the token yourself, base64-encode `instance_id:api_key`. See
+the Example section below for a `printf | base64` (bash) and
+`[Convert]::ToBase64String(...)` (PowerShell) recipe.
 
 The header name is case-sensitive per HTTP; the checker looks for
 `Authorization=Basic` followed by a space and the base64 token. Python
@@ -45,13 +54,22 @@ env:
 
 ## Example
 
-Building the token manually:
+Building the token manually on Linux / macOS:
 
 ```bash
 INSTANCE_ID="1234567"                  # from Grafana Cloud UI
 API_KEY="glc_eyJvIjoiO..."             # from Grafana Cloud UI
 TOKEN=$(printf '%s:%s' "$INSTANCE_ID" "$API_KEY" | base64)
 export OTEL_EXPORTER_OTLP_HEADERS="Authorization=Basic $TOKEN"
+```
+
+Same on Windows (PowerShell):
+
+```powershell
+$InstanceId = "1234567"
+$ApiKey = "glc_eyJvIjoiO..."
+$Token = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes("$InstanceId`:$ApiKey"))
+$env:OTEL_EXPORTER_OTLP_HEADERS = "Authorization=Basic $Token"
 ```
 
 ## Related

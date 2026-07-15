@@ -47,7 +47,7 @@ otel-checker check grafana-cloud --language=<lang>
 Direct-to-cloud env vars needed for the credential check to run:
 
 ```bash
-export OTEL_EXPORTER_OTLP_ENDPOINT="https://otlp-gateway-prod-us-east-0.grafana.net/otlp"
+export OTEL_EXPORTER_OTLP_ENDPOINT="https://otlp-gateway-<zone>.grafana.net/otlp"
 export OTEL_EXPORTER_OTLP_HEADERS="Authorization=Basic <base64-token>"
 export OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
 ```

@@ -31,13 +31,24 @@ Common causes:
    data**. It gives you the exact `Authorization: Basic <token>` line
    to paste.
 
-2. Or build it yourself:
+2. Or build it yourself.
+
+   Linux / macOS:
 
    ```bash
    INSTANCE_ID="1234567"
    API_KEY="glc_eyJvIjoi..."           # from the same stack
    TOKEN=$(printf '%s:%s' "$INSTANCE_ID" "$API_KEY" | base64)
    export OTEL_EXPORTER_OTLP_HEADERS="Authorization=Basic $TOKEN"
+   ```
+
+   Windows (PowerShell):
+
+   ```powershell
+   $InstanceId = "1234567"
+   $ApiKey = "glc_eyJvIjoi..."
+   $Token = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes("$InstanceId`:$ApiKey"))
+   $env:OTEL_EXPORTER_OTLP_HEADERS = "Authorization=Basic $Token"
    ```
 
    Check that `INSTANCE_ID` and the region embedded in the endpoint

@@ -33,6 +33,13 @@ Do not include a per-signal suffix (`/v1/traces`, `/v1/metrics`,
 `/v1/logs`). The OpenTelemetry SDK appends those automatically for the
 HTTP protocol.
 
+Note: this rule applies to `OTEL_EXPORTER_OTLP_ENDPOINT`, which is the
+"base" endpoint the SDK appends the signal path to. The
+*signal-specific* variables (`OTEL_EXPORTER_OTLP_TRACES_ENDPOINT`,
+`OTEL_EXPORTER_OTLP_METRICS_ENDPOINT`, `OTEL_EXPORTER_OTLP_LOGS_ENDPOINT`)
+are taken *as-is* — if you set those, they must include the signal path
+(e.g. `https://otlp-gateway-<zone>.grafana.net/otlp/v1/traces`).
+
 If you're sending through a local Collector first, that's an intentional
 choice — but the Grafana Cloud check is only valid against the direct
 endpoint. Either point at the gateway directly for this check, or scope
