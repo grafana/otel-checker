@@ -6,10 +6,10 @@ severity: error
 
 ## Why this matters
 
-`CORECLR_ENABLE_PROFILING` is the master switch for the .NET CLR profiling
+`CORECLR_ENABLE_PROFILING` is the main switch for the .NET CLR profiling
 API — the mechanism the OpenTelemetry .NET auto-instrumentation uses to
 attach to your process, hook method entry/exit, and emit spans and metrics
-without you touching the source. The CLR only reads the four `CORECLR_*`
+without you touching the source. The Common Language Runtime (CLR) only reads the four `CORECLR_*`
 profiler variables at process startup when this switch is set to `1`.
 
 If the variable is missing, `0`, or any other value, the CLR skips profiler

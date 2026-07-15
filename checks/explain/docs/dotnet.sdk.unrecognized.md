@@ -55,6 +55,6 @@ Standard ASP.NET Core project header:
 
 ## Related
 
-- [.NET SDK-style project reference](https://learn.microsoft.com/en-us/dotnet/core/project-sdk/overview)
+- [.NET SDK-style project reference](https://learn.microsoft.com/dotnet/core/project-sdk/overview)
 - `dotnet.sdk.no-implicit-packages` — related warning when the SDK is
   recognized but has no implicit packages mapped.

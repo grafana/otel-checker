@@ -68,7 +68,7 @@ export CORECLR_PROFILER_PATH=$OTEL_DOTNET_AUTO_HOME/linux-x64/OpenTelemetry.Auto
 
 - [OpenTelemetry .NET auto-instrumentation configuration](https://opentelemetry.io/docs/zero-code/dotnet/configuration/)
 - `dotnet.coreclr-enable-profiling.value-mismatch` — companion check for
-  the profiling master switch.
+  the profiling main switch.
 - `dotnet.coreclr-profiler.value-mismatch` — companion check for the
   profiler GUID.
 - `dotnet.otel-dotnet-auto-home.unset` — companion check for the root

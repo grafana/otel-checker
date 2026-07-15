@@ -71,6 +71,6 @@ export OTEL_DOTNET_AUTO_HOME=/opt/opentelemetry
 
 - [OpenTelemetry .NET auto-instrumentation configuration](https://opentelemetry.io/docs/zero-code/dotnet/configuration/)
 - `dotnet.coreclr-enable-profiling.value-mismatch` — companion check for
-  the profiling master switch.
+  the profiling main switch.
 - `dotnet.coreclr-profiler-path.unset` — companion check for the native
   library path the CLR loads under this GUID.

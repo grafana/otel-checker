@@ -26,7 +26,7 @@ Install the OpenTelemetry .NET auto-instrumentation distribution and point
 
   - Linux: `/opt/opentelemetry`
   - macOS: `/opt/opentelemetry` or `$HOME/otel-dotnet-auto`
-  - Windows: `C:\Program Files\OpenTelemetry\.NET AutoInstrumentation\`
+  - Windows: `"%PROGRAMFILES%\OpenTelemetry\.NET AutoInstrumentation\"`
 
 - Set the variable in the environment that runs the .NET process:
 

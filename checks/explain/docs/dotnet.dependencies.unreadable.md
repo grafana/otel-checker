@@ -17,8 +17,8 @@ Common causes:
 
 - **No restore yet**: `dotnet list package` requires `project.assets.json`,
   which `dotnet restore` (or an implicit restore on `build`/`run`)
-  produces. On a freshly-cloned repo the command errors until you
-  restore.
+  produces. On a freshly-cloned repo the command errors until NuGet
+  packages have been restored.
 - **Old SDK**: `--format json` was added in .NET SDK 7.0.200. Older SDKs
   emit human-readable text that the checker can't parse.
 - **Broken project state**: a partial build, a corrupt

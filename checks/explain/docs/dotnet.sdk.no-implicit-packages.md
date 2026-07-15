@@ -48,4 +48,4 @@ Other SDKs are recognized but have no mapping yet.
 
 - `dotnet.sdk.unrecognized` — related error when the SDK itself isn't
   recognized at all.
-- [.NET SDK-style project reference](https://learn.microsoft.com/en-us/dotnet/core/project-sdk/overview)
+- [.NET SDK-style project reference](https://learn.microsoft.com/dotnet/core/project-sdk/overview)

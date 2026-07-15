@@ -8,13 +8,13 @@ severity: error
 
 `otel-checker` reads the local .NET SDK version via `dotnet --version` and
 expects at least .NET 8. That's the oldest version the OpenTelemetry .NET
-distribution officially supports: earlier majors (.NET 6 and older) are
+distribution officially supports: earlier majors (.NET 7 and older) are
 past end-of-life
 ([endoflife.date/dotnet](https://endoflife.date/dotnet)) and the
 OpenTelemetry .NET auto-instrumentation and manual SDK packages no longer
 guarantee compatibility with them.
 
-Installing the OpenTelemetry NuGet packages on .NET 6 or older may
+Installing the OpenTelemetry NuGet packages on .NET 7 or older may
 succeed at restore time but throw at process startup with runtime errors
 that don't obviously point at OpenTelemetry, or silently emit degraded
 telemetry.
@@ -43,7 +43,7 @@ Upgrade the .NET SDK to a supported release — .NET 8 (LTS) or newer:
   (or the equivalent):
 
   ```yaml
-  - uses: actions/setup-dotnet@v4
+  - uses: actions/setup-dotnet@v5
     with:
       dotnet-version: '8.0.x'
   ```

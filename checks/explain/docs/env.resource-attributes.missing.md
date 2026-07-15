@@ -20,7 +20,7 @@ The checker flags these four attributes when they're missing:
 - `service.instance.id` — unique per-process identifier (pod name, host,
   process id). Required to distinguish two replicas of the same service.
 - `service.version` — the running build's version. Lets you see whether
-  a spike in errors coincides with a deploy.
+  a spike in errors coincides with a deployment.
 
 ## How to fix
 
