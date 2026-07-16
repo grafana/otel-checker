@@ -75,9 +75,11 @@ func load(fsys fs.FS) error {
 
 // parse extracts the YAML front-matter and body from a markdown file.
 // Files MUST start with a "---\n" line, contain a closing "---\n" within the
-// first ~20 lines, and have non-empty id/title/severity fields.
+// first ~20 lines, and have non-empty id/title/severity fields. CRLF line
+// endings are normalized to LF first so files edited through the GitHub web
+// UI on Windows still parse.
 func parse(data []byte) (Doc, error) {
-	s := string(data)
+	s := strings.ReplaceAll(string(data), "\r\n", "\n")
 	if !strings.HasPrefix(s, "---\n") {
 		return Doc{}, fmt.Errorf("missing front-matter (file must start with ---)")
 	}
