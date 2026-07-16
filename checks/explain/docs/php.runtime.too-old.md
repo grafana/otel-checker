@@ -6,13 +6,13 @@ severity: error
 
 ## Why this matters
 
-`otel-checker` requires PHP 8.0 or newer. Everything below has reached
+`otel-checker` requires PHP 8.0 or newer. Earlier versions have reached
 end-of-life
 ([endoflife.date/php](https://endoflife.date/php)) and the OpenTelemetry
 PHP packages target 8.0+: they rely on typed properties, constructor
 promotion, and other features that older PHP releases don't provide.
 Installing them on PHP 7.x either fails at `composer install` or throws
-`ParseError` at request time.
+`ParseError` at runtime.
 
 ## How to fix
 

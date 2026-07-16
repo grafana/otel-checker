@@ -24,7 +24,7 @@ Common shapes it does *not* recognize:
 ## How to fix
 
 1. If your `requirements.txt` uses loose specifiers, either pin exact
-   versions (recommended for reproducible builds anyway):
+   versions (recommended for reproducible builds):
 
    ```bash
    pip freeze > requirements.txt

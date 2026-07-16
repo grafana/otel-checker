@@ -28,7 +28,7 @@ auto-instrumentation setup.
 ## How to fix
 
 Install the instrumentation package(s) that match your stack. Common
-picks:
+choices include:
 
 ```bash
 # Framework
