@@ -42,7 +42,7 @@ GitHub Actions workflow that makes .NET visible to `otel-checker`:
 ```yaml
 - uses: actions/setup-dotnet@v5
   with:
-    dotnet-version: '8.0.x'
+    dotnet-version: '10.0.x'
 - run: otel-checker check sdk --language=dotnet
 ```
 
