@@ -68,6 +68,20 @@ func TestParseRejectsMissingClosingDelimiter(t *testing.T) {
 	}
 }
 
+func TestParseAcceptsCRLF(t *testing.T) {
+	// Docs edited via the GitHub web UI on Windows come back with CRLF
+	// line endings. The parser must normalize before checking the ---
+	// prefix; regression from #416.
+	src := "---\r\nid: x\r\ntitle: y\r\nseverity: warning\r\n---\r\nbody\r\n"
+	doc, err := parse([]byte(src))
+	if err != nil {
+		t.Fatalf("parse(CRLF) returned err = %v, want nil", err)
+	}
+	if doc.ID != "x" || doc.Title != "y" || doc.Severity != "warning" {
+		t.Errorf("parse(CRLF) returned wrong front-matter: %+v", doc)
+	}
+}
+
 func TestParseRejectsMissingFields(t *testing.T) {
 	cases := []string{
 		"---\ntitle: y\nseverity: warning\n---\nbody", // no id
