@@ -12,14 +12,18 @@ in a form the parser doesn't recognize. That means the
 supported-libraries report will be empty even though the check itself
 ran to completion.
 
-The parser accepts lines of the form `name==version` (an exact pin).
-Common shapes it does *not* recognize:
+The parser accepts lines of the form `name==version` (an exact pin) and
+handles `pip-compile --generate-hashes` output — trailing `\`
+continuations are stripped and `--hash=…` lines are skipped silently, so
+a hashed pin still parses as its `name==version` value.
+
+Common shapes the parser does *not* recognize:
 
 - Loose specifiers: `requests>=2.28`, `django~=4.2`, `flask` (bare name).
 - Editable installs: `-e .`, `-e git+https://...`.
 - File references: `-r requirements-dev.txt`.
 - Comments: `# ...` (silently ignored, not an error).
-- Compiled outputs where every dep is a URL: `pip-compile --generate-hashes`.
+- URL-only dependencies with no version pin.
 
 ## How to fix
 

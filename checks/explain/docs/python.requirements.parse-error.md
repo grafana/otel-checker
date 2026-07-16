@@ -6,11 +6,14 @@ severity: warning
 
 ## Why this matters
 
-`otel-checker`'s Python parser only understands lines of the form
-`package==version` — an exact pin. Every other line in
-`requirements.txt` (loose specifier, editable install, file reference,
-URL, environment marker) is skipped, and this warning fires so you know
-which lines were ignored.
+`otel-checker`'s Python parser understands lines of the form
+`package==version` — an exact pin. It also handles `pip-compile
+--generate-hashes` output: trailing `\` continuations are stripped and
+`--hash=…` lines are skipped silently, so a hashed pin still parses as
+its `name==version` value. Every other line in `requirements.txt`
+(loose specifier, editable install, file reference, URL, environment
+marker) is skipped, and this warning fires so you know which lines were
+ignored.
 
 The affected packages don't show up in the supported-libraries report,
 even if OpenTelemetry has instrumentation for them.
@@ -36,9 +39,10 @@ even if OpenTelemetry has instrumentation for them.
    ```
 
 2. If the flagged line is one the parser will never handle (editable
-   install, `-r` reference, URL, hash line), either leave it and accept
-   that its packages won't appear in the report, or export a separate
-   frozen file for the checker to consume.
+   install, `-r` reference, URL), either leave it and accept that its
+   packages won't appear in the report, or export a separate frozen
+   file for the checker to consume. Hashed `pip-compile` output is
+   handled — you don't need to strip `--hash=` lines yourself.
 
 3. If your project uses another dependency manager, export a
    `requirements.txt` in the pinned form:
@@ -55,6 +59,8 @@ Lines the parser handles vs. skips:
 ```text
 opentelemetry-api==1.28.0         # ✓ parsed
 django==4.2.11                    # ✓ parsed
+click==8.1.7 \                    # ✓ parsed (pip-compile hashed pin)
+    --hash=sha256:abc...          # ✓ silently skipped (hash line)
 
 requests>=2.28                    # ✗ skipped (loose specifier)
 -e .                              # ✗ skipped (editable install)

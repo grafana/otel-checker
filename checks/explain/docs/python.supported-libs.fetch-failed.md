@@ -17,10 +17,8 @@ the main output of `check sdk --language=python`.
 Common causes:
 
 - **No network access.** The environment running `otel-checker` can't
-  reach `raw.githubusercontent.com`. Common in air-gapped CI,
-  restrictive corporate networks, or a broken proxy config.
-- **GitHub-side outage.** Occasionally `raw.githubusercontent.com`
-  returns 5xx errors or times out.
+  reach `raw.githubusercontent.com`. Common in air-gapped CI, networks
+  with strict egress rules, or an unreachable proxy.
 - **Upstream format drift.** The Python contrib README structure
   changed in a way the parser doesn't handle. The fetch itself
   succeeded but the extraction failed.

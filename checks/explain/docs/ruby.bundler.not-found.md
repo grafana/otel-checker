@@ -37,7 +37,7 @@ gem install bundler:2.6.2
 In Docker, install Bundler in your image:
 
 ```dockerfile
-FROM ruby:3.3-alpine
+FROM ruby:4-alpine
 RUN gem install bundler
 ```
 

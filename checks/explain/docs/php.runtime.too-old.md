@@ -19,18 +19,28 @@ Installing them on PHP 7.x either fails at `composer install` or throws
 Upgrade to a supported PHP release:
 
 - **macOS**: `brew install php` (installs the current stable release).
-- **Debian / Ubuntu**: use Ondrej's PPA if the distro package is old:
+- **Debian / Ubuntu**: `sudo apt-get install php-cli`. This works on
+  current distro releases (Ubuntu 22.04+, Debian 12+). On older
+  releases the distro package predates PHP 8.0 — prefer Docker (see
+  below) or install a supported version another way.
+- **Docker**: use the [official PHP image](https://hub.docker.com/_/php)
+  maintained by the PHP team, e.g. `FROM php:8.3-cli` or
+  `FROM php:8.3-fpm`.
+- **CI**: run the job inside the official PHP Docker image so the
+  version is pinned by the image tag, not by the runner's default PHP.
+  On GitHub Actions:
 
-  ```bash
-  sudo add-apt-repository ppa:ondrej/php
-  sudo apt-get update
-  sudo apt-get install php8.3 php8.3-cli
+  ```yaml
+  jobs:
+    test:
+      runs-on: ubuntu-latest
+      container: php:8.3-cli
+      steps:
+        - uses: actions/checkout@v4
+        - run: otel-checker check sdk --language=php
   ```
 
-- **Docker**: bump the base image, e.g. `FROM php:8.3-cli` or
-  `FROM php:8.3-fpm`.
-- **CI**: pin the PHP version explicitly (e.g. `shivammathur/setup-php`
-  on GitHub Actions).
+  GitLab / CircleCI have equivalent `image:` / `docker:` fields.
 
 Verify:
 
@@ -41,13 +51,17 @@ php -v
 
 ## Example
 
-GitHub Actions workflow that pins PHP 8.3 before invoking the checker:
+GitHub Actions workflow that pins PHP 8.3 via the official PHP Docker
+image:
 
 ```yaml
-- uses: shivammathur/setup-php@v2
-  with:
-    php-version: '8.3'
-- run: otel-checker check sdk --language=php
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container: php:8.3-cli
+    steps:
+      - uses: actions/checkout@v4
+      - run: otel-checker check sdk --language=php
 ```
 
 ## Related

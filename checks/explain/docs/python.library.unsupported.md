@@ -7,11 +7,12 @@ severity: warning
 ## Why this matters
 
 For each dependency in your `requirements.txt`, the checker cross-references
-it against the OpenTelemetry Python contrib catalog (parsed live from the
-`opentelemetry-python-contrib` README on GitHub). When a library isn't
-in that catalog — no matching entry, or a matching entry whose version
-range doesn't cover the version you have pinned — you'll only get
-telemetry for that library if you add manual instrumentation yourself.
+it against the OpenTelemetry Python contrib catalog (parsed live from
+the [`opentelemetry-python-contrib`](https://github.com/open-telemetry/opentelemetry-python-contrib)
+README on GitHub). When a library isn't in that catalog — no matching
+entry, or a matching entry whose version range doesn't cover the version
+you have pinned — you'll only get telemetry for that library if you add
+manual instrumentation yourself.
 
 This warning only fires in debug mode (`--debug`). By default it's
 suppressed, since projects typically have dozens of dependencies whose

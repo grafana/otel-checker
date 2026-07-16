@@ -6,13 +6,18 @@ severity: error
 
 ## Why this matters
 
-The Ruby checker probes three runtimes — CRuby (`ruby -v`), JRuby
-(`jruby --version`), and TruffleRuby — and requires at least one to
-report a supported version. None of them responded here, which means no
-Ruby interpreter is on the current `PATH` (or all three returned
-versions below the minimums). Without a runtime the checker can't
-validate that your Gemfile is compatible with the OpenTelemetry Ruby
-gems, and your service can't run at all.
+The Ruby checker probes three runtimes and requires at least one to
+report a supported version:
+
+- [CRuby](https://www.ruby-lang.org/) (`ruby -v`)
+- [JRuby](https://www.jruby.org/) (`jruby --version`)
+- [TruffleRuby](https://github.com/oracle/truffleruby) (best-effort)
+
+This error means none of the three commands returned a usable version —
+either the corresponding binary isn't on the current `PATH`, or the
+version it reported is below the supported minimum. Without a runtime
+the checker can't validate that your Gemfile is compatible with the
+OpenTelemetry Ruby gems, and your service can't run at all.
 
 Supported minimums:
 
