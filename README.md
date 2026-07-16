@@ -280,12 +280,8 @@ Named components (e.g. `otlphttp/grafana_cloud`, `otlp/app`) are supported.
 
 ### Beyla
 
-Run `otel-checker check beyla --language=<lang>`:
-
-- `BEYLA_SERVICE_NAME` (optional).
-- `BEYLA_OPEN_PORT` (required).
-- Grafana Cloud submission env vars: `GRAFANA_CLOUD_SUBMIT`,
-  `GRAFANA_CLOUD_INSTANCE_ID`, `GRAFANA_CLOUD_API_KEY`.
+> [!NOTE]
+> TBD
 
 ### Alloy
 

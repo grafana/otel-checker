@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"regexp"
 	"strings"
 	"time"
@@ -16,6 +17,15 @@ import (
 var credentialCheckClient = &http.Client{Timeout: 10 * time.Second}
 
 var (
+	baseEndpointRegex   = regexp.MustCompile(`^https://.+\.grafana\.net/otlp/?$`)
+	signalEndpointRegex = map[string]*regexp.Regexp{
+		"traces":  regexp.MustCompile(`^https://.+\.grafana\.net/otlp/v1/traces/?$`),
+		"metrics": regexp.MustCompile(`^https://.+\.grafana\.net/otlp/v1/metrics/?$`),
+		"logs":    regexp.MustCompile(`^https://.+\.grafana\.net/otlp/v1/logs/?$`),
+	}
+)
+
+var (
 	OtelExporterOTLPProtocol = env.EnvVar{
 		Name:          "OTEL_EXPORTER_OTLP_PROTOCOL",
 		RequiredValue: "http/protobuf",
@@ -24,24 +34,11 @@ var (
 		ExplainID:     "grafana-cloud.protocol.invalid",
 	}
 
+	// OtelExporterOTLPEndpoint is only kept as a var so checkAuth and other
+	// callers can look up its value by name. Endpoint validation happens in
+	// checkEndpoints — it's context-dependent on the signal-specific vars.
 	OtelExporterOTLPEndpoint = env.EnvVar{
-		Name:      "OTEL_EXPORTER_OTLP_ENDPOINT",
-		Required:  true,
-		ExplainID: "grafana-cloud.endpoint.unset",
-		Validator: func(value string, language string, reporter *utils.ComponentReporter) {
-			match, _ := regexp.MatchString("https://.+\\.grafana\\.net/otlp", value)
-			if match {
-				reporter.AddSuccessfulCheck("OTEL_EXPORTER_OTLP_ENDPOINT set in the format similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp")
-			} else {
-				if strings.Contains(value, "localhost") {
-					reporter.AddWarningWithExplain("grafana-cloud.endpoint.localhost",
-						"OTEL_EXPORTER_OTLP_ENDPOINT is set to localhost. Update to a Grafana endpoint similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp to be able to send telemetry to your Grafana Cloud instance")
-				} else {
-					reporter.AddErrorWithExplain("grafana-cloud.endpoint.invalid-format",
-						"OTEL_EXPORTER_OTLP_ENDPOINT is not set in the format similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp")
-				}
-			}
-		},
+		Name:        "OTEL_EXPORTER_OTLP_ENDPOINT",
 		Description: "OTLP exporter endpoint",
 	}
 
@@ -70,14 +67,59 @@ func CheckGrafanaSetup(ctx context.Context, reporter utils.Reporter, grafanaRepo
 }
 
 func checkEnvVarsGrafana(reporter utils.Reporter, grafana *utils.ComponentReporter, language string, components []string) {
-	// Check common OpenTelemetry variables
-	commonVars := []env.EnvVar{
+	env.CheckEnvVars(grafana, language,
 		OtelExporterOTLPProtocol,
-		OtelExporterOTLPEndpoint,
-		OtelExporterOTLPHeaders,
+		OtelExporterOTLPHeaders)
+	checkEndpoints(grafana)
+}
+
+// checkEndpoints validates the OTLP endpoint variables. Each signal (traces,
+// metrics, logs) can be pointed at Grafana Cloud in one of two ways: via the
+// signal-specific `OTEL_EXPORTER_OTLP_<SIGNAL>_ENDPOINT` (must include the
+// `/v1/<signal>` path) or via the base `OTEL_EXPORTER_OTLP_ENDPOINT` (must
+// NOT include the signal path — the SDK appends it). The base is required
+// only for signals that don't have a signal-specific override.
+func checkEndpoints(reporter *utils.ComponentReporter) {
+	base := os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT")
+
+	signals := []string{"traces", "metrics", "logs"}
+	var missing []string
+	for _, signal := range signals {
+		varName := fmt.Sprintf("OTEL_EXPORTER_OTLP_%s_ENDPOINT", strings.ToUpper(signal))
+		value := os.Getenv(varName)
+		if value == "" {
+			missing = append(missing, signal)
+			continue
+		}
+		if signalEndpointRegex[signal].MatchString(value) {
+			reporter.AddSuccessfulCheck(fmt.Sprintf("%s set in the format similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp/v1/%s", varName, signal))
+		} else {
+			reporter.AddErrorWithExplain("grafana-cloud.signal-endpoint.invalid-format",
+				fmt.Sprintf("%s is not set in the format similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp/v1/%s", varName, signal))
+		}
 	}
 
-	env.CheckEnvVars(grafana, language, commonVars...)
+	baseRequired := len(missing) > 0
+
+	if base == "" {
+		if baseRequired {
+			reporter.AddErrorWithExplain("grafana-cloud.endpoint.unset",
+				fmt.Sprintf("OTEL_EXPORTER_OTLP_ENDPOINT is not set — required because signal-specific endpoint(s) missing for: %s", strings.Join(missing, ", ")))
+		} else {
+			reporter.AddSuccessfulCheck("OTEL_EXPORTER_OTLP_ENDPOINT is unset — all signals are covered by signal-specific endpoints")
+		}
+		return
+	}
+
+	if baseEndpointRegex.MatchString(base) {
+		reporter.AddSuccessfulCheck("OTEL_EXPORTER_OTLP_ENDPOINT set in the format similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp")
+	} else if strings.Contains(base, "localhost") {
+		reporter.AddWarningWithExplain("grafana-cloud.endpoint.localhost",
+			"OTEL_EXPORTER_OTLP_ENDPOINT is set to localhost. Update to a Grafana endpoint similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp to be able to send telemetry to your Grafana Cloud instance")
+	} else {
+		reporter.AddErrorWithExplain("grafana-cloud.endpoint.invalid-format",
+			"OTEL_EXPORTER_OTLP_ENDPOINT is not set in the format similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp (no signal suffix like /v1/traces)")
+	}
 }
 
 func checkAuth(ctx context.Context, reporter *utils.ComponentReporter) {
