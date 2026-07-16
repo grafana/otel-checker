@@ -1,0 +1,99 @@
+# Repo-internal: cuts a new release (annotated tag + GitHub Release with
+# auto-generated notes) from main. Dispatch manually and pick the semver bump.
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: 'Which semver part to bump.'
+        required: true
+        default: patch
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Cut new release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # to create the tag and the GitHub Release
+    steps:
+      - name: Enforce main branch
+        env:
+          REF: ${{ github.ref }}
+        run: |
+          if [[ "$REF" != "refs/heads/main" ]]; then
+            echo "::error::Release must be cut from main. Got: $REF"
+            exit 1
+          fi
+
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+          # zizmor: ignore[artipacked] — we need the token persisted to push the annotated tag below.
+          persist-credentials: true
+
+      - name: Compute next version
+        id: compute
+        env:
+          BUMP: ${{ inputs.bump }}
+        run: |
+          set -euo pipefail
+          latest=$(git tag --list 'v[0-9]*.[0-9]*.[0-9]*' --sort=-v:refname | head -n 1)
+          if [[ -z "$latest" ]]; then
+            latest="v0.0.0"
+          fi
+          echo "Latest tag: $latest"
+          ver="${latest#v}"
+          IFS='.' read -r major minor patch <<< "$ver"
+          case "$BUMP" in
+            major) major=$((major + 1)); minor=0; patch=0 ;;
+            minor) minor=$((minor + 1)); patch=0 ;;
+            patch) patch=$((patch + 1)) ;;
+            *) echo "::error::unknown bump: $BUMP"; exit 1 ;;
+          esac
+          new="v${major}.${minor}.${patch}"
+          echo "New version: $new"
+          echo "new_version=$new" >> "$GITHUB_OUTPUT"
+
+      - name: Create annotated tag
+        env:
+          NEW_VERSION: ${{ steps.compute.outputs.new_version }}
+          TARGET_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "$NEW_VERSION" -m "Release $NEW_VERSION" "$TARGET_SHA"
+          git push origin "$NEW_VERSION"
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          NEW_VERSION: ${{ steps.compute.outputs.new_version }}
+          TARGET_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          # The annotated tag was pushed in the previous step; --verify-tag
+          # tells gh to attach the Release to it rather than creating a new
+          # (lightweight) tag.
+          gh release create "$NEW_VERSION" \
+            --title "$NEW_VERSION" \
+            --generate-notes \
+            --latest \
+            --verify-tag \
+            --target "$TARGET_SHA"
+          echo "Created release $NEW_VERSION at $TARGET_SHA"
