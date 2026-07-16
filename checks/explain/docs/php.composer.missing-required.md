@@ -19,7 +19,7 @@ manual-instrumentation:
 - `open-telemetry/exporter-otlp` — the exporter that ships those
   signals to Grafana Cloud via OTLP.
 
-If any of them is missing, either the SDK never registers a tracer
+If any of them are missing, either the SDK never registers a tracer
 provider (so instrumentation packages produce no-op spans), or spans
 are produced but there's no exporter to ship them anywhere.
 
@@ -59,7 +59,7 @@ composer require \
 
 ## Example
 
-Minimal instrumentation bootstrap:
+Minimal instrumentation bootstrap code:
 
 ```php
 use OpenTelemetry\SDK\Sdk;
