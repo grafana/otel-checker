@@ -75,12 +75,24 @@ func readRequirementsTxt(reporter *utils.ComponentReporter, path string) []Libra
 func parseRequirementsTxt(reporter *utils.ComponentReporter, lines string) []Library {
 	var deps []Library
 	for _, line := range strings.Split(lines, "\n") {
-		lib, ok := parseRequirementLine(line)
+		// Strip trailing backslash line-continuation (pip-compile format) and
+		// surrounding whitespace so hashed files like
+		//   foo==1.0 \
+		//       --hash=sha256:abc \
+		// yield the same "foo==1.0" as an un-hashed pin.
+		clean := strings.TrimSpace(strings.TrimSuffix(strings.TrimSpace(line), `\`))
+		if clean == "" {
+			continue
+		}
+		// pip options and hash-continuation lines (e.g. --hash=sha256:...) are
+		// not package specifiers — skip silently.
+		if strings.HasPrefix(clean, "--") {
+			continue
+		}
+		lib, ok := parseRequirementLine(clean)
 		if !ok {
-			if line != "" {
-				reporter.AddWarningWithExplain("python.requirements.parse-error",
-					fmt.Sprintf("Could not parse line: %s", line))
-			}
+			reporter.AddWarningWithExplain("python.requirements.parse-error",
+				fmt.Sprintf("Could not parse line: %s", line))
 			continue
 		}
 		deps = append(deps, lib)

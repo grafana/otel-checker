@@ -4,11 +4,16 @@ import (
 	"context"
 	"os"
 	"os/exec"
+	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/grafana/otel-checker/checks/utils"
+)
 
-	"golang.org/x/mod/semver"
+var (
+	cRubyVersionRegex = regexp.MustCompile(`ruby (\d+)\.(\d+)`)
+	jRubyVersionRegex = regexp.MustCompile(`jruby (\d+)\.(\d+)`)
 )
 
 func CheckRubySetup(ctx context.Context, reporter *utils.ComponentReporter, commands utils.Commands) {
@@ -40,7 +45,7 @@ func checkRubyVersion(ctx context.Context, reporter *utils.ComponentReporter) {
 		reporter.AddSuccessfulCheck("Ruby setup successful")
 	} else {
 		reporter.AddErrorWithExplain("ruby.runtime.not-found",
-			"No Ruby found, install CRuby >= 3.0, JRuby >= 9.3.2.0, or TruffleRuby >= 22.1")
+			"No Ruby found, install CRuby >= 3.3, JRuby >= 9.4, or TruffleRuby >= 22.1")
 	}
 }
 
@@ -85,14 +90,20 @@ func checkCRubyVersion(ctx context.Context, reporter *utils.ComponentReporter) b
 		return false
 	}
 
-	if strings.Contains(string(stdout), "ruby 3") {
-		reporter.AddSuccessfulCheck("Using CRuby >= 3.0")
-		return true
-	} else {
-		reporter.AddErrorWithExplain("ruby.cruby.too-old",
-			"Not using recommended CRuby version, update to CRuby >= 3.0")
+	m := cRubyVersionRegex.FindStringSubmatch(string(stdout))
+	if m == nil {
 		return false
 	}
+	major, _ := strconv.Atoi(m[1])
+	minor, _ := strconv.Atoi(m[2])
+
+	if major > 3 || (major == 3 && minor >= 3) {
+		reporter.AddSuccessfulCheck("Using CRuby >= 3.3")
+		return true
+	}
+	reporter.AddErrorWithExplain("ruby.cruby.too-old",
+		"Not using recommended CRuby version, update to CRuby >= 3.3")
+	return false
 }
 
 func checkJRubyVersion(ctx context.Context, reporter *utils.ComponentReporter) bool {
@@ -103,16 +114,20 @@ func checkJRubyVersion(ctx context.Context, reporter *utils.ComponentReporter) b
 		return false
 	}
 
-	version := strings.Fields(string(stdout))[2]
-
-	if semver.Compare(version, "9.3.2.0") >= 0 {
-		reporter.AddSuccessfulCheck("Using JRuby >= 9.3.2.0")
-		return true
-	} else {
-		reporter.AddErrorWithExplain("ruby.jruby.too-old",
-			"Not using recommended JRuby version, update to JRuby >= 9.3.2.0")
+	m := jRubyVersionRegex.FindStringSubmatch(string(stdout))
+	if m == nil {
 		return false
 	}
+	major, _ := strconv.Atoi(m[1])
+	minor, _ := strconv.Atoi(m[2])
+
+	if major > 9 || (major == 9 && minor >= 4) {
+		reporter.AddSuccessfulCheck("Using JRuby >= 9.4")
+		return true
+	}
+	reporter.AddErrorWithExplain("ruby.jruby.too-old",
+		"Not using recommended JRuby version, update to JRuby >= 9.4")
+	return false
 }
 
 // not implemented yet
