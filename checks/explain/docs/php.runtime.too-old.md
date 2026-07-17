@@ -36,7 +36,7 @@ Upgrade to a supported PHP release:
       runs-on: ubuntu-latest
       container: php:8.3-cli
       steps:
-        - uses: actions/checkout@v4
+        - uses: actions/checkout@v7
         - run: otel-checker check sdk --language=php
   ```
 
