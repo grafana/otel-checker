@@ -1,0 +1,42 @@
+version: 2
+
+project_name: otel-checker
+
+builds:
+  - binary: otel-checker
+    main: ./cmd/otel-checker
+    env:
+      # Keep Linux archives libc-independent so they run on glibc and musl.
+      - CGO_ENABLED=0
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w -X main.version={{ .Version }}
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+
+archives:
+  - formats: [tar.gz]
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    name_template: >-
+      {{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}
+
+checksum:
+  name_template: checksums.txt
+  algorithm: sha256
+
+release:
+  draft: true
+  use_existing_draft: true
+  mode: keep-existing
+  replace_existing_artifacts: true
+
+changelog:
+  disable: true

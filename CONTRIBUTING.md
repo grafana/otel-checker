@@ -102,6 +102,10 @@ quality and streamlines the development workflow.
 7. Commit your changes with a descriptive message
 8. Submit a pull request to the main repository
 
+Pull request titles must use the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
+format. For example, use `feat: add a collector check` or `fix: handle a missing
+configuration file`. The PR Title check enforces this format.
+
 ## Before Submitting Pull Requests
 
 Please ensure:
@@ -118,6 +122,29 @@ Once you submit a pull request:
 1. Maintainers will review your code
 2. They may request changes or improvements
 3. Once approved, your PR will be merged into the main branch
+
+## Release process
+
+Releases are prepared automatically from semantic pull request titles. After
+changes land on `main`, [release-please](https://github.com/googleapis/release-please)
+opens or updates a draft release pull request. Merging that pull request creates
+the next version tag and draft GitHub release. GoReleaser then builds and uploads
+archives for Linux, macOS, and Windows on amd64 and arm64, along with SHA-256
+checksums and build provenance. Linux artifacts disable cgo and are therefore
+usable on both glibc- and musl-based distributions. The workflow publishes the
+release after the assets are uploaded.
+
+The release workflow is `.github/workflows/release.yml`, and its build settings
+are in `.goreleaser.yml`. To test a release build locally without publishing:
+
+```bash
+mise run lint
+mise run test
+mise exec -- goreleaser release --snapshot --clean
+```
+
+Maintainers can republish an existing tag by manually running the Release
+workflow from that tag and providing the tag name as the workflow input.
 
 ## Submit a pull request
 
