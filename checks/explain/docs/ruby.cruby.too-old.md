@@ -60,7 +60,7 @@ ruby -v
 
 ## Related
 
-- [Ruby release schedule](https://www.ruby-lang.org/en/downloads/branches/)
+- [Ruby downloads and maintenance branches](https://www.ruby-lang.org/en/downloads/)
 - [endoflife.date/ruby](https://endoflife.date/ruby) — current status of
   every Ruby major.
 - `ruby.jruby.too-old` — related check for JRuby.
