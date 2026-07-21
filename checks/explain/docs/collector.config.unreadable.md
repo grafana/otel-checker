@@ -6,20 +6,21 @@ severity: error
 
 ## Why this matters
 
-`otel-checker check collector` looks for `config.yaml` inside the directory
-passed via `--collector-config-path` (or the current directory when the
-flag is omitted). Every downstream collector check — endpoint format,
-receiver protocols, per-pipeline exporter presence — reads from that
-file. If it can't be opened, the checker has nothing to inspect and skips
-the whole collector-side analysis.
+`otel-checker check collector` reads the Collector's config file from the
+full path passed via `--collector-config-path`. When the flag is omitted,
+it falls back to `config.yaml` (then `config.yml`) in the current working
+directory. Every downstream collector check — endpoint format, receiver
+protocols, per-pipeline exporter presence — reads from that file. If it
+can't be opened, the checker has nothing to inspect and skips the whole
+collector-side analysis.
 
 Common causes:
 
-- Running the checker from a directory that doesn't contain the
-  Collector's config.
-- Passing `--collector-config-path` to a folder that doesn't hold a file
-  literally named `config.yaml` (a different filename, or a symlink to
-  a file the current user can't read).
+- Running the checker from a directory that doesn't contain a
+  `config.yaml` / `config.yml` and not passing `--collector-config-path`.
+- Passing `--collector-config-path` with a wrong path (typo, relative
+  path resolved from a different directory, or pointing at a directory
+  instead of the file itself).
 - Permissions: the config lives on disk but the invoking user doesn't
   have read access.
 
@@ -28,24 +29,22 @@ Common causes:
 1. Confirm the file exists at the expected path:
 
    ```bash
-   ls -l ./config.yaml
+   ls -l ./otel/my-collector.yaml
    ```
 
-2. If your config lives elsewhere, point the checker at its directory:
+2. If your config lives elsewhere or uses a non-standard filename, pass
+   the full file path via `--collector-config-path` (the flag accepts
+   any filename):
 
    ```bash
-   otel-checker check collector --collector-config-path=./otel/
+   otel-checker check collector --collector-config-path=./otel/my-collector.yaml
    ```
-
-   The flag takes a directory; the file inside must be named
-   `config.yaml`. Rename or symlink if your setup uses a different
-   filename.
 
 3. If the file exists but the read failed with `permission denied`, fix
    the permission bits so the checker's user can read it:
 
    ```bash
-   chmod +r ./config.yaml
+   chmod +r ./otel/my-collector.yaml
    ```
 
 ## Example
@@ -62,7 +61,7 @@ my-service/
 Invocation from `my-service/`:
 
 ```bash
-otel-checker check collector --collector-config-path=./otel/
+otel-checker check collector --collector-config-path=./otel/config.yaml
 ```
 
 ## Related

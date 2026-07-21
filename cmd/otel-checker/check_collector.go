@@ -18,6 +18,6 @@ func newCheckCollectorCmd(c *utils.Commands) *cobra.Command {
 		},
 	}
 	cmd.Flags().StringVar(&c.CollectorConfigPath, "collector-config-path", "",
-		"Path to the directory containing the collector's config.yaml")
+		"Full path to the Collector config file. If unset, looks for config.yaml then config.yml in the current directory.")
 	return cmd
 }

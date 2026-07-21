@@ -23,9 +23,6 @@ func runChecks(ctx context.Context, c utils.Commands) error {
 	if c.PackageJsonPath != "" && !strings.HasSuffix(c.PackageJsonPath, "/") {
 		c.PackageJsonPath += "/"
 	}
-	if c.CollectorConfigPath != "" && !strings.HasSuffix(c.CollectorConfigPath, "/") {
-		c.CollectorConfigPath += "/"
-	}
 	reporter := checks.Run(ctx, c)
 	if err := output.Render(os.Stdout, reporter, c.Format); err != nil {
 		return err

@@ -106,7 +106,7 @@ flint: fixed: gofmt — commit before pushing | partial: cargo-clippy
 ```bash
 # Per-component verbs
 otel-checker check sdk           --language=<lang> [--manual-instrumentation ...]
-otel-checker check collector     [--collector-config-path=<path>]
+otel-checker check collector     [--collector-config-path=<file>]
 otel-checker check beyla         --language=<lang>
 otel-checker check alloy         --language=<lang>
 otel-checker check grafana-cloud --language=<lang>
