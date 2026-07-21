@@ -100,8 +100,10 @@ service:
       processors: []
       exporters: [otlphttp/grafana_cloud]
 `,
-			expectedErrors:   []string{},
-			expectedWarnings: []string{},
+			expectedErrors: []string{},
+			expectedWarnings: []string{
+				"Value of exporter > otlphttp/local > endpoint on config.yaml is set to localhost. Update to a Grafana endpoint similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp to be able to send telemetry to your Grafana Cloud instance",
+			},
 			expectedChecks: []string{
 				"Value of exporter > otlphttp/grafana_cloud > endpoint on config.yaml set in the format similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp",
 				"Value of service > pipelines > traces > exporters on config.yaml contains otlphttp",
@@ -176,7 +178,7 @@ service:
       exporters: [otlp_http/invalid]
 `,
 			expectedErrors: []string{
-				"Value of exporter > otlphttp > endpoint on config.yaml is not set in the format similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp",
+				"Value of exporter > otlp_http/invalid > endpoint on config.yaml is not a valid URL",
 			},
 			expectedWarnings: []string{},
 			expectedChecks: []string{
@@ -228,7 +230,10 @@ service:
 			},
 		},
 		{
-			name: "Invalid endpoint format",
+			// A well-formed URL that isn't Grafana Cloud is a warning:
+			// the exporter is technically valid but telemetry from it won't
+			// reach Grafana Cloud.
+			name: "Non-Grafana URL is warned about, not accepted silently",
 			configYAML: `
 receivers:
   otlp:
@@ -253,10 +258,10 @@ service:
       processors: []
       exporters: [otlphttp]
 `,
-			expectedErrors: []string{
-				"Value of exporter > otlphttp > endpoint on config.yaml is not set in the format similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp",
+			expectedErrors: []string{},
+			expectedWarnings: []string{
+				"Value of exporter > otlphttp > endpoint on config.yaml is a valid URL but is not a Grafana Cloud endpoint. Data from this exporter will not reach Grafana Cloud",
 			},
-			expectedWarnings: []string{},
 			expectedChecks: []string{
 				"Value of service > pipelines > traces > exporters on config.yaml contains otlphttp",
 				"Value of service > pipelines > traces > receivers on config.yaml contains otlp",
@@ -337,6 +342,64 @@ service:
 			},
 			expectedChecks: []string{
 				"Value of exporter > otlphttp > endpoint on config.yaml set in the format similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp",
+				"Value of service > pipelines > traces > receivers on config.yaml contains otlp",
+				"Value of service > pipelines > logs > exporters on config.yaml contains otlphttp",
+				"Value of service > pipelines > logs > receivers on config.yaml contains otlp",
+				"Value of service > pipelines > metrics > exporters on config.yaml contains otlphttp",
+				"Value of service > pipelines > metrics > receivers on config.yaml contains otlp",
+			},
+		},
+		{
+			name: "Multi-exporter setup with one invalid and one valid endpoint",
+			configYAML: `
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+exporters:
+  debug:
+    verbosity: detailed
+  otlp_http/grafana_cloud:
+    endpoint: invalid_endpoint
+    auth:
+      authenticator: basicauth/grafana_cloud
+  otlp_http/prometheus:
+    endpoint: http://prometheus:9090/api/v1/otlp
+  otlp_http/loki:
+    endpoint: http://loki:3100/otlp
+  otlp_http/tempo:
+    endpoint: http://tempo:4318
+  otlp_http/pyroscope:
+    endpoint: http://pyroscope:4040
+service:
+  pipelines:
+    metrics:
+      receivers: [otlp, prometheus]
+      processors: [resource/home_monitoring, batch]
+      exporters: [otlp_http/grafana_cloud, otlp_http/prometheus]
+    logs:
+      receivers: [otlp, receiver_creator]
+      processors: [resource/home_monitoring, batch]
+      exporters: [otlp_http/loki, otlp_http/grafana_cloud]
+    traces:
+      receivers: [otlp]
+      processors: [resource/home_monitoring, batch]
+      exporters: [otlp_http/grafana_cloud, otlp_http/tempo]
+`,
+			expectedErrors: []string{
+				"Value of exporter > otlp_http/grafana_cloud > endpoint on config.yaml is not a valid URL",
+			},
+			expectedWarnings: []string{
+				"Value of exporter > otlp_http/prometheus > endpoint on config.yaml is a valid URL but is not a Grafana Cloud endpoint. Data from this exporter will not reach Grafana Cloud",
+				"Value of exporter > otlp_http/loki > endpoint on config.yaml is a valid URL but is not a Grafana Cloud endpoint. Data from this exporter will not reach Grafana Cloud",
+				"Value of exporter > otlp_http/tempo > endpoint on config.yaml is a valid URL but is not a Grafana Cloud endpoint. Data from this exporter will not reach Grafana Cloud",
+				"Value of exporter > otlp_http/pyroscope > endpoint on config.yaml is a valid URL but is not a Grafana Cloud endpoint. Data from this exporter will not reach Grafana Cloud",
+			},
+			expectedChecks: []string{
+				"Value of service > pipelines > traces > exporters on config.yaml contains otlphttp",
 				"Value of service > pipelines > traces > receivers on config.yaml contains otlp",
 				"Value of service > pipelines > logs > exporters on config.yaml contains otlphttp",
 				"Value of service > pipelines > logs > receivers on config.yaml contains otlp",
