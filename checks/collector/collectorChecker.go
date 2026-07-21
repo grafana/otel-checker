@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 	"regexp"
-	"slices"
+	"sort"
 	"strings"
 
 	"github.com/grafana/otel-checker/checks/utils"
@@ -17,18 +17,9 @@ func CheckCollectorSetup(reporter *utils.ComponentReporter, language string, con
 }
 
 type configFile struct {
-	Receivers struct {
-		Otlp struct {
-			Protocols map[string]any `yaml:"protocols"`
-		} `yaml:"otlp"`
-	} `yaml:"receivers"`
-	Exporters struct {
-		Otlphttp struct {
-			Endpoint string                 `yaml:"endpoint"`
-			Auth     map[string]interface{} `yaml:"auth"`
-		} `yaml:"otlphttp"`
-	} `yaml:"exporters"`
-	Service struct {
+	Receivers map[string]receiverConfig `yaml:"receivers"`
+	Exporters map[string]exporterConfig `yaml:"exporters"`
+	Service   struct {
 		Pipelines struct {
 			Traces struct {
 				Receivers  []string `yaml:"receivers"`
@@ -49,10 +40,21 @@ type configFile struct {
 	} `yaml:"service"`
 }
 
+type receiverConfig struct {
+	Protocols map[string]any `yaml:"protocols"`
+}
+
+type exporterConfig struct {
+	Endpoint string                 `yaml:"endpoint"`
+	Auth     map[string]interface{} `yaml:"auth"`
+}
+
+var otlpHTTPGrafanaEndpointPattern = regexp.MustCompile(`https://.+\.grafana\.net/otlp`)
+
 // checkCollectorConfig reads the Collector configuration file and runs the
 // downstream checks against it. configPath, when non-empty, must be the full
-// path to the file the user wants checked. When configPath is empty, the
-// checker falls back to config.yaml then config.yml in the current
+// path to the file the user wants checked (any filename). When configPath is
+// empty, the checker falls back to config.yaml then config.yml in the current
 // working directory.
 func checkCollectorConfig(reporter *utils.ComponentReporter, configPath string) {
 	var candidates []string
@@ -85,60 +87,122 @@ func checkCollectorConfig(reporter *utils.ComponentReporter, configPath string) 
 		return
 	}
 
-	if c.Receivers.Otlp.Protocols["http"] == nil {
-		reporter.AddWarningWithExplain("collector.receivers.http-protocol-missing",
-			"The value of receivers > otlp > protocols > http is nil. Make sure the key exists on your config.yaml")
-	}
+	checkOTLPReceiverHTTPProtocol(reporter, c.Receivers)
 
-	match, _ := regexp.MatchString("https:\\/\\/.+\\.grafana\\.net\\/otlp", c.Exporters.Otlphttp.Endpoint)
-	if match {
-		reporter.AddSuccessfulCheck("Value of exporter > otlphttp > endpoint on config.yaml set in the format similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp")
-	} else {
-		if strings.Contains(c.Exporters.Otlphttp.Endpoint, "localhost") {
-			reporter.AddWarningWithExplain("collector.endpoint.localhost",
-				"Value of exporter > otlphttp > endpoint on config.yaml is set to localhost. Update to a Grafana endpoint similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp to be able to send telemetry to your Grafana Cloud instance")
-		} else {
-			reporter.AddErrorWithExplain("collector.endpoint.invalid-format",
-				"Value of exporter > otlphttp > endpoint on config.yaml is not set in the format similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp")
-		}
-	}
+	checkOTLPHTTPExporterEndpoint(reporter, c.Exporters)
 
 	// Traces
-	if slices.Contains(c.Service.Pipelines.Traces.Exporters, "otlphttp") {
+	if containsOTLPHTTPExporter(c.Service.Pipelines.Traces.Exporters) {
 		reporter.AddSuccessfulCheck("Value of service > pipelines > traces > exporters on config.yaml contains otlphttp")
 	} else {
 		reporter.AddWarningWithExplain("collector.pipelines.traces-otlphttp-missing",
 			"Value of service > pipelines > traces > exporters on config.yaml does not contain otlphttp")
 	}
-	if slices.Contains(c.Service.Pipelines.Traces.Receivers, "otlp") {
+	if containsOTLPReceiver(c.Service.Pipelines.Traces.Receivers) {
 		reporter.AddSuccessfulCheck("Value of service > pipelines > traces > receivers on config.yaml contains otlp")
 	} else {
 		reporter.AddSuccessfulCheck("Value of service > pipelines > traces > receivers on config.yaml does not contain otlp")
 	}
 
 	// Logs
-	if slices.Contains(c.Service.Pipelines.Logs.Exporters, "otlphttp") {
+	if containsOTLPHTTPExporter(c.Service.Pipelines.Logs.Exporters) {
 		reporter.AddSuccessfulCheck("Value of service > pipelines > logs > exporters on config.yaml contains otlphttp")
 	} else {
 		reporter.AddWarningWithExplain("collector.pipelines.logs-otlphttp-missing",
 			"Value of service > pipelines > logs > exporters on config.yaml does not contain otlphttp")
 	}
-	if slices.Contains(c.Service.Pipelines.Logs.Receivers, "otlp") {
+	if containsOTLPReceiver(c.Service.Pipelines.Logs.Receivers) {
 		reporter.AddSuccessfulCheck("Value of service > pipelines > logs > receivers on config.yaml contains otlp")
 	} else {
 		reporter.AddSuccessfulCheck("Value of service > pipelines > logs > receivers on config.yaml does not contain otlp")
 	}
 
 	// Metrics
-	if slices.Contains(c.Service.Pipelines.Metrics.Exporters, "otlphttp") {
+	if containsOTLPHTTPExporter(c.Service.Pipelines.Metrics.Exporters) {
 		reporter.AddSuccessfulCheck("Value of service > pipelines > metrics > exporters on config.yaml contains otlphttp")
 	} else {
 		reporter.AddWarningWithExplain("collector.pipelines.metrics-otlphttp-missing",
 			"Value of service > pipelines > metrics > exporters on config.yaml does not contain otlphttp")
 	}
-	if slices.Contains(c.Service.Pipelines.Metrics.Receivers, "otlp") {
+	if containsOTLPReceiver(c.Service.Pipelines.Metrics.Receivers) {
 		reporter.AddSuccessfulCheck("Value of service > pipelines > metrics > receivers on config.yaml contains otlp")
 	} else {
 		reporter.AddSuccessfulCheck("Value of service > pipelines > metrics > receivers on config.yaml does not contain otlp")
 	}
+}
+
+func checkOTLPReceiverHTTPProtocol(reporter *utils.ComponentReporter, receivers map[string]receiverConfig) {
+	for _, id := range componentIDsWithType(receivers, "otlp") {
+		if receivers[id].Protocols["http"] != nil {
+			return
+		}
+	}
+
+	reporter.AddWarningWithExplain("collector.receivers.http-protocol-missing",
+		"The value of receivers > otlp > protocols > http is nil. Make sure the key exists on your config.yaml")
+}
+
+func checkOTLPHTTPExporterEndpoint(reporter *utils.ComponentReporter, exporters map[string]exporterConfig) {
+	ids := otlpHTTPExporterIDs(exporters)
+	for _, id := range ids {
+		if otlpHTTPGrafanaEndpointPattern.MatchString(exporters[id].Endpoint) {
+			reporter.AddSuccessfulCheck(fmt.Sprintf("Value of exporter > %s > endpoint on config.yaml set in the format similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp", id))
+			return
+		}
+	}
+
+	for _, id := range ids {
+		if strings.Contains(exporters[id].Endpoint, "localhost") {
+			reporter.AddWarningWithExplain("collector.endpoint.localhost",
+				fmt.Sprintf("Value of exporter > %s > endpoint on config.yaml is set to localhost. Update to a Grafana endpoint similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp to be able to send telemetry to your Grafana Cloud instance", id))
+			return
+		}
+	}
+
+	reporter.AddErrorWithExplain("collector.endpoint.invalid-format",
+		"Value of exporter > otlphttp > endpoint on config.yaml is not set in the format similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp")
+}
+
+func otlpHTTPExporterIDs(exporters map[string]exporterConfig) []string {
+	return componentIDsWithType(exporters, "otlphttp", "otlp_http")
+}
+
+func componentIDsWithType[T any](components map[string]T, types ...string) []string {
+	ids := make([]string, 0, len(components))
+	for id := range components {
+		if componentIDHasType(id, types...) {
+			ids = append(ids, id)
+		}
+	}
+	sort.Strings(ids)
+	return ids
+}
+
+func containsOTLPHTTPExporter(exporters []string) bool {
+	for _, exporter := range exporters {
+		if componentIDHasType(exporter, "otlphttp", "otlp_http") {
+			return true
+		}
+	}
+	return false
+}
+
+func containsOTLPReceiver(receivers []string) bool {
+	for _, receiver := range receivers {
+		if componentIDHasType(receiver, "otlp") {
+			return true
+		}
+	}
+	return false
+}
+
+func componentIDHasType(id string, types ...string) bool {
+	componentType, _, _ := strings.Cut(id, "/")
+	componentType = strings.ToLower(componentType)
+	for _, t := range types {
+		if componentType == t {
+			return true
+		}
+	}
+	return false
 }
