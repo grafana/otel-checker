@@ -346,7 +346,7 @@ service:
 		},
 		{
 			// Every pipeline uses a non-OTLP receiver — this should now warn
-			// per pipeline rather than silently "succeed" as before.
+			// per pipeline.
 			name: "Pipelines fed only by non-OTLP receivers",
 			configYAML: `
 receivers:
