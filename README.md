@@ -52,7 +52,7 @@ flag set on each subcommand.
 # Single-component checks
 otel-checker check sdk --language=js
 otel-checker check sdk --language=java --manual-instrumentation
-otel-checker check collector --collector-config-path=./otel/
+otel-checker check collector --collector-config-path=./otel/config.yaml
 otel-checker check grafana-cloud --language=python
 
 # Multi-component (positional, comma-separated, no spaces)

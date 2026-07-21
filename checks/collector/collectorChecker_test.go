@@ -348,8 +348,7 @@ service:
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// Create a temporary config.yaml file
-			configPath := tmpDir + "/"
+			// Write the config to the temp dir and pass its full path.
 			configFile := filepath.Join(tmpDir, "config.yaml")
 			err := os.WriteFile(configFile, []byte(tt.configYAML), 0644)
 			if err != nil {
@@ -360,8 +359,8 @@ service:
 			reporter := utils.Reporter{}
 			componentReporter := reporter.Component("collector")
 
-			// Call the function under test
-			checkCollectorConfig(componentReporter, configPath)
+			// Call the function under test with the full file path.
+			checkCollectorConfig(componentReporter, configFile)
 
 			// Compare the results
 			assert.ElementsMatch(t, tt.expectedErrors, componentReporter.Errors, "errors mismatch")
@@ -406,7 +405,6 @@ service:
       processors: []
       exporters: [otlphttp]
 `
-	configPath := tmpDir + "/"
 	configFile := filepath.Join(tmpDir, "config.yaml")
 	err = os.WriteFile(configFile, []byte(validConfig), 0644)
 	if err != nil {
@@ -417,8 +415,8 @@ service:
 	reporter := utils.Reporter{}
 	componentReporter := reporter.Component("collector")
 
-	// Call the function under test
-	CheckCollectorSetup(componentReporter, "go", configPath)
+	// Call the function under test with the full file path.
+	CheckCollectorSetup(componentReporter, "go", configFile)
 
 	// Expected results
 	expectedChecks := []string{
@@ -447,14 +445,148 @@ func TestMissingConfigFile(t *testing.T) {
 		_ = os.RemoveAll(path)
 	}(tmpDir)
 
-	// Create a new reporter for testing
+	// Point the checker at a specific non-existent file inside tmpDir.
+	missing := filepath.Join(tmpDir, "does-not-exist.yaml")
+
+	reporter := utils.Reporter{}
+	componentReporter := reporter.Component("collector")
+	checkCollectorConfig(componentReporter, missing)
+
+	// The tried-paths list is just the explicit file the user asked for.
+	assert.Len(t, componentReporter.Errors, 1, "expected one error")
+	msg := componentReporter.Errors[0]
+	assert.Contains(t, msg, "Could not find a Collector config file", "error should say no config was found")
+	assert.Contains(t, msg, missing, "error should list the path the user provided")
+}
+
+func TestMissingConfigFileFallback(t *testing.T) {
+	// With no path passed, the checker falls back to config.yaml then
+	// config.yml in the current working directory. Chdir to an empty tmp
+	// dir so neither exists.
+	tmpDir, err := os.MkdirTemp("", "collector-fallback-missing-test")
+	if err != nil {
+		t.Fatalf("Failed to create temp dir: %v", err)
+	}
+	defer func(path string) {
+		_ = os.RemoveAll(path)
+	}(tmpDir)
+	origWD, _ := os.Getwd()
+	if err := os.Chdir(tmpDir); err != nil {
+		t.Fatalf("chdir: %v", err)
+	}
+	defer func() { _ = os.Chdir(origWD) }()
+
+	reporter := utils.Reporter{}
+	componentReporter := reporter.Component("collector")
+	checkCollectorConfig(componentReporter, "")
+
+	assert.Len(t, componentReporter.Errors, 1, "expected one error")
+	msg := componentReporter.Errors[0]
+	assert.Contains(t, msg, "Could not find a Collector config file")
+	assert.Contains(t, msg, "config.yaml", "fallback list should include config.yaml")
+	assert.Contains(t, msg, "config.yml", "fallback list should include config.yml")
+}
+
+func TestCheckCollectorConfigYmlExtension(t *testing.T) {
+	// Exercise the empty-flag fallback: config.yml (short extension) in the
+	// current working directory must be picked up when the user doesn't pass
+	// --collector-config-path.
+	tmpDir, err := os.MkdirTemp("", "collector-yml-test")
+	if err != nil {
+		t.Fatalf("Failed to create temp dir: %v", err)
+	}
+	defer func(path string) {
+		_ = os.RemoveAll(path)
+	}(tmpDir)
+
+	config := `
+receivers:
+  otlp:
+    protocols:
+      grpc: ""
+      http: ""
+exporters:
+  otlphttp:
+    endpoint: https://otlp-gateway-prod-us-east-0.grafana.net/otlp
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: []
+      exporters: [otlphttp]
+    logs:
+      receivers: [otlp]
+      processors: []
+      exporters: [otlphttp]
+    metrics:
+      receivers: [otlp]
+      processors: []
+      exporters: [otlphttp]
+`
+	if err := os.WriteFile(filepath.Join(tmpDir, "config.yml"), []byte(config), 0644); err != nil {
+		t.Fatalf("Failed to write config.yml: %v", err)
+	}
+
+	origWD, _ := os.Getwd()
+	if err := os.Chdir(tmpDir); err != nil {
+		t.Fatalf("chdir: %v", err)
+	}
+	defer func() { _ = os.Chdir(origWD) }()
+
 	reporter := utils.Reporter{}
 	componentReporter := reporter.Component("collector")
 
-	// Call the function under test with a path that doesn't have a config.yaml
-	checkCollectorConfig(componentReporter, tmpDir+"/")
+	checkCollectorConfig(componentReporter, "")
 
-	// Expect an error about not being able to find the config file
-	assert.Len(t, componentReporter.Errors, 1, "expected one error")
-	assert.Contains(t, componentReporter.Errors[0], "Could not check file", "error should mention the missing file")
+	assert.Empty(t, componentReporter.Errors, "no errors expected for a valid config.yml")
+	assert.NotEmpty(t, componentReporter.Checks, "expected successful checks against config.yml")
+}
+
+func TestCheckCollectorConfigCustomFilename(t *testing.T) {
+	// The Collector accepts any filename via --config; the checker should too
+	// when the user passes a full path to --collector-config-path.
+	tmpDir, err := os.MkdirTemp("", "collector-custom-name-test")
+	if err != nil {
+		t.Fatalf("Failed to create temp dir: %v", err)
+	}
+	defer func(path string) {
+		_ = os.RemoveAll(path)
+	}(tmpDir)
+
+	config := `
+receivers:
+  otlp:
+    protocols:
+      grpc: ""
+      http: ""
+exporters:
+  otlphttp:
+    endpoint: https://otlp-gateway-prod-us-east-0.grafana.net/otlp
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: []
+      exporters: [otlphttp]
+    logs:
+      receivers: [otlp]
+      processors: []
+      exporters: [otlphttp]
+    metrics:
+      receivers: [otlp]
+      processors: []
+      exporters: [otlphttp]
+`
+	customPath := filepath.Join(tmpDir, "my-collector.yaml")
+	if err := os.WriteFile(customPath, []byte(config), 0644); err != nil {
+		t.Fatalf("Failed to write %s: %v", customPath, err)
+	}
+
+	reporter := utils.Reporter{}
+	componentReporter := reporter.Component("collector")
+
+	checkCollectorConfig(componentReporter, customPath)
+
+	assert.Empty(t, componentReporter.Errors, "no errors expected when a valid config with a non-standard filename is passed")
+	assert.NotEmpty(t, componentReporter.Checks, "expected successful checks")
 }

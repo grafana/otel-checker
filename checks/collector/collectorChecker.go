@@ -3,7 +3,6 @@ package collector
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 	"regexp"
 	"sort"
 	"strings"
@@ -52,63 +51,83 @@ type exporterConfig struct {
 
 var otlpHTTPGrafanaEndpointPattern = regexp.MustCompile(`https://.+\.grafana\.net/otlp`)
 
+// checkCollectorConfig reads the Collector configuration file and runs the
+// downstream checks against it. configPath, when non-empty, must be the full
+// path to the file the user wants checked (any filename). When configPath is
+// empty, the checker falls back to config.yaml then config.yml in the current
+// working directory.
 func checkCollectorConfig(reporter *utils.ComponentReporter, configPath string) {
-	filePath := filepath.Join(configPath, "config.yaml")
-	yamlFile, err := os.ReadFile(filePath)
-	if err != nil {
-		reporter.AddErrorWithExplain("collector.config.unreadable",
-			fmt.Sprintf("Could not check file %s: %s", filePath, err))
+	var candidates []string
+	if configPath != "" {
+		candidates = []string{configPath}
 	} else {
-		var c configFile
-		err = yaml.Unmarshal([]byte(yamlFile), &c)
-		if err != nil {
-			reporter.AddErrorWithExplain("collector.config.parse-error",
-				fmt.Sprintf("Could not parse file %s: %s", filePath, err))
-			return
+		candidates = []string{"config.yaml", "config.yml"}
+	}
+	var (
+		filePath string
+		yamlFile []byte
+	)
+	for _, p := range candidates {
+		b, err := os.ReadFile(p)
+		if err == nil {
+			filePath = p
+			yamlFile = b
+			break
 		}
+	}
+	if yamlFile == nil {
+		reporter.AddErrorWithExplain("collector.config.unreadable",
+			fmt.Sprintf("Could not find a Collector config file. Tried: %s", strings.Join(candidates, ", ")))
+		return
+	}
+	var c configFile
+	if err := yaml.Unmarshal(yamlFile, &c); err != nil {
+		reporter.AddErrorWithExplain("collector.config.parse-error",
+			fmt.Sprintf("Could not parse file %s: %s", filePath, err))
+		return
+	}
 
-		checkOTLPReceiverHTTPProtocol(reporter, c.Receivers)
+	checkOTLPReceiverHTTPProtocol(reporter, c.Receivers)
 
-		checkOTLPHTTPExporterEndpoint(reporter, c.Exporters)
+	checkOTLPHTTPExporterEndpoint(reporter, c.Exporters)
 
-		// Traces
-		if containsOTLPHTTPExporter(c.Service.Pipelines.Traces.Exporters) {
-			reporter.AddSuccessfulCheck("Value of service > pipelines > traces > exporters on config.yaml contains otlphttp")
-		} else {
-			reporter.AddWarningWithExplain("collector.pipelines.traces-otlphttp-missing",
-				"Value of service > pipelines > traces > exporters on config.yaml does not contain otlphttp")
-		}
-		if containsOTLPReceiver(c.Service.Pipelines.Traces.Receivers) {
-			reporter.AddSuccessfulCheck("Value of service > pipelines > traces > receivers on config.yaml contains otlp")
-		} else {
-			reporter.AddSuccessfulCheck("Value of service > pipelines > traces > receivers on config.yaml does not contain otlp")
-		}
+	// Traces
+	if containsOTLPHTTPExporter(c.Service.Pipelines.Traces.Exporters) {
+		reporter.AddSuccessfulCheck("Value of service > pipelines > traces > exporters on config.yaml contains otlphttp")
+	} else {
+		reporter.AddWarningWithExplain("collector.pipelines.traces-otlphttp-missing",
+			"Value of service > pipelines > traces > exporters on config.yaml does not contain otlphttp")
+	}
+	if containsOTLPReceiver(c.Service.Pipelines.Traces.Receivers) {
+		reporter.AddSuccessfulCheck("Value of service > pipelines > traces > receivers on config.yaml contains otlp")
+	} else {
+		reporter.AddSuccessfulCheck("Value of service > pipelines > traces > receivers on config.yaml does not contain otlp")
+	}
 
-		// Logs
-		if containsOTLPHTTPExporter(c.Service.Pipelines.Logs.Exporters) {
-			reporter.AddSuccessfulCheck("Value of service > pipelines > logs > exporters on config.yaml contains otlphttp")
-		} else {
-			reporter.AddWarningWithExplain("collector.pipelines.logs-otlphttp-missing",
-				"Value of service > pipelines > logs > exporters on config.yaml does not contain otlphttp")
-		}
-		if containsOTLPReceiver(c.Service.Pipelines.Logs.Receivers) {
-			reporter.AddSuccessfulCheck("Value of service > pipelines > logs > receivers on config.yaml contains otlp")
-		} else {
-			reporter.AddSuccessfulCheck("Value of service > pipelines > logs > receivers on config.yaml does not contain otlp")
-		}
+	// Logs
+	if containsOTLPHTTPExporter(c.Service.Pipelines.Logs.Exporters) {
+		reporter.AddSuccessfulCheck("Value of service > pipelines > logs > exporters on config.yaml contains otlphttp")
+	} else {
+		reporter.AddWarningWithExplain("collector.pipelines.logs-otlphttp-missing",
+			"Value of service > pipelines > logs > exporters on config.yaml does not contain otlphttp")
+	}
+	if containsOTLPReceiver(c.Service.Pipelines.Logs.Receivers) {
+		reporter.AddSuccessfulCheck("Value of service > pipelines > logs > receivers on config.yaml contains otlp")
+	} else {
+		reporter.AddSuccessfulCheck("Value of service > pipelines > logs > receivers on config.yaml does not contain otlp")
+	}
 
-		// Metrics
-		if containsOTLPHTTPExporter(c.Service.Pipelines.Metrics.Exporters) {
-			reporter.AddSuccessfulCheck("Value of service > pipelines > metrics > exporters on config.yaml contains otlphttp")
-		} else {
-			reporter.AddWarningWithExplain("collector.pipelines.metrics-otlphttp-missing",
-				"Value of service > pipelines > metrics > exporters on config.yaml does not contain otlphttp")
-		}
-		if containsOTLPReceiver(c.Service.Pipelines.Metrics.Receivers) {
-			reporter.AddSuccessfulCheck("Value of service > pipelines > metrics > receivers on config.yaml contains otlp")
-		} else {
-			reporter.AddSuccessfulCheck("Value of service > pipelines > metrics > receivers on config.yaml does not contain otlp")
-		}
+	// Metrics
+	if containsOTLPHTTPExporter(c.Service.Pipelines.Metrics.Exporters) {
+		reporter.AddSuccessfulCheck("Value of service > pipelines > metrics > exporters on config.yaml contains otlphttp")
+	} else {
+		reporter.AddWarningWithExplain("collector.pipelines.metrics-otlphttp-missing",
+			"Value of service > pipelines > metrics > exporters on config.yaml does not contain otlphttp")
+	}
+	if containsOTLPReceiver(c.Service.Pipelines.Metrics.Receivers) {
+		reporter.AddSuccessfulCheck("Value of service > pipelines > metrics > receivers on config.yaml contains otlp")
+	} else {
+		reporter.AddSuccessfulCheck("Value of service > pipelines > metrics > receivers on config.yaml does not contain otlp")
 	}
 }
 
