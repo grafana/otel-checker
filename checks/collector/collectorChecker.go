@@ -101,7 +101,8 @@ func checkCollectorConfig(reporter *utils.ComponentReporter, configPath string) 
 	if containsOTLPReceiver(c.Service.Pipelines.Traces.Receivers) {
 		reporter.AddSuccessfulCheck("Value of service > pipelines > traces > receivers on config.yaml contains otlp")
 	} else {
-		reporter.AddSuccessfulCheck("Value of service > pipelines > traces > receivers on config.yaml does not contain otlp")
+		reporter.AddWarningWithExplain("collector.pipelines.traces-otlp-missing",
+			"Value of service > pipelines > traces > receivers on config.yaml does not contain otlp")
 	}
 
 	// Logs
@@ -114,7 +115,8 @@ func checkCollectorConfig(reporter *utils.ComponentReporter, configPath string) 
 	if containsOTLPReceiver(c.Service.Pipelines.Logs.Receivers) {
 		reporter.AddSuccessfulCheck("Value of service > pipelines > logs > receivers on config.yaml contains otlp")
 	} else {
-		reporter.AddSuccessfulCheck("Value of service > pipelines > logs > receivers on config.yaml does not contain otlp")
+		reporter.AddWarningWithExplain("collector.pipelines.logs-otlp-missing",
+			"Value of service > pipelines > logs > receivers on config.yaml does not contain otlp")
 	}
 
 	// Metrics
@@ -127,7 +129,8 @@ func checkCollectorConfig(reporter *utils.ComponentReporter, configPath string) 
 	if containsOTLPReceiver(c.Service.Pipelines.Metrics.Receivers) {
 		reporter.AddSuccessfulCheck("Value of service > pipelines > metrics > receivers on config.yaml contains otlp")
 	} else {
-		reporter.AddSuccessfulCheck("Value of service > pipelines > metrics > receivers on config.yaml does not contain otlp")
+		reporter.AddWarningWithExplain("collector.pipelines.metrics-otlp-missing",
+			"Value of service > pipelines > metrics > receivers on config.yaml does not contain otlp")
 	}
 }
 

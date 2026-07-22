@@ -344,6 +344,53 @@ service:
 				"Value of service > pipelines > metrics > receivers on config.yaml contains otlp",
 			},
 		},
+		{
+			// Every pipeline uses a non-OTLP receiver — this should now warn
+			// per pipeline.
+			name: "Pipelines fed only by non-OTLP receivers",
+			configYAML: `
+receivers:
+  otlp:
+    protocols:
+      grpc: ""
+      http: ""
+  prometheus:
+    config:
+      scrape_configs:
+        - job_name: 'app'
+  filelog:
+    include: [/var/log/app/*.log]
+exporters:
+  otlphttp:
+    endpoint: https://otlp-gateway-prod-us-east-0.grafana.net/otlp
+service:
+  pipelines:
+    traces:
+      receivers: [zipkin]
+      processors: []
+      exporters: [otlphttp]
+    logs:
+      receivers: [filelog]
+      processors: []
+      exporters: [otlphttp]
+    metrics:
+      receivers: [prometheus]
+      processors: []
+      exporters: [otlphttp]
+`,
+			expectedErrors: []string{},
+			expectedWarnings: []string{
+				"Value of service > pipelines > traces > receivers on config.yaml does not contain otlp",
+				"Value of service > pipelines > logs > receivers on config.yaml does not contain otlp",
+				"Value of service > pipelines > metrics > receivers on config.yaml does not contain otlp",
+			},
+			expectedChecks: []string{
+				"Value of exporter > otlphttp > endpoint on config.yaml set in the format similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp",
+				"Value of service > pipelines > traces > exporters on config.yaml contains otlphttp",
+				"Value of service > pipelines > logs > exporters on config.yaml contains otlphttp",
+				"Value of service > pipelines > metrics > exporters on config.yaml contains otlphttp",
+			},
+		},
 	}
 
 	for _, tt := range tests {
