@@ -60,4 +60,4 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 - `php.runtime.too-old` — related failure when PHP is found but its
   version is below the minimum.
 - `php.composer.not-found` — related failure for the companion tool.
-- [PHP downloads](https://www.php.net/downloads)
+- [PHP installation manual](https://www.php.net/manual/en/install.php)
