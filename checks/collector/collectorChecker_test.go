@@ -415,7 +415,7 @@ service:
 receivers:
   otlp:
     protocols:
-		      grpc: ""
+		  grpc: ""
       http: ""
   prometheus:
     config:
