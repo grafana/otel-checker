@@ -1,0 +1,20 @@
+---
+name: PR Title
+
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
+      - reopened
+
+permissions: {}
+
+jobs:
+  lint:
+    runs-on: ubuntu-24.04
+    permissions:
+      pull-requests: read
+    steps:
+      - uses: grafana/shared-workflows/actions/lint-pr-title@70c40e5b6522c854a55334124545261cae3d4c73 # lint-pr-title/v1.2.4

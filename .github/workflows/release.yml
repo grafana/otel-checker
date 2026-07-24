@@ -1,98 +1,111 @@
-# Repo-internal: cuts a new release (annotated tag + GitHub Release with
-# auto-generated notes) from main. Dispatch manually and pick the semver bump.
+---
 name: Release
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
     inputs:
-      bump:
-        description: 'Which semver part to bump.'
+      tag_name:
+        description: Existing release tag to publish or republish
         required: true
-        default: patch
-        type: choice
-        options:
-          - patch
-          - minor
-          - major
 
 permissions: {}
 
-concurrency:
-  group: release
-  cancel-in-progress: false
-
 jobs:
-  release:
-    name: Cut new release
-    runs-on: ubuntu-latest
+  release-please:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
     permissions:
-      contents: write # to create the tag and the GitHub Release
+      contents: write
+      issues: write
+      pull-requests: write
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
     steps:
-      - name: Enforce default branch
-        env:
-          REF_NAME: ${{ github.ref_name }}
-          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
-        run: |
-          if [[ "$REF_NAME" != "$DEFAULT_BRANCH" ]]; then
-            echo "::error::Release must be cut from $DEFAULT_BRANCH. Got: $REF_NAME"
-            exit 1
-          fi
+      - name: Run release-please
+        id: release
+        uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
 
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+  goreleaser:
+    if: github.event_name == 'push' && needs.release-please.outputs.release_created == 'true'
+    needs: release-please
+    runs-on: ubuntu-24.04
+    permissions:
+      attestations: write
+      contents: write
+      id-token: write
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
-          fetch-tags: true
-          # zizmor: ignore[artipacked] — we need the token persisted to push the annotated tag below.
-          persist-credentials: true
-
-      - name: Compute next version
-        id: compute
+          ref: refs/tags/${{ needs.release-please.outputs.tag_name }}
+          persist-credentials: false
+      - name: Setup mise
+        uses: jdx/mise-action@dad1bfd3df957f44999b559dd69dc1671cb4e9ea # v4.2.1
+        with:
+          version: v2026.7.7
+          sha256: 429f71e7e989908bf975aafac9066329c16e2d8fc7cd8e74fdf21dd6300ffe7c
+      - name: Run GoReleaser
         env:
-          BUMP: ${{ inputs.bump }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: goreleaser release --clean
+      - name: Attest release assets
+        uses: actions/attest-build-provenance@0f67c3f4856b2e3261c31976d6725780e5e4c373 # v4.1.1
+        with:
+          subject-checksums: ./dist/checksums.txt
+      - name: Publish release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: ${{ needs.release-please.outputs.tag_name }}
+        run: gh release edit "$TAG_NAME" --draft=false
+
+  publish-existing-tag:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    permissions:
+      attestations: write
+      contents: write
+      id-token: write
+    steps:
+      - name: Verify workflow ref matches requested tag
+        env:
+          EXPECTED_TAG: ${{ github.event.inputs.tag_name }}
+          WORKFLOW_REF: ${{ github.ref_name }}
+          WORKFLOW_REF_TYPE: ${{ github.ref_type }}
         run: |
-          set -euo pipefail
-          latest=$(git tag --list 'v[0-9]*.[0-9]*.[0-9]*' --sort=-v:refname | head -n 1)
-          if [[ -z "$latest" ]]; then
-            latest="v0.0.0"
+          if [ "$WORKFLOW_REF_TYPE" != "tag" ] || [ "$WORKFLOW_REF" != "$EXPECTED_TAG" ]; then
+            echo "workflow_dispatch must be run from tag '$EXPECTED_TAG'" >&2
+            echo "to produce attestations for the requested source revision" >&2
+            exit 1
           fi
-          echo "Latest tag: $latest"
-          ver="${latest#v}"
-          IFS='.' read -r major minor patch <<< "$ver"
-          case "$BUMP" in
-            major) major=$((major + 1)); minor=0; patch=0 ;;
-            minor) minor=$((minor + 1)); patch=0 ;;
-            patch) patch=$((patch + 1)) ;;
-            *) echo "::error::unknown bump: $BUMP"; exit 1 ;;
-          esac
-          new="v${major}.${minor}.${patch}"
-          echo "New version: $new"
-          echo "new_version=$new" >> "$GITHUB_OUTPUT"
-
-      - name: Create annotated tag
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          ref: refs/tags/${{ github.event.inputs.tag_name }}
+          persist-credentials: false
+      - name: Setup mise
+        uses: jdx/mise-action@dad1bfd3df957f44999b559dd69dc1671cb4e9ea # v4.2.1
+        with:
+          version: v2026.7.7
+          sha256: 429f71e7e989908bf975aafac9066329c16e2d8fc7cd8e74fdf21dd6300ffe7c
+      - name: Run GoReleaser
         env:
-          NEW_VERSION: ${{ steps.compute.outputs.new_version }}
-          TARGET_SHA: ${{ github.sha }}
-        run: |
-          set -euo pipefail
-          git config user.name  "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git tag -a "$NEW_VERSION" -m "Release $NEW_VERSION" "$TARGET_SHA"
-          git push origin "$NEW_VERSION"
-
-      - name: Create release
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: goreleaser release --clean
+      - name: Attest release assets
+        uses: actions/attest-build-provenance@0f67c3f4856b2e3261c31976d6725780e5e4c373 # v4.1.1
+        with:
+          subject-checksums: ./dist/checksums.txt
+      - name: Publish release
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NEW_VERSION: ${{ steps.compute.outputs.new_version }}
-          TARGET_SHA: ${{ github.sha }}
-        run: |
-          set -euo pipefail
-          # The annotated tag was pushed in the previous step; --verify-tag
-          # tells gh to attach the Release to it rather than creating a new
-          # (lightweight) tag.
-          gh release create "$NEW_VERSION" \
-            --title "$NEW_VERSION" \
-            --generate-notes \
-            --latest \
-            --verify-tag \
-            --target "$TARGET_SHA"
-          echo "Created release $NEW_VERSION at $TARGET_SHA"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: ${{ github.event.inputs.tag_name }}
+        run: gh release edit "$TAG_NAME" --draft=false

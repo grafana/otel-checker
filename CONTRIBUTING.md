@@ -102,6 +102,10 @@ quality and streamlines the development workflow.
 7. Commit your changes with a descriptive message
 8. Submit a pull request to the main repository
 
+Pull request titles must use the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
+format. For example, use `feat: add a collector check` or `fix: handle a missing
+configuration file`. The PR Title check enforces this format.
+
 ## Before Submitting Pull Requests
 
 Please ensure:

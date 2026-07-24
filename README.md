@@ -6,9 +6,22 @@ validating your Grafana token and more.
 
 ## Usage
 
-Requirement: Golang
+For source installs, you need Go 1.25 or higher. Prebuilt binaries are also
+available from the [GitHub Releases](https://github.com/grafana/otel-checker/releases)
+page.
 
 ## Installation
+
+### Prebuilt binaries
+
+Download the archive for your operating system and CPU architecture from the
+[latest release](https://github.com/grafana/otel-checker/releases/latest),
+extract it, and put the `otel-checker` binary on your `PATH`. Release archives
+are provided for Linux, macOS, and Windows on amd64 and arm64. The statically
+linked Linux archives work on both glibc- and musl-based distributions, such as
+Alpine Linux. `checksums.txt` contains SHA-256 checksums for verification.
+
+### Go install
 
 1. Install the `otel-checker` binary
 
