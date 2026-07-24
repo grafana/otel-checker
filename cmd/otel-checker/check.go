@@ -51,7 +51,7 @@ func newCheckCmd() *cobra.Command {
 	f.StringVar(&c.PackageJsonPath, "package-json-path", "",
 		"Path to the directory containing package.json (JS only)")
 	f.StringVar(&c.CollectorConfigPath, "collector-config-path", "",
-		"Path to the directory containing the collector's config.yaml")
+		"Full path to the Collector config file. If unset, looks for config.yaml then config.yml in the current directory.")
 
 	_ = cmd.RegisterFlagCompletionFunc("language", staticCompletion(utils.SupportedLanguages))
 

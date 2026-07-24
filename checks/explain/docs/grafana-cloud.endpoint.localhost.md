@@ -28,7 +28,7 @@ Two options depending on which topology you want to validate:
    instead:
 
    ```bash
-   otel-checker check collector --collector-config-path=./otel/
+   otel-checker check collector --collector-config-path=./otel/config.yaml
    ```
 
    That inspects the Collector's `config.yaml` for the Grafana Cloud
