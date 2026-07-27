@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # /// script
 # requires-python = ">=3.12"
 # dependencies = [
@@ -5,17 +6,16 @@
 # ]
 # ///
 
-#!/usr/bin/env python3
-
+import argparse
 import re
 import sys
-import yaml
-import argparse
 from pathlib import Path
-from typing import Dict, Any, List, Optional
+from typing import Any
+
+import yaml
 
 
-def parse_go_mod_file(file_path: Path) -> Dict[str, Any]:
+def parse_go_mod_file(file_path: Path) -> dict[str, Any]:
     """Parse a go.mod file and extract the module name and dependencies."""
     dependencies = {}
     module_name = None
@@ -59,8 +59,8 @@ def calculate_version_range(version: str) -> str:
 
 
 def find_matching_dependency(
-    file_path: Path, go_mod_data: Dict[str, Any]
-) -> Optional[Dict[str, Any]]:
+    file_path: Path, go_mod_data: dict[str, Any]
+) -> dict[str, Any] | None:
     """
     Find the dependency that matches the directory structure of the go.mod file.
 
@@ -115,7 +115,7 @@ def find_matching_dependency(
     return None
 
 
-def find_go_mod_files(repo_path: Path) -> List[Path]:
+def find_go_mod_files(repo_path: Path) -> list[Path]:
     """Find all go.mod files in the instrumentation directory."""
     instrumentation_dir = repo_path / "instrumentation"
     if not instrumentation_dir.exists():
@@ -180,7 +180,7 @@ def main():
                     ]
             else:
                 print(f"No matching dependency found for {rel_path}")
-        except Exception as e:
+        except (KeyError, OSError, TypeError, UnicodeError, ValueError) as e:
             print(f"Error processing {go_mod_file}: {e}", file=sys.stderr)
 
     output_path = Path(args.output)

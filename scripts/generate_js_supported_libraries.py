@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # /// script
 # requires-python = ">=3.12"
 # dependencies = [
@@ -5,19 +6,18 @@
 # ]
 # ///
 
-#!/usr/bin/env python3
-
+import argparse
 import re
 import sys
-import yaml
-import argparse
 from pathlib import Path
-from typing import Optional, Dict, Any
+from typing import Any
+
+import yaml
 
 
 def create_result(
     library_name: str, link: str, version_range: str, dir_name: str
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Create a standardized result dictionary."""
     return {
         "name": library_name,
@@ -32,7 +32,7 @@ def get_repo_link(dir_name: str) -> str:
     return f"https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/packages/{dir_name}"
 
 
-def extract_supported_versions(readme_path: Path) -> Optional[Dict[str, Any]]:
+def extract_supported_versions(readme_path: Path) -> dict[str, Any] | None:
     """Extract supported versions from a README.md file."""
     try:
         with open(readme_path, "r") as f:
@@ -111,7 +111,7 @@ def extract_supported_versions(readme_path: Path) -> Optional[Dict[str, Any]]:
             file=sys.stderr,
         )
         return None
-    except Exception as e:
+    except (OSError, UnicodeError) as e:
         print(f"Error processing {readme_path}: {e}", file=sys.stderr)
         return None
 
