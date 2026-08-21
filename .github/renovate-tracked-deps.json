@@ -7,18 +7,35 @@
       ]
     },
     ".github/workflows/lint.yml": {
-      "regex": [
-        "mise"
+      "github-actions": [
+        "actions/checkout",
+        "jdx/mise",
+        "jdx/mise-action",
+        "ubuntu"
+      ]
+    },
+    ".github/workflows/pr-title.yml": {
+      "github-actions": [
+        "grafana/shared-workflows",
+        "ubuntu"
       ]
     },
     ".github/workflows/release.yml": {
-      "regex": [
-        "mise"
+      "github-actions": [
+        "actions/attest-build-provenance",
+        "actions/checkout",
+        "googleapis/release-please-action",
+        "jdx/mise",
+        "jdx/mise-action",
+        "ubuntu"
       ]
     },
     ".github/workflows/test.yaml": {
-      "regex": [
-        "mise"
+      "github-actions": [
+        "actions/checkout",
+        "jdx/mise",
+        "jdx/mise-action",
+        "ubuntu"
       ]
     },
     "mise.toml": {
@@ -43,6 +60,29 @@
         "uv",
         "zizmor"
       ]
+    }
+  },
+  "actionMeta": {
+    "actions/attest-build-provenance": {
+      "packageName": "actions/attest-build-provenance",
+      "refKind": "version-tag"
+    },
+    "actions/checkout": {
+      "packageName": "actions/checkout",
+      "refKind": "version-tag"
+    },
+    "googleapis/release-please-action": {
+      "packageName": "googleapis/release-please-action",
+      "refKind": "version-tag"
+    },
+    "grafana/shared-workflows/actions/lint-pr-title": {
+      "packageName": "grafana/shared-workflows",
+      "refKind": "version-tag",
+      "compatibility": "lint-pr-title"
+    },
+    "jdx/mise-action": {
+      "packageName": "jdx/mise-action",
+      "refKind": "version-tag"
     }
   }
 }
