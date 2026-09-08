@@ -2,7 +2,7 @@
 go = "1.27.1"
 goreleaser = "2.18.0"
 node = "24.20.0"
-uv = "0.12.9"
+uv = "0.12.10"
 
 # Linters
 actionlint = "1.7.12"
