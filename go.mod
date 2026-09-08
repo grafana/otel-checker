@@ -1,6 +1,6 @@
 module github.com/grafana/otel-checker
 
-go 1.25.8
+go 1.26.0
 
 require (
 	charm.land/glamour/v2 v2.0.1
@@ -9,7 +9,7 @@ require (
 	github.com/spf13/cobra v1.10.2
 	github.com/stretchr/testify v1.12.1
 	go.yaml.in/yaml/v3 v3.0.5
-	golang.org/x/mod v0.40.0
+	golang.org/x/mod v0.41.0
 	golang.org/x/term v0.45.0
 )
 
