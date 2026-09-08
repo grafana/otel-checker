@@ -45,6 +45,7 @@ otel-checker check collector        # Collector config only
 otel-checker check beyla            # Beyla only
 otel-checker check alloy            # Grafana Alloy only
 otel-checker check grafana-cloud    # Grafana Cloud connectivity only
+otel-checker check config           # OpenTelemetry declarative config file only
 otel-checker serve                  # web UI for a previously-saved JSON result
 otel-checker explain                    # show explanations for every finding from a saved results file
 otel-checker explain <id>               # show the explanation for a single ID
@@ -66,6 +67,7 @@ flag set on each subcommand.
 otel-checker check sdk --language=js
 otel-checker check sdk --language=java --manual-instrumentation
 otel-checker check collector --collector-config-path=./otel/config.yaml
+otel-checker check config --config-path=./otel-config.yaml
 otel-checker check grafana-cloud --language=python
 
 # Multi-component (positional, comma-separated, no spaces)
@@ -290,6 +292,33 @@ Run `otel-checker check collector`:
   contains an `otlp` receiver.
 
 Named components (e.g. `otlphttp/grafana_cloud`, `otlp/app`) are supported.
+
+### Config (declarative configuration)
+
+Run `otel-checker check config`:
+
+- `otel-config.yaml` (or `otel-config.yml`) exists and parses as valid
+  YAML matching the [OpenTelemetry declarative configuration schema](https://opentelemetry.io/docs/specs/otel/configuration/).
+  Override the path with `--config-path=<file>`.
+- `file_format` is declared at the top level.
+- Each of the three signals (`traces`, `metrics`, `logs`) declares at
+  least one `otlp_http` endpoint under its provider:
+  - Traces: `tracer_provider.processors[].batch|simple.exporter.otlp_http.endpoint`
+  - Metrics: `meter_provider.readers[].periodic|pull.exporter.otlp_http.endpoint`
+  - Logs: `logger_provider.processors[].batch|simple.exporter.otlp_http.endpoint`
+
+Environment-variable substitutions (`${VAR}`, `${env:VAR}`,
+`${VAR:-default}`) are resolved against the process environment before
+validation. When a referenced variable is unset and has no `:-` default,
+the finding fires as `config.env-var.unresolved`.
+
+The declarative config and OpenTelemetry environment variables are
+mutually exclusive per the OTel spec. When `--config-path` is passed
+(or a default `otel-config.yaml` is present), the `grafana-cloud`
+check reads endpoints from the config file and skips the env-var,
+auth-header, and credential-HTTP checks. Without a config file, the
+`grafana-cloud` check behaves as before and reads from
+`OTEL_EXPORTER_OTLP_*_ENDPOINT`.
 
 ### Beyla
 
