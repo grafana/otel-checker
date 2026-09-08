@@ -90,11 +90,6 @@ func checkEnvVarsGrafana(reporter utils.Reporter, grafana *utils.ComponentReport
 // the declarative config, applying the same Grafana Cloud regex as the
 // env-var flow. Endpoints undergo env-var substitution first so
 // ${VAR:-default} placeholders resolve to concrete URLs.
-//
-// Exported so both check paths can call it: `check grafana-cloud` (via
-// CheckGrafanaSetup) and `check config` (dispatched directly from
-// checks.Run so a config-only invocation still validates endpoints,
-// which is grafana's responsibility).
 func CheckEndpointsFromConfig(reporter *utils.ComponentReporter, f *config.File) {
 	endpoints := f.SignalEndpoints()
 	for _, signal := range []string{"traces", "metrics", "logs"} {
@@ -131,8 +126,6 @@ func CheckEndpointsFromConfig(reporter *utils.ComponentReporter, f *config.File)
 	}
 }
 
-// isValidURL is true when s parses as a URL with both a scheme and a
-// host — matches the collector checker's helper of the same name.
 func isValidURL(s string) bool {
 	if s == "" {
 		return false

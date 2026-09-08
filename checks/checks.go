@@ -69,7 +69,7 @@ func Run(ctx context.Context, commands utils.Commands) *utils.Reporter {
 			)
 			// Endpoint format validation is the grafana check's job, but
 			// it lives under the same file the config component just
-			// parsed — so drive it from here when grafana-cloud isn't
+			// parsed, so drive it from here when grafana-cloud isn't
 			// already in the components list (which would run it too and
 			// duplicate every finding).
 			if parsedConfig != nil && !slices.Contains(commands.Components, "grafana-cloud") {
@@ -81,9 +81,6 @@ func Run(ctx context.Context, commands utils.Commands) *utils.Reporter {
 	return &reporter
 }
 
-// errNoConfigFile is the sentinel returned to CheckConfigSetup when neither
-// an explicit --config-path nor a default file could be located. It's
-// distinguished from a real load error by the empty resolvedConfigPath.
 var errNoConfigFile = errNoFile{}
 
 type errNoFile struct{}

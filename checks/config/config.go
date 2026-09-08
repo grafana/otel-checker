@@ -122,9 +122,6 @@ func endpointOf(w *WithExporter) string {
 	return w.Exporter.OTLPHTTP.Endpoint
 }
 
-// envVarPattern matches ${VAR}, ${VAR:-default}, and the ${env:VAR}
-// variants used by OTel declarative configuration. The submatches are
-// (optional "env:" prefix, variable name, optional ":-default" suffix).
 var envVarPattern = regexp.MustCompile(`\$\{(env:)?([A-Za-z_][A-Za-z0-9_]*)(?::-([^}]*))?\}`)
 
 // ExpandEnv resolves every ${VAR}, ${env:VAR}, and ${VAR:-default}
