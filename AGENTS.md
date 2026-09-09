@@ -53,6 +53,43 @@ run `mise run lint:fix` again.
 Example output:
 flint: fixed: gofmt — commit before pushing | partial: cargo-clippy
 
+## Repo setup
+
+After cloning, activate the repository's git hooks:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+The pre-commit hook in `.githooks/` blocks commits that strip required
+fields from `mise.lock` (an older local `mise` will silently rewrite
+the file and break CI — see the next section).
+
+## mise.lock
+
+`mise.lock` is renovated automatically and should not be modified
+manually. When your local `mise` is older than the version CI uses,
+any `mise run <task>` triggers `mise install` under the hood, and the
+older mise silently strips fields the newer one treats as required
+(`lockfile_version = 1`, `specifiers = [...]` entries,
+`trust_policy_excludes`). CI then fails on `npm:renovate` resolution.
+
+Guardrails:
+
+1. Keep your local `mise` current. On macOS: `brew upgrade mise`.
+2. The pre-commit hook (activated via `core.hooksPath .githooks`)
+   blocks commits that lose the sentinel fields, with recovery
+   instructions in the error message.
+
+If the hook fires, recover with:
+
+```bash
+git checkout main -- mise.lock
+```
+
+Regenerate only via `mise lock` with a mise version that matches CI —
+never edit the file by hand.
+
 ## Architecture
 
 ### Package Organization

@@ -178,16 +178,33 @@ These checks are automatically performed for all languages and components.
     `service.name` in `OTEL_RESOURCE_ATTRIBUTES`)
   - Example warning: `Set OTEL_RESOURCE_ATTRIBUTES="service.namespace=shop": An optional namespace for service.name`
 
+When a declarative config file is present (see the
+[Config](#config-declarative-configuration) section below), resource
+attribute checks source from the file's `resource.attributes` and
+`resource.attributes_list` blocks instead of `OTEL_RESOURCE_ATTRIBUTES`,
+with env-var substitutions (`${VAR}`, `${VAR:-default}`) resolved
+against the process environment. Warnings then point at the config
+file (`config.resource-attributes.missing`,
+`config.service-name.unset`) instead of the env-var equivalents.
+
 ### Grafana Cloud
 
-Run `otel-checker check grafana-cloud --language=<lang>` (or pass
-`--components=grafana-cloud` to `check`):
+Run `otel-checker check grafana-cloud` (add `--language=python` if the
+customer uses Python — that variant expects the URL-encoded
+`Authorization=Basic%20<token>` form; every other language uses the
+literal-space form, which is also the default when `--language` is
+omitted):
 
 - `OTEL_EXPORTER_OTLP_ENDPOINT` matches
   `https://otlp-gateway-<zone>.grafana.net/otlp`.
 - `OTEL_EXPORTER_OTLP_PROTOCOL` is `http/protobuf`.
 - `OTEL_EXPORTER_OTLP_HEADERS` contains an `Authorization=Basic <token>` entry.
 - Credential validation: tests the endpoint with the provided token.
+
+When a declarative config file is present, endpoint validation reads
+from the file's `otlp_http` blocks (with env-var substitution) instead
+of the env vars, and the auth-header / credential-HTTP checks are
+skipped. See the [Config](#config-declarative-configuration) section.
 
 ### SDK
 
@@ -302,23 +319,48 @@ Run `otel-checker check config`:
   Override the path with `--config-path=<file>`.
 - `file_format` is declared at the top level.
 - Each of the three signals (`traces`, `metrics`, `logs`) declares at
-  least one `otlp_http` endpoint under its provider:
+  least one `otlp_http` endpoint under its provider (endpoint format
+  validated by the [Grafana Cloud](#grafana-cloud) check):
   - Traces: `tracer_provider.processors[].batch|simple.exporter.otlp_http.endpoint`
   - Metrics: `meter_provider.readers[].periodic|pull.exporter.otlp_http.endpoint`
   - Logs: `logger_provider.processors[].batch|simple.exporter.otlp_http.endpoint`
+- Recommended resource attributes are declared under
+  `resource.attributes` or `resource.attributes_list`. Both blocks
+  contribute; per spec, `attributes` entries have higher priority than
+  `attributes_list` when both declare the same key. Reported IDs:
+  `config.service-name.unset`, `config.resource-attributes.missing`.
 
-Environment-variable substitutions (`${VAR}`, `${env:VAR}`,
-`${VAR:-default}`) are resolved against the process environment before
-validation. When a referenced variable is unset and has no `:-` default,
-the finding fires as `config.env-var.unresolved`.
+**Environment-variable substitution**
+is applied to every string value the checker consumes (endpoints,
+resource attribute values, `attributes_list`). Supported forms:
+
+- `${VAR}` and `${env:VAR}` — resolves to the process env; unresolved
+  reference fires `config.env-var.unresolved`.
+- `${VAR:-default}` — uses `default` verbatim when `VAR` is unset or
+  empty.
+- `$$` — escape sequence for a literal `$`; `$${VAR}` produces the
+  literal string `${VAR}` (unexpanded).
+
+Substitution is single-pass per spec — if a resolved value itself
+contains `${...}`, the placeholder is left literal, NOT re-expanded.
 
 The declarative config and OpenTelemetry environment variables are
 mutually exclusive per the OTel spec. When `--config-path` is passed
-(or a default `otel-config.yaml` is present), the `grafana-cloud`
-check reads endpoints from the config file and skips the env-var,
-auth-header, and credential-HTTP checks. Without a config file, the
-`grafana-cloud` check behaves as before and reads from
-`OTEL_EXPORTER_OTLP_*_ENDPOINT`.
+(or a default `otel-config.yaml` is present):
+
+- The [Grafana Cloud](#grafana-cloud) check reads OTLP endpoints from
+  the config file and skips the env-var, auth-header, and
+  credential-HTTP checks.
+- The [Common Environment Variables](#common-environment-variables)
+  resource-attribute checks read from `resource:` in the config file
+  instead of `OTEL_RESOURCE_ATTRIBUTES` / `OTEL_SERVICE_NAME`.
+- When running `check config` alone (without also selecting
+  `grafana-cloud`), the endpoint check is driven from the config
+  component so `check config` produces a complete report; when both
+  components are selected, endpoint findings are reported once under
+  Grafana Cloud.
+
+Without a config file, all env-var-based behavior is unchanged.
 
 ### Beyla
 

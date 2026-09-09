@@ -163,6 +163,141 @@ func TestSignalEndpoints_NilProviders(t *testing.T) {
 	assert.Empty(t, got["logs"])
 }
 
+// TestLoad_UpstreamSDKConfigExample loads the official
+// otel-sdk-config.yaml example and asserts
+// the parser accepts every field the file uses.
+//
+// If a future spec revision adds a field that our lenient YAML
+// decoding can't tolerate, this test catches it before it reaches
+// customer configs. Refresh the fixture with:
+//
+//	curl -sL https://raw.githubusercontent.com/open-telemetry/opentelemetry-configuration/main/examples/otel-sdk-config.yaml > testdata/otel-sdk-config.yaml
+func TestLoad_UpstreamSDKConfigExample(t *testing.T) {
+	f, err := Load("testdata/otel-sdk-config.yaml")
+	require.NoError(t, err)
+	require.NotNil(t, f)
+
+	assert.Equal(t, "1.1", f.FileFormat)
+
+	endpoints := f.SignalEndpoints()
+	assert.Equal(t, []string{"http://localhost:4318/v1/traces"}, endpoints["traces"])
+	assert.Equal(t, []string{"http://localhost:4318/v1/metrics"}, endpoints["metrics"])
+	assert.Equal(t, []string{"http://localhost:4318/v1/logs"}, endpoints["logs"])
+
+	assert.Equal(t, map[string]string{"service.name": "unknown_service"}, f.ResourceAttributes())
+}
+
+func TestResourceAttributes(t *testing.T) {
+	t.Run("nil file returns empty map", func(t *testing.T) {
+		var f *File
+		assert.Empty(t, f.ResourceAttributes())
+	})
+
+	t.Run("nil resource returns empty map", func(t *testing.T) {
+		f := &File{}
+		assert.Empty(t, f.ResourceAttributes())
+	})
+
+	t.Run("attributes only", func(t *testing.T) {
+		f := &File{Resource: &Resource{
+			Attributes: []ResourceAttribute{
+				{Name: "service.name", Value: "checkout"},
+				{Name: "service.version", Value: "1.4.2"},
+			},
+		}}
+		assert.Equal(t, map[string]string{
+			"service.name":    "checkout",
+			"service.version": "1.4.2",
+		}, f.ResourceAttributes())
+	})
+
+	t.Run("attributes_list only", func(t *testing.T) {
+		f := &File{Resource: &Resource{
+			AttributesList: "service.name=shop,deployment.environment.name=prod",
+		}}
+		assert.Equal(t, map[string]string{
+			"service.name":                "shop",
+			"deployment.environment.name": "prod",
+		}, f.ResourceAttributes())
+	})
+
+	t.Run("attributes override attributes_list per spec", func(t *testing.T) {
+		f := &File{Resource: &Resource{
+			AttributesList: "service.name=from-list,service.version=1.0",
+			Attributes: []ResourceAttribute{
+				{Name: "service.name", Value: "from-attributes"},
+			},
+		}}
+		got := f.ResourceAttributes()
+		assert.Equal(t, "from-attributes", got["service.name"])
+		assert.Equal(t, "1.0", got["service.version"])
+	})
+
+	t.Run("env-var substitution resolved via process env", func(t *testing.T) {
+		t.Setenv("MY_SERVICE", "billing")
+		f := &File{Resource: &Resource{
+			Attributes: []ResourceAttribute{
+				{Name: "service.name", Value: "${MY_SERVICE}"},
+			},
+		}}
+		assert.Equal(t, "billing", f.ResourceAttributes()["service.name"])
+	})
+
+	t.Run("env-var default used when var unset", func(t *testing.T) {
+		f := &File{Resource: &Resource{
+			Attributes: []ResourceAttribute{
+				{Name: "service.name", Value: "${MISSING_VAR:-fallback}"},
+			},
+		}}
+		assert.Equal(t, "fallback", f.ResourceAttributes()["service.name"])
+	})
+
+	t.Run("attributes_list env-var expansion", func(t *testing.T) {
+		t.Setenv("EXTRA_ATTRS", "region=eu-west-2,tier=paid")
+		f := &File{Resource: &Resource{
+			AttributesList: "${EXTRA_ATTRS}",
+		}}
+		got := f.ResourceAttributes()
+		assert.Equal(t, "eu-west-2", got["region"])
+		assert.Equal(t, "paid", got["tier"])
+	})
+
+	t.Run("unresolved env var leaves placeholder as literal — dropped as empty when only content", func(t *testing.T) {
+		// attributes_list references an unset env var with no default —
+		// ExpandEnv leaves the ${...} placeholder, which is then parsed as
+		// key-value pairs and produces no valid entries.
+		f := &File{Resource: &Resource{
+			AttributesList: "${UNSET_VAR_ATTR_LIST}",
+		}}
+		assert.Empty(t, f.ResourceAttributes())
+	})
+
+	t.Run("nil attribute value skipped per spec", func(t *testing.T) {
+		f := &File{Resource: &Resource{
+			Attributes: []ResourceAttribute{
+				{Name: "service.name", Value: nil},
+				{Name: "service.version", Value: "1.0"},
+			},
+		}}
+		got := f.ResourceAttributes()
+		assert.Equal(t, map[string]string{"service.version": "1.0"}, got)
+	})
+
+	t.Run("non-string attribute value stringified", func(t *testing.T) {
+		// AttributeNameValue.value can be number/bool per schema —
+		// we stringify for presence checks.
+		f := &File{Resource: &Resource{
+			Attributes: []ResourceAttribute{
+				{Name: "service.version", Value: 2},
+				{Name: "sampling.enabled", Value: true},
+			},
+		}}
+		got := f.ResourceAttributes()
+		assert.Equal(t, "2", got["service.version"])
+		assert.Equal(t, "true", got["sampling.enabled"])
+	})
+}
+
 func TestLoad_MissingFile(t *testing.T) {
 	_, err := Load(filepath.Join(t.TempDir(), "does-not-exist.yaml"))
 	require.Error(t, err)
