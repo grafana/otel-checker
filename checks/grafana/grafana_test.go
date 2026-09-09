@@ -3,8 +3,118 @@ package grafana
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
+	"github.com/grafana/otel-checker/checks/config"
 	"github.com/grafana/otel-checker/checks/utils"
 )
+
+func TestCheckEndpointsFromConfig(t *testing.T) {
+	// Baseline file — three Grafana Cloud endpoints, one per signal, no
+	// env-var substitution required.
+	grafanaCloudFile := func() *config.File {
+		return &config.File{
+			TracerProvider: &config.TracerProvider{
+				Processors: []config.SpanProcessor{
+					{Batch: &config.WithExporter{
+						Exporter: config.Exporter{OTLPHTTP: &config.OTLPHTTPExporter{
+							Endpoint: "https://otlp-gateway-prod-us-east-0.grafana.net/otlp/v1/traces",
+						}},
+					}},
+				},
+			},
+			MeterProvider: &config.MeterProvider{
+				Readers: []config.MetricReader{
+					{Periodic: &config.WithExporter{
+						Exporter: config.Exporter{OTLPHTTP: &config.OTLPHTTPExporter{
+							Endpoint: "https://otlp-gateway-prod-us-east-0.grafana.net/otlp/v1/metrics",
+						}},
+					}},
+				},
+			},
+			LoggerProvider: &config.LoggerProvider{
+				Processors: []config.LogProcessor{
+					{Batch: &config.WithExporter{
+						Exporter: config.Exporter{OTLPHTTP: &config.OTLPHTTPExporter{
+							Endpoint: "https://otlp-gateway-prod-us-east-0.grafana.net/otlp/v1/logs",
+						}},
+					}},
+				},
+			},
+		}
+	}
+
+	t.Run("all three signals valid", func(t *testing.T) {
+		r := &utils.ComponentReporter{}
+		CheckEndpointsFromConfig(r, grafanaCloudFile())
+		assert.Empty(t, r.Errors)
+		assert.Empty(t, r.Warnings)
+		assert.Len(t, r.Checks, 3)
+	})
+
+	t.Run("localhost endpoint warns", func(t *testing.T) {
+		f := grafanaCloudFile()
+		f.TracerProvider.Processors[0].Batch.Exporter.OTLPHTTP.Endpoint = "http://localhost:4318/v1/traces"
+		r := &utils.ComponentReporter{}
+		CheckEndpointsFromConfig(r, f)
+		assert.Empty(t, r.Errors)
+		assert.Contains(t, r.Warnings[0], "localhost")
+	})
+
+	t.Run("valid non-Grafana URL warns", func(t *testing.T) {
+		f := grafanaCloudFile()
+		f.TracerProvider.Processors[0].Batch.Exporter.OTLPHTTP.Endpoint = "https://otel.example.com/v1/traces"
+		r := &utils.ComponentReporter{}
+		CheckEndpointsFromConfig(r, f)
+		assert.Empty(t, r.Errors)
+		assert.Contains(t, r.Warnings[0], "not a Grafana Cloud endpoint")
+	})
+
+	t.Run("invalid URL errors", func(t *testing.T) {
+		f := grafanaCloudFile()
+		f.TracerProvider.Processors[0].Batch.Exporter.OTLPHTTP.Endpoint = "not-a-url"
+		r := &utils.ComponentReporter{}
+		CheckEndpointsFromConfig(r, f)
+		assert.NotEmpty(t, r.Errors)
+	})
+
+	t.Run("missing signal provider warns", func(t *testing.T) {
+		f := grafanaCloudFile()
+		f.LoggerProvider = nil
+		r := &utils.ComponentReporter{}
+		CheckEndpointsFromConfig(r, f)
+		assert.Contains(t, r.Warnings[0], "No otlp_http endpoint declared for logs")
+	})
+
+	t.Run("env-var substitution resolves via process env", func(t *testing.T) {
+		t.Setenv("MY_ENDPOINT", "https://otlp-gateway-prod-us-east-0.grafana.net/otlp")
+		f := grafanaCloudFile()
+		f.TracerProvider.Processors[0].Batch.Exporter.OTLPHTTP.Endpoint = "${MY_ENDPOINT}/v1/traces"
+		r := &utils.ComponentReporter{}
+		CheckEndpointsFromConfig(r, f)
+		assert.Empty(t, r.Errors)
+		assert.Empty(t, r.Warnings)
+		assert.Len(t, r.Checks, 3)
+	})
+
+	t.Run("env-var default used when var unset", func(t *testing.T) {
+		f := grafanaCloudFile()
+		f.TracerProvider.Processors[0].Batch.Exporter.OTLPHTTP.Endpoint = "${MISSING_VAR:-http://localhost:4318}/v1/traces"
+		r := &utils.ComponentReporter{}
+		CheckEndpointsFromConfig(r, f)
+		assert.Empty(t, r.Errors)
+		assert.Contains(t, r.Warnings[0], "localhost")
+	})
+
+	t.Run("unresolved env var errors", func(t *testing.T) {
+		f := grafanaCloudFile()
+		f.TracerProvider.Processors[0].Batch.Exporter.OTLPHTTP.Endpoint = "${OTHER_MISSING_VAR}/v1/traces"
+		r := &utils.ComponentReporter{}
+		CheckEndpointsFromConfig(r, f)
+		assert.NotEmpty(t, r.Errors)
+		assert.Contains(t, r.Errors[0], "OTHER_MISSING_VAR")
+	})
+}
 
 func TestCheckEnvVarsGrafana(t *testing.T) {
 	correct := correctWith(map[string]string{})

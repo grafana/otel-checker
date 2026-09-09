@@ -2,10 +2,12 @@ package checks
 
 import (
 	"context"
+	"slices"
 
 	"github.com/grafana/otel-checker/checks/alloy"
 	"github.com/grafana/otel-checker/checks/beyla"
 	"github.com/grafana/otel-checker/checks/collector"
+	"github.com/grafana/otel-checker/checks/config"
 	"github.com/grafana/otel-checker/checks/env"
 	"github.com/grafana/otel-checker/checks/grafana"
 	"github.com/grafana/otel-checker/checks/sdk"
@@ -24,6 +26,21 @@ import (
 func Run(ctx context.Context, commands utils.Commands) *utils.Reporter {
 	reporter := utils.Reporter{}
 
+	// Declarative config parsing is done once, up front, so both the
+	// `config` component (which reports on the parse itself) and the
+	// `grafana-cloud` component (which reads endpoints from it when
+	// present) can share the result.
+	resolvedConfigPath, configCandidates := config.Resolve(commands.ConfigPath)
+	var (
+		parsedConfig  *config.File
+		configLoadErr error
+	)
+	if resolvedConfigPath != "" {
+		parsedConfig, configLoadErr = config.Load(resolvedConfigPath)
+	} else {
+		configLoadErr = errNoConfigFile
+	}
+
 	env.CheckCommon(reporter.Component("Common Environment Variables"), commands.Language)
 
 	for _, c := range commands.Components {
@@ -41,12 +58,34 @@ func Run(ctx context.Context, commands utils.Commands) *utils.Reporter {
 				commands.CollectorConfigPath,
 			)
 		case "grafana-cloud":
-			grafana.CheckGrafanaSetup(ctx, reporter, reporter.Component("Grafana Cloud"), commands)
+			grafana.CheckGrafanaSetup(ctx, reporter, reporter.Component("Grafana Cloud"), commands, parsedConfig)
+		case "config":
+			config.CheckConfigSetup(
+				reporter.Component("Declarative Config"),
+				resolvedConfigPath,
+				configCandidates,
+				parsedConfig,
+				configLoadErr,
+			)
+			// Endpoint format validation is the grafana check's job, but
+			// it lives under the same file the config component just
+			// parsed, so drive it from here when grafana-cloud isn't
+			// already in the components list (which would run it too and
+			// duplicate every finding).
+			if parsedConfig != nil && !slices.Contains(commands.Components, "grafana-cloud") {
+				grafana.CheckEndpointsFromConfig(reporter.Component("Grafana Cloud"), parsedConfig)
+			}
 		}
 	}
 
 	return &reporter
 }
+
+var errNoConfigFile = errNoFile{}
+
+type errNoFile struct{}
+
+func (errNoFile) Error() string { return "no declarative config file found" }
 
 func SDKSetup(ctx context.Context, reporter *utils.ComponentReporter, commands utils.Commands) {
 	switch commands.Language {

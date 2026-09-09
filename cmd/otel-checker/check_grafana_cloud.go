@@ -20,8 +20,7 @@ func newCheckGrafanaCloudCmd(c *utils.Commands) *cobra.Command {
 		},
 	}
 	cmd.Flags().StringVar(&c.Language, "language", "",
-		"Language used for instrumentation (needed for OTLP header quirks). Possible values: "+strings.Join(utils.SupportedLanguages, ", "))
-	_ = cmd.MarkFlagRequired("language")
+		"Language used for instrumentation. Optional — only affects the OTEL_EXPORTER_OTLP_HEADERS format (Python expects Basic%20, others expect a literal space). Possible values: "+strings.Join(utils.SupportedLanguages, ", "))
 	_ = cmd.RegisterFlagCompletionFunc("language", staticCompletion(utils.SupportedLanguages))
 	return cmd
 }
