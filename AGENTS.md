@@ -154,3 +154,4 @@ otel-checker check --language=js --format=json > results.json    # capture for e
   typos, editorconfig-checker, golangci-lint, gofmt, ruff, ruff-format,
   biome, biome-format, lychee, renovate-deps)
 - Python scripts use uv for dependencies
+- Security issues should be reported via [Grafana's security issue reporting page](https://grafana.com/legal/report-a-security-issue/) and not directly in this repository.
