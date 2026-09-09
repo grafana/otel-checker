@@ -330,8 +330,7 @@ Run `otel-checker check config`:
   `attributes_list` when both declare the same key. Reported IDs:
   `config.service-name.unset`, `config.resource-attributes.missing`.
 
-**Environment-variable substitution** (spec:
-[data-model#environment-variable-substitution](https://opentelemetry.io/docs/specs/otel/configuration/data-model/#environment-variable-substitution))
+**Environment-variable substitution**
 is applied to every string value the checker consumes (endpoints,
 resource attribute values, `attributes_list`). Supported forms:
 
