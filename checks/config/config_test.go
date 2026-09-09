@@ -71,6 +71,31 @@ func TestExpandEnv(t *testing.T) {
 			input:      "",
 			wantResult: "",
 		},
+		{
+			name:       "$$ escape produces literal $",
+			input:      "$$",
+			wantResult: "$",
+		},
+		{
+			name:       "$${VAR} escapes the substitution reference",
+			input:      "$${EXISTS}",
+			wantResult: "${EXISTS}",
+		},
+		{
+			name:       "$$$ then substitution — escape then expand",
+			input:      "$$${EXISTS}",
+			wantResult: "$hello",
+		},
+		{
+			name:       "$$ inside a larger string",
+			input:      "cost: 5$$",
+			wantResult: "cost: 5$",
+		},
+		{
+			name:       "escape does not disable a nearby substitution",
+			input:      "${EXISTS}/$${LITERAL}/${EXISTS}",
+			wantResult: "hello/${LITERAL}/hello",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

@@ -122,15 +122,39 @@ func endpointOf(w *WithExporter) string {
 	return w.Exporter.OTLPHTTP.Endpoint
 }
 
-var envVarPattern = regexp.MustCompile(`\$\{(env:)?([A-Za-z_][A-Za-z0-9_]*)(?::-([^}]*))?\}`)
+// envVarPattern matches either the `$$` escape sequence or a full
+// substitution reference. The alternation is ordered so `$$` wins at
+// positions where the two could overlap. Submatch indices:
+//
+//	1 - optional "env:" prefix
+//	2 - variable name
+//	3 - optional ":-default" content
+//
+// When submatch 2 is empty, the overall match is the `$$` escape.
+var envVarPattern = regexp.MustCompile(`\$\$|\$\{(env:)?([A-Za-z_][A-Za-z0-9_]*)(?::-([^}]*))?\}`)
 
 // ExpandEnv resolves every ${VAR}, ${env:VAR}, and ${VAR:-default}
-// occurrence in s using os.LookupEnv. When a referenced variable is
+// occurrence in s using os.LookupEnv, and honors the `$$` escape (the
+// spec's mechanism for embedding a literal `$` — `$${VAR}` produces the
+// literal string `${VAR}`, unexpanded). When a referenced variable is
 // unset (or set to the empty string) and no default is provided, the
 // placeholder is left intact and the variable name is appended to
 // unresolved so the caller can surface the failure.
+//
+// ExpandEnv is intentionally single-pass. Per the OpenTelemetry
+// Configuration spec, substitution MUST NOT recurse — if a resolved
+// value itself contains ${...}, the placeholder is left literal and is
+// NOT re-expanded. From the spec example:
+//
+//	"Value of env var REPLACE_ME is ${DO_NOT_REPLACE_ME}, and is not
+//	 substituted recursively"
+//
+// See: https://opentelemetry.io/docs/specs/otel/configuration/data-model/#environment-variable-substitution
 func ExpandEnv(s string) (result string, unresolved []string) {
 	result = envVarPattern.ReplaceAllStringFunc(s, func(match string) string {
+		if match == "$$" {
+			return "$"
+		}
 		sub := envVarPattern.FindStringSubmatch(match)
 		name := sub[2]
 		hasDefault := strings.Contains(match, ":-")
