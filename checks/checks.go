@@ -41,7 +41,7 @@ func Run(ctx context.Context, commands utils.Commands) *utils.Reporter {
 		configLoadErr = errNoConfigFile
 	}
 
-	env.CheckCommon(reporter.Component("Common Environment Variables"), commands.Language)
+	env.CheckCommon(reporter.Component("Common Environment Variables"), commands.Language, parsedConfig)
 
 	for _, c := range commands.Components {
 		switch c {

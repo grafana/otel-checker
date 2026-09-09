@@ -16,9 +16,21 @@ import (
 // file.
 type File struct {
 	FileFormat     string          `yaml:"file_format"`
+	Resource       *Resource       `yaml:"resource,omitempty"`
 	TracerProvider *TracerProvider `yaml:"tracer_provider,omitempty"`
 	MeterProvider  *MeterProvider  `yaml:"meter_provider,omitempty"`
 	LoggerProvider *LoggerProvider `yaml:"logger_provider,omitempty"`
+}
+
+type Resource struct {
+	Attributes     []ResourceAttribute `yaml:"attributes,omitempty"`
+	AttributesList string              `yaml:"attributes_list,omitempty"`
+}
+
+type ResourceAttribute struct {
+	Name  string `yaml:"name"`
+	Value any    `yaml:"value"`
+	Type  string `yaml:"type,omitempty"`
 }
 
 type TracerProvider struct {
@@ -122,6 +134,45 @@ func endpointOf(w *WithExporter) string {
 	return w.Exporter.OTLPHTTP.Endpoint
 }
 
+func (f *File) ResourceAttributes() map[string]string {
+	out := map[string]string{}
+	if f == nil || f.Resource == nil {
+		return out
+	}
+
+	// attributes_list (lower priority) parses first.
+	if raw := f.Resource.AttributesList; raw != "" {
+		expanded, _ := ExpandEnv(raw)
+		for pair := range strings.SplitSeq(expanded, ",") {
+			key, value, ok := strings.Cut(pair, "=")
+			if !ok {
+				continue
+			}
+			key = strings.TrimSpace(key)
+			value = strings.TrimSpace(value)
+			if key == "" || value == "" {
+				continue
+			}
+			out[key] = value
+		}
+	}
+
+	// attributes (higher priority) overrides.
+	for _, attr := range f.Resource.Attributes {
+		if attr.Value == nil {
+			continue
+		}
+		raw := fmt.Sprintf("%v", attr.Value)
+		expanded, _ := ExpandEnv(raw)
+		expanded = strings.TrimSpace(expanded)
+		if expanded == "" {
+			continue
+		}
+		out[attr.Name] = expanded
+	}
+	return out
+}
+
 // envVarPattern matches either the `$$` escape sequence or a full
 // substitution reference. The alternation is ordered so `$$` wins at
 // positions where the two could overlap. Submatch indices:
@@ -134,22 +185,10 @@ func endpointOf(w *WithExporter) string {
 var envVarPattern = regexp.MustCompile(`\$\$|\$\{(env:)?([A-Za-z_][A-Za-z0-9_]*)(?::-([^}]*))?\}`)
 
 // ExpandEnv resolves every ${VAR}, ${env:VAR}, and ${VAR:-default}
-// occurrence in s using os.LookupEnv, and honors the `$$` escape (the
-// spec's mechanism for embedding a literal `$` — `$${VAR}` produces the
-// literal string `${VAR}`, unexpanded). When a referenced variable is
+// occurrence in s using os.LookupEnv. When a referenced variable is
 // unset (or set to the empty string) and no default is provided, the
 // placeholder is left intact and the variable name is appended to
 // unresolved so the caller can surface the failure.
-//
-// ExpandEnv is intentionally single-pass. Per the OpenTelemetry
-// Configuration spec, substitution MUST NOT recurse — if a resolved
-// value itself contains ${...}, the placeholder is left literal and is
-// NOT re-expanded. From the spec example:
-//
-//	"Value of env var REPLACE_ME is ${DO_NOT_REPLACE_ME}, and is not
-//	 substituted recursively"
-//
-// See: https://opentelemetry.io/docs/specs/otel/configuration/data-model/#environment-variable-substitution
 func ExpandEnv(s string) (result string, unresolved []string) {
 	result = envVarPattern.ReplaceAllStringFunc(s, func(match string) string {
 		if match == "$$" {
