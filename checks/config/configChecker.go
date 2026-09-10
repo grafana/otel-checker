@@ -15,7 +15,7 @@ import (
 //
 // candidatePaths is the list of paths the loader tried, in order. It's
 // used to make the "file not found" message actionable.
-func CheckConfigSetup(reporter *utils.ComponentReporter, resolvedPath string, candidatePaths []string, file *File, loadErr error) {
+func CheckConfigSetup(reporter *utils.ComponentReporter, resolvedPath string, candidatePaths []string, file *File, unknownFields []string, loadErr error) {
 	if loadErr != nil {
 		if resolvedPath == "" {
 			reporter.AddErrorWithExplain("config.file.unreadable",
@@ -34,6 +34,11 @@ func CheckConfigSetup(reporter *utils.ComponentReporter, resolvedPath string, ca
 			fmt.Sprintf("%s does not declare a file_format — set e.g. file_format: \"1.1\"", resolvedPath))
 	} else {
 		reporter.AddSuccessfulCheck(fmt.Sprintf("file_format is set to %q", file.FileFormat))
+	}
+
+	for _, msg := range unknownFields {
+		reporter.AddWarningWithExplain("config.unknown-field",
+			fmt.Sprintf("%s: %s — not part of the OpenTelemetry Configuration schema; the SDK will ignore this value", resolvedPath, msg))
 	}
 }
 

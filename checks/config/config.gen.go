@@ -812,7 +812,7 @@ type ExperimentalInstrumentation struct {
 
 	// Configure general SemConv options that may apply to multiple languages and
 	// instrumentations.
-	// Instrumenation may merge general config options with the language specific
+	// Instrumentation may merge general config options with the language specific
 	// configuration at .instrumentation.<language>.
 	// If omitted, default values as described in ExperimentalGeneralInstrumentation
 	// are used.
