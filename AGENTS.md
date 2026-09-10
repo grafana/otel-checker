@@ -25,11 +25,18 @@ mise run check
 # Update dependencies
 mise run deps
 
-# Regenerate supported library lists from upstream OTel contrib repos.
-# Expects sibling clones of opentelemetry-{go,js}-contrib by default;
-# pass --clone-folders to point at a different parent directory.
+# Regenerate supported library lists from upstream OTel contrib repos
+# AND the declarative-config model from the upstream schema. Expects
+# sibling clones of opentelemetry-{go,js}-contrib by default; pass
+# --clone-folders to point at a different parent directory.
 mise run generate
 mise run generate --clone-folders=/path/to/parent-of-clones
+
+# Regenerate only the declarative-config model (checks/config/config.gen.go)
+# from the upstream JSON schema. Defaults to fetching at main; pass --ref
+# to pin to a tag or SHA.
+mise run generate-config-schema
+mise run generate-config-schema --ref=v1.1.0
 ```
 
 ## Linting
@@ -103,6 +110,11 @@ never edit the file by hand.
   `rubyChecker.go`, `phpChecker.go`)
 - **`checks/sdk/supported/`** — Shared library support checking logic
 - **`checks/collector/`** — OTel Collector YAML config validation
+- **`checks/config/`** — OpenTelemetry declarative-configuration YAML
+  validation. `config.go` holds hand-written helpers (`Load`,
+  `SignalEndpoints`, `ResourceAttributes`, `ExpandEnv`); `config.gen.go`
+  is regenerated from the upstream JSON schema by
+  `scripts/generate_config_schema.sh` — DO NOT EDIT that file.
 - **`checks/beyla/`** — Beyla-specific checks (stub — no checks yet)
 - **`checks/alloy/`** — Grafana Alloy checks (stub — no checks yet)
 - **`checks/grafana/`** — Grafana Cloud connectivity/auth validation
@@ -116,7 +128,12 @@ never edit the file by hand.
   public API
 - **`checks/webserver/`** — Embedded web UI (`tmpl/`, `static/`) for
   `--web-server` and the `serve` subcommand
-- **`scripts/`** — Python scripts to generate `supported-libraries.yaml` from upstream OTel contrib repos
+- **`scripts/`** — Generators: Python scripts (`generate_*_supported_libraries.py`)
+  build `supported-libraries.yaml` from upstream OTel contrib repos;
+  `generate_config_schema.sh` builds `checks/config/config.gen.go`
+  from the upstream declarative-config JSON schema (runs
+  `github.com/atombender/go-jsonschema`, then renames the root type
+  to `File`).
 
 ### Key Patterns
 

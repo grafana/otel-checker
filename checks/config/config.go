@@ -1,6 +1,11 @@
 // Package config parses the OpenTelemetry declarative configuration YAML
 // (https://opentelemetry.io/docs/specs/otel/configuration/) and exposes helpers
 // for extracting the fields the checker cares about.
+//
+// The type declarations for the config model live in config.gen.go and are
+// generated from the upstream JSON schema via scripts/generate_config_schema.sh.
+// Only helpers (Load, SignalEndpoints, ResourceAttributes, ExpandEnv) are
+// hand-written here.
 package config
 
 import (
@@ -12,77 +17,28 @@ import (
 	"go.yaml.in/yaml/v3"
 )
 
-// File is the top-level structure of an OTel declarative configuration
-// file.
-type File struct {
-	FileFormat     string          `yaml:"file_format"`
-	Resource       *Resource       `yaml:"resource,omitempty"`
-	TracerProvider *TracerProvider `yaml:"tracer_provider,omitempty"`
-	MeterProvider  *MeterProvider  `yaml:"meter_provider,omitempty"`
-	LoggerProvider *LoggerProvider `yaml:"logger_provider,omitempty"`
-}
-
-type Resource struct {
-	Attributes     []ResourceAttribute `yaml:"attributes,omitempty"`
-	AttributesList string              `yaml:"attributes_list,omitempty"`
-}
-
-type ResourceAttribute struct {
-	Name  string `yaml:"name"`
-	Value any    `yaml:"value"`
-	Type  string `yaml:"type,omitempty"`
-}
-
-type TracerProvider struct {
-	Processors []SpanProcessor `yaml:"processors,omitempty"`
-}
-
-type SpanProcessor struct {
-	Batch  *WithExporter `yaml:"batch,omitempty"`
-	Simple *WithExporter `yaml:"simple,omitempty"`
-}
-
-type MeterProvider struct {
-	Readers []MetricReader `yaml:"readers,omitempty"`
-}
-
-type MetricReader struct {
-	Periodic *WithExporter `yaml:"periodic,omitempty"`
-	Pull     *WithExporter `yaml:"pull,omitempty"`
-}
-
-type LoggerProvider struct {
-	Processors []LogProcessor `yaml:"processors,omitempty"`
-}
-
-type LogProcessor struct {
-	Batch  *WithExporter `yaml:"batch,omitempty"`
-	Simple *WithExporter `yaml:"simple,omitempty"`
-}
-
-type WithExporter struct {
-	Exporter Exporter `yaml:"exporter"`
-}
-
-type Exporter struct {
-	OTLPHTTP *OTLPHTTPExporter `yaml:"otlp_http,omitempty"`
-}
-
-type OTLPHTTPExporter struct {
-	Endpoint string `yaml:"endpoint,omitempty"`
-}
-
-// Load reads and parses the YAML at path. Env-var substitutions inside
-// string values are left as-is, callers use ExpandEnv when they need
-// the resolved value.
+// Load reads, env-var-expands, and parses the YAML at path.
+//
+// Substitution happens BEFORE unmarshal because the generated schema
+// types many fields as int/bool (schedule_delay, disabled, …) and yaml
+// can't unmarshal a `${...}` string into a typed field.
+//
+// Unresolved variables (no env value and no `:-default`) are stripped
+// to the empty string so yaml sees a null value for the field.
 func Load(path string) (*File, error) {
 	raw, err := os.ReadFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("could not read config file: %w", err)
 	}
 
+	expanded, _ := ExpandEnv(string(raw))
+	// Any ${...} still present is an unresolved reference with no
+	// default; drop them so yaml can null-out the field rather than
+	// failing type coercion.
+	expanded = envVarPattern.ReplaceAllString(expanded, "")
+
 	var f File
-	if err := yaml.Unmarshal(raw, &f); err != nil {
+	if err := yaml.Unmarshal([]byte(expanded), &f); err != nil {
 		return nil, fmt.Errorf("could not parse config file: %w", err)
 	}
 	return &f, nil
@@ -96,42 +52,66 @@ func (f *File) SignalEndpoints() map[string][]string {
 
 	if f.TracerProvider != nil {
 		for _, p := range f.TracerProvider.Processors {
-			if e := endpointOf(p.Batch); e != "" {
+			if e := traceEndpoint(p.Batch); e != "" {
 				out["traces"] = append(out["traces"], e)
 			}
-			if e := endpointOf(p.Simple); e != "" {
-				out["traces"] = append(out["traces"], e)
+			if p.Simple != nil {
+				if e := otlpHTTPEndpoint(p.Simple.Exporter.OTLPHTTP); e != "" {
+					out["traces"] = append(out["traces"], e)
+				}
 			}
 		}
 	}
 	if f.MeterProvider != nil {
 		for _, r := range f.MeterProvider.Readers {
-			if e := endpointOf(r.Periodic); e != "" {
-				out["metrics"] = append(out["metrics"], e)
-			}
-			if e := endpointOf(r.Pull); e != "" {
-				out["metrics"] = append(out["metrics"], e)
+			if r.Periodic != nil {
+				if e := metricEndpoint(r.Periodic.Exporter.OTLPHTTP); e != "" {
+					out["metrics"] = append(out["metrics"], e)
+				}
 			}
 		}
 	}
 	if f.LoggerProvider != nil {
 		for _, p := range f.LoggerProvider.Processors {
-			if e := endpointOf(p.Batch); e != "" {
+			if e := logEndpoint(p.Batch); e != "" {
 				out["logs"] = append(out["logs"], e)
 			}
-			if e := endpointOf(p.Simple); e != "" {
-				out["logs"] = append(out["logs"], e)
+			if p.Simple != nil {
+				if e := otlpHTTPEndpoint(p.Simple.Exporter.OTLPHTTP); e != "" {
+					out["logs"] = append(out["logs"], e)
+				}
 			}
 		}
 	}
 	return out
 }
 
-func endpointOf(w *WithExporter) string {
-	if w == nil || w.Exporter.OTLPHTTP == nil {
+func traceEndpoint(b *BatchSpanProcessor) string {
+	if b == nil {
 		return ""
 	}
-	return w.Exporter.OTLPHTTP.Endpoint
+	return otlpHTTPEndpoint(b.Exporter.OTLPHTTP)
+}
+
+func logEndpoint(b *BatchLogRecordProcessor) string {
+	if b == nil {
+		return ""
+	}
+	return otlpHTTPEndpoint(b.Exporter.OTLPHTTP)
+}
+
+func otlpHTTPEndpoint(exp *OTLPHTTPExporter) string {
+	if exp == nil || exp.Endpoint == nil {
+		return ""
+	}
+	return *exp.Endpoint
+}
+
+func metricEndpoint(exp *OTLPHTTPMetricExporter) string {
+	if exp == nil || exp.Endpoint == nil {
+		return ""
+	}
+	return *exp.Endpoint
 }
 
 func (f *File) ResourceAttributes() map[string]string {
@@ -141,8 +121,8 @@ func (f *File) ResourceAttributes() map[string]string {
 	}
 
 	// attributes_list (lower priority) parses first.
-	if raw := f.Resource.AttributesList; raw != "" {
-		expanded, _ := ExpandEnv(raw)
+	if list := f.Resource.AttributesList; list != nil && *list != "" {
+		expanded, _ := ExpandEnv(*list)
 		for pair := range strings.SplitSeq(expanded, ",") {
 			key, value, ok := strings.Cut(pair, "=")
 			if !ok {

@@ -10,36 +10,44 @@ import (
 )
 
 func TestCheckEndpointsFromConfig(t *testing.T) {
+	// strPtr returns a *string; the generated schema types wrap
+	// endpoints as `*string` so this is what tests use to set them.
+	strPtr := func(s string) *string { return &s }
+
+	setTraceEndpoint := func(f *config.File, endpoint string) {
+		f.TracerProvider.Processors[0].Batch.Exporter.OTLPHTTP.Endpoint = strPtr(endpoint)
+	}
+
 	// Baseline file — three Grafana Cloud endpoints, one per signal, no
 	// env-var substitution required.
 	grafanaCloudFile := func() *config.File {
 		return &config.File{
 			TracerProvider: &config.TracerProvider{
-				Processors: []config.SpanProcessor{
-					{Batch: &config.WithExporter{
-						Exporter: config.Exporter{OTLPHTTP: &config.OTLPHTTPExporter{
-							Endpoint: "https://otlp-gateway-prod-us-east-0.grafana.net/otlp/v1/traces",
-						}},
+				Processors: []config.SpanProcessor{{
+					Batch: &config.BatchSpanProcessor{Exporter: config.SpanExporter{
+						OTLPHTTP: &config.OTLPHTTPExporter{
+							Endpoint: strPtr("https://otlp-gateway-prod-us-east-0.grafana.net/otlp/v1/traces"),
+						},
 					}},
-				},
+				}},
 			},
 			MeterProvider: &config.MeterProvider{
-				Readers: []config.MetricReader{
-					{Periodic: &config.WithExporter{
-						Exporter: config.Exporter{OTLPHTTP: &config.OTLPHTTPExporter{
-							Endpoint: "https://otlp-gateway-prod-us-east-0.grafana.net/otlp/v1/metrics",
-						}},
+				Readers: []config.MetricReader{{
+					Periodic: &config.PeriodicMetricReader{Exporter: config.PushMetricExporter{
+						OTLPHTTP: &config.OTLPHTTPMetricExporter{
+							Endpoint: strPtr("https://otlp-gateway-prod-us-east-0.grafana.net/otlp/v1/metrics"),
+						},
 					}},
-				},
+				}},
 			},
 			LoggerProvider: &config.LoggerProvider{
-				Processors: []config.LogProcessor{
-					{Batch: &config.WithExporter{
-						Exporter: config.Exporter{OTLPHTTP: &config.OTLPHTTPExporter{
-							Endpoint: "https://otlp-gateway-prod-us-east-0.grafana.net/otlp/v1/logs",
-						}},
+				Processors: []config.LogRecordProcessor{{
+					Batch: &config.BatchLogRecordProcessor{Exporter: config.LogRecordExporter{
+						OTLPHTTP: &config.OTLPHTTPExporter{
+							Endpoint: strPtr("https://otlp-gateway-prod-us-east-0.grafana.net/otlp/v1/logs"),
+						},
 					}},
-				},
+				}},
 			},
 		}
 	}
@@ -54,7 +62,7 @@ func TestCheckEndpointsFromConfig(t *testing.T) {
 
 	t.Run("localhost endpoint warns", func(t *testing.T) {
 		f := grafanaCloudFile()
-		f.TracerProvider.Processors[0].Batch.Exporter.OTLPHTTP.Endpoint = "http://localhost:4318/v1/traces"
+		setTraceEndpoint(f, "http://localhost:4318/v1/traces")
 		r := &utils.ComponentReporter{}
 		CheckEndpointsFromConfig(r, f)
 		assert.Empty(t, r.Errors)
@@ -63,7 +71,7 @@ func TestCheckEndpointsFromConfig(t *testing.T) {
 
 	t.Run("valid non-Grafana URL warns", func(t *testing.T) {
 		f := grafanaCloudFile()
-		f.TracerProvider.Processors[0].Batch.Exporter.OTLPHTTP.Endpoint = "https://otel.example.com/v1/traces"
+		setTraceEndpoint(f, "https://otel.example.com/v1/traces")
 		r := &utils.ComponentReporter{}
 		CheckEndpointsFromConfig(r, f)
 		assert.Empty(t, r.Errors)
@@ -72,7 +80,7 @@ func TestCheckEndpointsFromConfig(t *testing.T) {
 
 	t.Run("invalid URL errors", func(t *testing.T) {
 		f := grafanaCloudFile()
-		f.TracerProvider.Processors[0].Batch.Exporter.OTLPHTTP.Endpoint = "not-a-url"
+		setTraceEndpoint(f, "not-a-url")
 		r := &utils.ComponentReporter{}
 		CheckEndpointsFromConfig(r, f)
 		assert.NotEmpty(t, r.Errors)
@@ -89,7 +97,7 @@ func TestCheckEndpointsFromConfig(t *testing.T) {
 	t.Run("env-var substitution resolves via process env", func(t *testing.T) {
 		t.Setenv("MY_ENDPOINT", "https://otlp-gateway-prod-us-east-0.grafana.net/otlp")
 		f := grafanaCloudFile()
-		f.TracerProvider.Processors[0].Batch.Exporter.OTLPHTTP.Endpoint = "${MY_ENDPOINT}/v1/traces"
+		setTraceEndpoint(f, "${MY_ENDPOINT}/v1/traces")
 		r := &utils.ComponentReporter{}
 		CheckEndpointsFromConfig(r, f)
 		assert.Empty(t, r.Errors)
@@ -99,7 +107,7 @@ func TestCheckEndpointsFromConfig(t *testing.T) {
 
 	t.Run("env-var default used when var unset", func(t *testing.T) {
 		f := grafanaCloudFile()
-		f.TracerProvider.Processors[0].Batch.Exporter.OTLPHTTP.Endpoint = "${MISSING_VAR:-http://localhost:4318}/v1/traces"
+		setTraceEndpoint(f, "${MISSING_VAR:-http://localhost:4318}/v1/traces")
 		r := &utils.ComponentReporter{}
 		CheckEndpointsFromConfig(r, f)
 		assert.Empty(t, r.Errors)
@@ -108,7 +116,7 @@ func TestCheckEndpointsFromConfig(t *testing.T) {
 
 	t.Run("unresolved env var errors", func(t *testing.T) {
 		f := grafanaCloudFile()
-		f.TracerProvider.Processors[0].Batch.Exporter.OTLPHTTP.Endpoint = "${OTHER_MISSING_VAR}/v1/traces"
+		setTraceEndpoint(f, "${OTHER_MISSING_VAR}/v1/traces")
 		r := &utils.ComponentReporter{}
 		CheckEndpointsFromConfig(r, f)
 		assert.NotEmpty(t, r.Errors)

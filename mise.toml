@@ -73,9 +73,16 @@ uv run scripts/generate_js_supported_libraries.py \
   -o checks/sdk/js/supported-libraries.yaml
 """
 
+[tasks.generate-config-schema]
+usage = 'flag "--ref <ref>" help="Git ref in open-telemetry/opentelemetry-configuration to fetch the schema from" default="main"'
+run = """
+scripts/generate_config_schema.sh ${usage_ref}
+"""
+
 [tasks.generate]
 usage = 'flag "--clone-folders <path>" help="Parent directory containing the opentelemetry-{go,js}-contrib clones" default=".."'
 depends = [
   "generate-go-supported-libraries --clone-folders {{usage.clone_folders}}",
   "generate-js-supported-libraries --clone-folders {{usage.clone_folders}}",
+  "generate-config-schema",
 ]
