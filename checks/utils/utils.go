@@ -35,6 +35,7 @@ type Commands struct {
 	InstrumentationFile   string
 	PackageJsonPath       string
 	CollectorConfigPath   string
+	ConfigPath            string
 	Debug                 bool
 	Format                string
 }
@@ -43,11 +44,15 @@ const DefaultListen = "127.0.0.1:8080"
 
 var (
 	SupportedLanguages  = []string{"dotnet", "go", "java", "js", "python", "ruby", "php"}
-	SupportedComponents = []string{"sdk", "beyla", "alloy", "collector", "grafana-cloud"}
+	SupportedComponents = []string{"sdk", "beyla", "alloy", "collector", "grafana-cloud", "config"}
 	SupportedFormats    = []string{"text", "json", "yaml"}
 	// LanguageRequiredFor lists the components whose checks need a language hint.
-	// "collector" is intentionally omitted — its YAML schema is language-agnostic.
-	LanguageRequiredFor = []string{"sdk", "beyla", "alloy", "grafana-cloud"}
+	// "collector", "config", and "grafana-cloud" are intentionally omitted:
+	// collector and config are language-agnostic YAML schemas, and
+	// grafana-cloud only uses the language to distinguish Python's
+	// URL-encoded auth header from the literal-space form every other
+	// language expects — when unset, we assume the literal-space form.
+	LanguageRequiredFor = []string{"sdk", "beyla", "alloy"}
 )
 
 func Validate(c Commands) error {

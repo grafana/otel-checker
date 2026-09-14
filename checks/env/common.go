@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/grafana/otel-checker/checks/config"
 	"github.com/grafana/otel-checker/checks/utils"
 )
 
@@ -57,36 +58,49 @@ func ParseResourceAttributes() map[string]string {
 	return attributes
 }
 
-// CheckResourceAttributes checks if recommended OpenTelemetry resource attributes are configured
-func CheckResourceAttributes(reporter *utils.ComponentReporter) {
-	// Define the recommended resource attributes based on Grafana documentation
-	// See: https://grafana.com/docs/grafana-cloud/monitor-applications/application-observability/instrument/resource-attributes/
-	recommendedAttributes := []ResourceAttribute{
-		{
-			Name:         "service.namespace",
-			Description:  "An optional namespace for service.name",
-			ExampleValue: "shop",
-		},
-		{
-			Name:         "deployment.environment.name",
-			Description:  "Name of the deployment environment (e.g. 'staging' or 'production')",
-			ExampleValue: "production",
-		},
-		{
-			Name:         "service.instance.id",
-			Description:  "The unique instance, e.g. the pod name",
-			ExampleValue: "checkout-123",
-		},
-		{
-			Name:         "service.version",
-			Description:  "The application version, to see if a new version has introduced a bug",
-			ExampleValue: "1.2",
-		},
-	}
+// recommendedResourceAttributes lists the attributes both env-var mode
+// and config-file mode check for.
+var recommendedResourceAttributes = []ResourceAttribute{
+	{
+		Name:         "service.namespace",
+		Description:  "An optional namespace for service.name",
+		ExampleValue: "shop",
+	},
+	{
+		Name:         "deployment.environment.name",
+		Description:  "Name of the deployment environment (e.g. 'staging' or 'production')",
+		ExampleValue: "production",
+	},
+	{
+		Name:         "service.instance.id",
+		Description:  "The unique instance, e.g. the pod name",
+		ExampleValue: "checkout-123",
+	},
+	{
+		Name:         "service.version",
+		Description:  "The application version, to see if a new version has introduced a bug",
+		ExampleValue: "1.2",
+	},
+}
 
+// CheckResourceAttributes verifies that the recommended OpenTelemetry
+// resource attributes are declared. When parsedConfig is non-nil and
+// has a resource: block, attributes are sourced from the declarative
+// config (with env-var substitution applied) and the messages point
+// the reader at the config file. Otherwise attributes come from
+// OTEL_RESOURCE_ATTRIBUTES and the messages point at env vars.
+func CheckResourceAttributes(reporter *utils.ComponentReporter, parsedConfig *config.File) {
+	if parsedConfig != nil && parsedConfig.Resource != nil {
+		checkResourceAttributesFromConfig(reporter, parsedConfig)
+		return
+	}
+	checkResourceAttributesFromEnv(reporter)
+}
+
+func checkResourceAttributesFromEnv(reporter *utils.ComponentReporter) {
 	attributes := ParseResourceAttributes()
 
-	for _, attr := range recommendedAttributes {
+	for _, attr := range recommendedResourceAttributes {
 		value, exists := attributes[attr.Name]
 
 		if exists && value != "" {
@@ -113,10 +127,37 @@ func CheckResourceAttributes(reporter *utils.ComponentReporter) {
 	}
 }
 
-func CheckCommon(r *utils.ComponentReporter, language string) {
+func checkResourceAttributesFromConfig(reporter *utils.ComponentReporter, parsedConfig *config.File) {
+	attributes := parsedConfig.ResourceAttributes()
+
+	for _, attr := range recommendedResourceAttributes {
+		value, exists := attributes[attr.Name]
+
+		if exists && value != "" {
+			reporter.AddSuccessfulCheck(
+				fmt.Sprintf("Resource attribute %s is set to '%s' via the declarative config file", attr.Name, value))
+		} else {
+			reporter.AddWarningWithExplain("config.resource-attributes.missing",
+				fmt.Sprintf("Add resource attribute %s (e.g. %q) under resource.attributes in the declarative config file: %s", attr.Name, attr.ExampleValue, attr.Description))
+		}
+	}
+
+	// service.name may only be declared in the config file's resource.attributes
+	if serviceName, ok := attributes["service.name"]; ok && serviceName != "" {
+		reporter.AddSuccessfulCheck(fmt.Sprintf("Service name is set to '%s' via the declarative config file", serviceName))
+	} else {
+		reporter.AddWarningWithExplain("config.service-name.unset",
+			"Add service.name (e.g. \"checkout\") under resource.attributes in the declarative config file")
+	}
+}
+
+// CheckCommon runs the language-agnostic env / resource checks. When
+// parsedConfig is non-nil, resource-attribute checks read from the
+// config file's resource: block instead of OTEL_RESOURCE_ATTRIBUTES.
+func CheckCommon(r *utils.ComponentReporter, language string, parsedConfig *config.File) {
 	CheckExporterEnvVars(r, language)
 
-	CheckResourceAttributes(r)
+	CheckResourceAttributes(r, parsedConfig)
 }
 
 func CheckExporterEnvVars(r *utils.ComponentReporter, language string) {

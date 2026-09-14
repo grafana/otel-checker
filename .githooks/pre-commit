@@ -1,0 +1,47 @@
+#!/bin/sh
+# Guard against an older local mise silently rewriting mise.lock.
+#
+# When a mise older than the one CI uses runs `mise install` (which
+# every `mise run <task>` invocation does), it strips fields the newer
+# mise treats as required:
+#   - the top-level `lockfile_version = 1` header
+#   - `specifiers = [...]` under each `[[tools.*]]` block
+#   - `[tools."npm:renovate".options] trust_policy_excludes`
+# CI then fails to resolve `npm:renovate` and every downstream task
+# breaks. This has bitten multiple PRs.
+#
+# This hook blocks the commit when the staged mise.lock is missing
+# either sentinel field, and tells the author how to recover.
+set -eu
+
+if ! git diff --cached --name-only | grep -qx 'mise.lock'; then
+    exit 0
+fi
+
+staged=$(git show :mise.lock)
+
+fail() {
+    printf '\033[31mmise.lock: %s\033[0m\n' "$1" >&2
+    cat <<'HINT' >&2
+
+Your local mise version is likely older than the one CI uses and has
+silently rewritten mise.lock. To recover:
+
+    git checkout main -- mise.lock
+
+And upgrade mise so it stops happening (Homebrew example):
+
+    brew upgrade mise
+
+If you are intentionally regenerating the lockfile, run `mise lock`
+with a mise version that matches CI (see .github/workflows/) and
+commit the full regenerated file.
+HINT
+    exit 1
+}
+
+echo "$staged" | grep -q '^lockfile_version = ' || \
+    fail "missing top-level 'lockfile_version = ' header"
+
+echo "$staged" | grep -q '^specifiers = ' || \
+    fail "missing 'specifiers = [...]' entries under [[tools.*]] blocks"

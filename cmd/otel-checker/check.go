@@ -52,6 +52,8 @@ func newCheckCmd() *cobra.Command {
 		"Path to the directory containing package.json (JS only)")
 	f.StringVar(&c.CollectorConfigPath, "collector-config-path", "",
 		"Full path to the Collector config file. If unset, looks for config.yaml then config.yml in the current directory.")
+	f.StringVar(&c.ConfigPath, "config-path", "",
+		"Full path to the declarative config file. If unset, looks for otel-config.yaml then otel-config.yml in the current directory.")
 
 	_ = cmd.RegisterFlagCompletionFunc("language", staticCompletion(utils.SupportedLanguages))
 
@@ -61,6 +63,7 @@ func newCheckCmd() *cobra.Command {
 		newCheckBeylaCmd(c),
 		newCheckAlloyCmd(c),
 		newCheckGrafanaCloudCmd(c),
+		newCheckConfigCmd(c),
 	)
 
 	return cmd

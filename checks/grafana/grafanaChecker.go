@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"regexp"
 	"strings"
 	"time"
 
+	"github.com/grafana/otel-checker/checks/config"
 	"github.com/grafana/otel-checker/checks/env"
 	"github.com/grafana/otel-checker/checks/utils"
 )
@@ -61,7 +63,18 @@ var (
 	}
 )
 
-func CheckGrafanaSetup(ctx context.Context, reporter utils.Reporter, grafanaReporter *utils.ComponentReporter, commands utils.Commands) {
+// CheckGrafanaSetup runs the Grafana Cloud connectivity checks. When
+// parsedConfig is non-nil, endpoints come from the declarative config
+// file and the environment-variable-based endpoint / header / credential
+// checks are skipped — the two configuration paths are mutually
+// exclusive per OpenTelemetry declarative-configuration semantics.
+func CheckGrafanaSetup(ctx context.Context, reporter utils.Reporter, grafanaReporter *utils.ComponentReporter, commands utils.Commands, parsedConfig *config.File) {
+	if parsedConfig != nil {
+		CheckEndpointsFromConfig(grafanaReporter, parsedConfig)
+		grafanaReporter.AddWarningWithExplain("grafana-cloud.credentials.skipped",
+			"Credentials and headers not checked — endpoints were read from the declarative config file")
+		return
+	}
 	checkEnvVarsGrafana(reporter, grafanaReporter, commands.Language, commands.Components)
 	checkAuth(ctx, grafanaReporter)
 }
@@ -71,6 +84,57 @@ func checkEnvVarsGrafana(reporter utils.Reporter, grafana *utils.ComponentReport
 		OtelExporterOTLPProtocol,
 		OtelExporterOTLPHeaders)
 	checkEndpoints(grafana)
+}
+
+// CheckEndpointsFromConfig validates each OTLP HTTP endpoint declared in
+// the declarative config, applying the same Grafana Cloud regex as the
+// env-var flow. Endpoints undergo env-var substitution first so
+// ${VAR:-default} placeholders resolve to concrete URLs.
+func CheckEndpointsFromConfig(reporter *utils.ComponentReporter, f *config.File) {
+	endpoints := f.SignalEndpoints()
+	for _, signal := range []string{"traces", "metrics", "logs"} {
+		list := endpoints[signal]
+		if len(list) == 0 {
+			reporter.AddWarningWithExplain("config.endpoint.missing",
+				fmt.Sprintf("No otlp_http endpoint declared for %s in the config file", signal))
+			continue
+		}
+		re := signalEndpointRegex[signal]
+		for _, raw := range list {
+			expanded, unresolved := config.ExpandEnv(raw)
+			if len(unresolved) > 0 {
+				reporter.AddErrorWithExplain("config.env-var.unresolved",
+					fmt.Sprintf("%s endpoint references unset environment variable(s) with no default: %s (raw: %q)",
+						signal, strings.Join(unresolved, ", "), raw))
+				continue
+			}
+			describe := fmt.Sprintf("%s endpoint (%q)", signal, raw)
+			switch {
+			case re.MatchString(expanded):
+				reporter.AddSuccessfulCheck(fmt.Sprintf("%s set in the format similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp/v1/%s", describe, signal))
+			case strings.Contains(expanded, "localhost"):
+				reporter.AddWarningWithExplain("grafana-cloud.endpoint.localhost",
+					fmt.Sprintf("%s resolves to a localhost URL (%q). Update to a Grafana endpoint similar to https://otlp-gateway-prod-us-east-0.grafana.net/otlp/v1/%s", describe, expanded, signal))
+			case isValidURL(expanded):
+				reporter.AddWarningWithExplain("grafana-cloud.endpoint.not-grafana",
+					fmt.Sprintf("%s resolves to a valid URL (%q) but is not a Grafana Cloud endpoint. Data will not reach Grafana Cloud", describe, expanded))
+			default:
+				reporter.AddErrorWithExplain("grafana-cloud.signal-endpoint.invalid-format",
+					fmt.Sprintf("%s resolves to %q, not a valid URL matching https://otlp-gateway-prod-us-east-0.grafana.net/otlp/v1/%s", describe, expanded, signal))
+			}
+		}
+	}
+}
+
+func isValidURL(s string) bool {
+	if s == "" {
+		return false
+	}
+	u, err := url.Parse(s)
+	if err != nil {
+		return false
+	}
+	return u.Scheme != "" && u.Host != ""
 }
 
 // checkEndpoints validates the OTLP endpoint variables. Each signal (traces,
