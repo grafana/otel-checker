@@ -51,13 +51,15 @@ the binary, pick whichever fits the customer's image:
 ### Option 1: `kubectl debug` with a custom image (works with distroless / read-only apps)
 
 1. Build a minimal image that ships the checker. No official image is
-   published — the Dockerfile is one layer:
+   published — the Dockerfile is one layer. `bash` is installed so the
+   debug shell can iterate the target's environment safely with
+   `read -d ''` (BusyBox `sh` doesn't support `-d`):
 
    ```dockerfile
    FROM alpine:3
-   RUN apk add --no-cache ca-certificates
+   RUN apk add --no-cache ca-certificates bash
    COPY otel-checker /otel-checker
-   ENTRYPOINT ["/bin/sh"]
+   ENTRYPOINT ["/bin/bash"]
    ```
 
    Build and push to a registry the cluster can pull from:
@@ -68,27 +70,38 @@ the binary, pick whichever fits the customer's image:
    ```
 
 2. Attach as an ephemeral debug container sharing the target's process
-   namespace:
+   namespace. Pass `--container=otel-checker-debug` so the container
+   has a stable name — without it, `kubectl` picks something like
+   `debugger-abc12` and the `kubectl cp -c ...` step later can't find it:
 
    ```bash
    POD=<pod-name>
    NS=<namespace>
    APP_CONTAINER=<container-name>
+   DEBUG_CONTAINER=otel-checker-debug
 
    kubectl debug -it $POD -n $NS \
      --image=<your-registry>/otel-checker:latest \
+     --container=$DEBUG_CONTAINER \
      --target=$APP_CONTAINER \
      --profile=general \
-     -- sh
+     -- bash
    ```
 
 3. From the debug shell, adopt the target container's env and working
-   directory via `/proc`:
+   directory via `/proc`. `/proc/<pid>/environ` is NUL-delimited; the
+   loop below reads one full `KEY=VALUE` entry at a time so values
+   containing spaces, newlines, or glob characters are preserved
+   verbatim. Do NOT use `export $(cat .../environ | xargs ...)` — that
+   pattern word-splits values and expands globs against the current
+   directory:
 
-   ```sh
+   ```bash
    APP_PID=$(pgrep -n -f <app-binary-or-keyword>)   # e.g. dotnet, java, node, python
    cd /proc/$APP_PID/cwd                            # target's working directory
-   export $(cat /proc/$APP_PID/environ | tr '\0' '\n' | xargs -d '\n')
+   while IFS= read -r -d '' entry; do
+     export "$entry"
+   done < /proc/$APP_PID/environ
 
    /otel-checker check grafana-cloud --language=<lang> --format=json > /tmp/results.json
    cat /tmp/results.json
@@ -97,10 +110,11 @@ the binary, pick whichever fits the customer's image:
    Replace `<lang>` with one of `dotnet`, `go`, `java`, `js`, `python`,
    `ruby`, `php`.
 
-4. Copy the results file out for review or web-UI replay:
+4. Copy the results file out for review or web-UI replay. `-c` must
+   match the `--container` name set in step 2:
 
    ```bash
-   kubectl cp $NS/$POD:/tmp/results.json ./results.json -c debugger
+   kubectl cp $NS/$POD:/tmp/results.json ./results.json -c $DEBUG_CONTAINER
    otel-checker serve --data=./results.json          # opens the local web UI
    otel-checker explain                              # markdown docs for every flagged ID
    ```
