@@ -33,10 +33,11 @@ func Run(ctx context.Context, commands utils.Commands) *utils.Reporter {
 	resolvedConfigPath, configCandidates := config.Resolve(commands.ConfigPath)
 	var (
 		parsedConfig  *config.File
+		unknownFields []string
 		configLoadErr error
 	)
 	if resolvedConfigPath != "" {
-		parsedConfig, configLoadErr = config.Load(resolvedConfigPath)
+		parsedConfig, unknownFields, configLoadErr = config.Load(resolvedConfigPath)
 	} else {
 		configLoadErr = errNoConfigFile
 	}
@@ -65,6 +66,7 @@ func Run(ctx context.Context, commands utils.Commands) *utils.Reporter {
 				resolvedConfigPath,
 				configCandidates,
 				parsedConfig,
+				unknownFields,
 				configLoadErr,
 			)
 			// Endpoint format validation is the grafana check's job, but

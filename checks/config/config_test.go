@@ -3,6 +3,7 @@ package config
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -137,7 +138,7 @@ logger_provider:
 	path := filepath.Join(t.TempDir(), "otel-config.yaml")
 	require.NoError(t, os.WriteFile(path, []byte(yaml), 0o600))
 
-	f, err := Load(path)
+	f, _, err := Load(path)
 	require.NoError(t, err)
 	require.NotNil(t, f)
 	assert.Equal(t, "1.1", f.FileFormat)
@@ -176,7 +177,7 @@ func TestSignalEndpoints_NilProviders(t *testing.T) {
 //
 //	curl -sL https://raw.githubusercontent.com/open-telemetry/opentelemetry-configuration/main/examples/otel-sdk-config.yaml > testdata/otel-sdk-config.yaml
 func TestLoad_UpstreamSDKConfigExample(t *testing.T) {
-	f, err := Load("testdata/otel-sdk-config.yaml")
+	f, _, err := Load("testdata/otel-sdk-config.yaml")
 	require.NoError(t, err)
 	require.NotNil(t, f)
 
@@ -306,15 +307,63 @@ func TestResourceAttributes(t *testing.T) {
 }
 
 func TestLoad_MissingFile(t *testing.T) {
-	_, err := Load(filepath.Join(t.TempDir(), "does-not-exist.yaml"))
+	_, _, err := Load(filepath.Join(t.TempDir(), "does-not-exist.yaml"))
 	require.Error(t, err)
 }
 
 func TestLoad_InvalidYAML(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "broken.yaml")
 	require.NoError(t, os.WriteFile(path, []byte("tracer_provider:\n  processors: [not-a-map]"), 0o600))
-	_, err := Load(path)
+	_, _, err := Load(path)
 	require.Error(t, err)
+}
+
+func TestLoad_UnknownFields(t *testing.T) {
+	t.Run("all fields known — no warnings", func(t *testing.T) {
+		path := filepath.Join(t.TempDir(), "otel-config.yaml")
+		yaml := `file_format: "1.1"
+resource:
+  attributes:
+    - name: service.name
+      value: my-service
+`
+		require.NoError(t, os.WriteFile(path, []byte(yaml), 0o600))
+		_, unknown, err := Load(path)
+		require.NoError(t, err)
+		assert.Empty(t, unknown)
+	})
+
+	t.Run("top-level unknown field flagged", func(t *testing.T) {
+		path := filepath.Join(t.TempDir(), "otel-config.yaml")
+		yaml := `file_format: "1.1"
+totally_bogus_field: 42
+`
+		require.NoError(t, os.WriteFile(path, []byte(yaml), 0o600))
+		_, unknown, err := Load(path)
+		require.NoError(t, err)
+		require.Len(t, unknown, 1)
+		assert.Contains(t, unknown[0], "totally_bogus_field")
+		assert.Contains(t, unknown[0], "not found in type")
+	})
+
+	t.Run("nested unknown field flagged", func(t *testing.T) {
+		path := filepath.Join(t.TempDir(), "otel-config.yaml")
+		// `resources` (plural typo) instead of `resource` at the root
+		// AND a nested `sampler_config` (fake) under tracer_provider.
+		yaml := `file_format: "1.1"
+resources:
+  attributes: []
+tracer_provider:
+  sampler_config: fake
+`
+		require.NoError(t, os.WriteFile(path, []byte(yaml), 0o600))
+		_, unknown, err := Load(path)
+		require.NoError(t, err)
+		require.Len(t, unknown, 2)
+		joined := strings.Join(unknown, "\n")
+		assert.Contains(t, joined, "resources")
+		assert.Contains(t, joined, "sampler_config")
+	})
 }
 
 func TestResolve(t *testing.T) {

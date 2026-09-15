@@ -9,6 +9,8 @@
 package config
 
 import (
+	"bytes"
+	"errors"
 	"fmt"
 	"os"
 	"regexp"
@@ -25,10 +27,13 @@ import (
 //
 // Unresolved variables (no env value and no `:-default`) are stripped
 // to the empty string so yaml sees a null value for the field.
-func Load(path string) (*File, error) {
+//
+// The second return value lists fields present in the file that
+// aren't part of the generated schema.
+func Load(path string) (*File, []string, error) {
 	raw, err := os.ReadFile(path)
 	if err != nil {
-		return nil, fmt.Errorf("could not read config file: %w", err)
+		return nil, nil, fmt.Errorf("could not read config file: %w", err)
 	}
 
 	expanded, _ := ExpandEnv(string(raw))
@@ -37,11 +42,34 @@ func Load(path string) (*File, error) {
 	// failing type coercion.
 	expanded = envVarPattern.ReplaceAllString(expanded, "")
 
+	unknown := findUnknownFields([]byte(expanded))
+
 	var f File
 	if err := yaml.Unmarshal([]byte(expanded), &f); err != nil {
-		return nil, fmt.Errorf("could not parse config file: %w", err)
+		return nil, unknown, fmt.Errorf("could not parse config file: %w", err)
 	}
-	return &f, nil
+	return &f, unknown, nil
+}
+
+func findUnknownFields(data []byte) []string {
+	var f File
+	d := yaml.NewDecoder(bytes.NewReader(data))
+	d.KnownFields(true)
+	err := d.Decode(&f)
+	if err == nil {
+		return nil
+	}
+	var typeErr *yaml.TypeError
+	if !errors.As(err, &typeErr) {
+		return nil
+	}
+	var unknown []string
+	for _, e := range typeErr.Errors {
+		if strings.Contains(e, "not found in type") {
+			unknown = append(unknown, e)
+		}
+	}
+	return unknown
 }
 
 func (f *File) SignalEndpoints() map[string][]string {
