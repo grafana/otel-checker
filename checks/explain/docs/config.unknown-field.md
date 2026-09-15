@@ -12,7 +12,7 @@ generated from the upstream
 A field the file declares but the schema doesn't know about is one of
 three things:
 
-1. **A typo**: `sceduler_delay` instead of `schedule_delay`,
+1. **A typo**: `schedulers_delay` instead of `schedule_delay`,
    `resources` (plural) instead of `resource`, etc.
 2. **A deprecated or renamed field**: the schema evolved and the
    file is on an older shape.
