@@ -28,14 +28,10 @@ In all three cases, the SDK will silently drop the field at runtime.
   [schema reference](https://github.com/open-telemetry/opentelemetry-configuration/tree/main/schema).
   Fix typos, remove obsolete fields, or move vendor-specific settings
   under `distribution:`.
-- If the field is legitimate and the checker's schema is out of
-  date, regenerate `checks/config/config.gen.go` against the latest
-  upstream schema:
-
-  ```bash
-  mise run generate-config-schema
-  ```
-
+- If the field is legitimate and you believe the checker's schema is
+  out of date, please
+  [open an issue](https://github.com/grafana/otel-checker/issues/new)
+  so we can regenerate the model.
 - If the field is intentionally custom and you want the checker to
   stop warning about it, use `distribution:` (which is
   `additionalProperties: true` per spec and is skipped by this check).
