@@ -142,16 +142,19 @@ logger_provider:
 	require.NotNil(t, f)
 	assert.Equal(t, "1.1", f.FileFormat)
 
+	// Env-var substitution happens in Load (before yaml unmarshal) so
+	// SignalEndpoints returns the fully-resolved URLs. Unset vars fall
+	// through to the `:-` default.
 	endpoints := f.SignalEndpoints()
 	assert.Equal(t, []string{
-		"${OTEL_EXPORTER_OTLP_ENDPOINT:-http://localhost:4318}/v1/traces",
+		"http://localhost:4318/v1/traces",
 		"https://otlp-gateway-prod-us-east-0.grafana.net/otlp/v1/traces",
 	}, endpoints["traces"])
 	assert.Equal(t, []string{
-		"${OTEL_EXPORTER_OTLP_ENDPOINT:-http://localhost:4318}/v1/metrics",
+		"http://localhost:4318/v1/metrics",
 	}, endpoints["metrics"])
 	assert.Equal(t, []string{
-		"${OTEL_EXPORTER_OTLP_ENDPOINT:-http://localhost:4318}/v1/logs",
+		"http://localhost:4318/v1/logs",
 	}, endpoints["logs"])
 }
 
@@ -188,6 +191,10 @@ func TestLoad_UpstreamSDKConfigExample(t *testing.T) {
 }
 
 func TestResourceAttributes(t *testing.T) {
+	// AttributesList is typed as ResourceAttributesList (*string in the
+	// generated schema); tests use strPtr to satisfy the wrapper type.
+	strPtr := func(s string) *string { return &s }
+
 	t.Run("nil file returns empty map", func(t *testing.T) {
 		var f *File
 		assert.Empty(t, f.ResourceAttributes())
@@ -200,7 +207,7 @@ func TestResourceAttributes(t *testing.T) {
 
 	t.Run("attributes only", func(t *testing.T) {
 		f := &File{Resource: &Resource{
-			Attributes: []ResourceAttribute{
+			Attributes: []AttributeNameValue{
 				{Name: "service.name", Value: "checkout"},
 				{Name: "service.version", Value: "1.4.2"},
 			},
@@ -213,7 +220,7 @@ func TestResourceAttributes(t *testing.T) {
 
 	t.Run("attributes_list only", func(t *testing.T) {
 		f := &File{Resource: &Resource{
-			AttributesList: "service.name=shop,deployment.environment.name=prod",
+			AttributesList: strPtr("service.name=shop,deployment.environment.name=prod"),
 		}}
 		assert.Equal(t, map[string]string{
 			"service.name":                "shop",
@@ -223,8 +230,8 @@ func TestResourceAttributes(t *testing.T) {
 
 	t.Run("attributes override attributes_list per spec", func(t *testing.T) {
 		f := &File{Resource: &Resource{
-			AttributesList: "service.name=from-list,service.version=1.0",
-			Attributes: []ResourceAttribute{
+			AttributesList: strPtr("service.name=from-list,service.version=1.0"),
+			Attributes: []AttributeNameValue{
 				{Name: "service.name", Value: "from-attributes"},
 			},
 		}}
@@ -236,7 +243,7 @@ func TestResourceAttributes(t *testing.T) {
 	t.Run("env-var substitution resolved via process env", func(t *testing.T) {
 		t.Setenv("MY_SERVICE", "billing")
 		f := &File{Resource: &Resource{
-			Attributes: []ResourceAttribute{
+			Attributes: []AttributeNameValue{
 				{Name: "service.name", Value: "${MY_SERVICE}"},
 			},
 		}}
@@ -245,7 +252,7 @@ func TestResourceAttributes(t *testing.T) {
 
 	t.Run("env-var default used when var unset", func(t *testing.T) {
 		f := &File{Resource: &Resource{
-			Attributes: []ResourceAttribute{
+			Attributes: []AttributeNameValue{
 				{Name: "service.name", Value: "${MISSING_VAR:-fallback}"},
 			},
 		}}
@@ -255,7 +262,7 @@ func TestResourceAttributes(t *testing.T) {
 	t.Run("attributes_list env-var expansion", func(t *testing.T) {
 		t.Setenv("EXTRA_ATTRS", "region=eu-west-2,tier=paid")
 		f := &File{Resource: &Resource{
-			AttributesList: "${EXTRA_ATTRS}",
+			AttributesList: strPtr("${EXTRA_ATTRS}"),
 		}}
 		got := f.ResourceAttributes()
 		assert.Equal(t, "eu-west-2", got["region"])
@@ -267,14 +274,14 @@ func TestResourceAttributes(t *testing.T) {
 		// ExpandEnv leaves the ${...} placeholder, which is then parsed as
 		// key-value pairs and produces no valid entries.
 		f := &File{Resource: &Resource{
-			AttributesList: "${UNSET_VAR_ATTR_LIST}",
+			AttributesList: strPtr("${UNSET_VAR_ATTR_LIST}"),
 		}}
 		assert.Empty(t, f.ResourceAttributes())
 	})
 
 	t.Run("nil attribute value skipped per spec", func(t *testing.T) {
 		f := &File{Resource: &Resource{
-			Attributes: []ResourceAttribute{
+			Attributes: []AttributeNameValue{
 				{Name: "service.name", Value: nil},
 				{Name: "service.version", Value: "1.0"},
 			},
@@ -287,7 +294,7 @@ func TestResourceAttributes(t *testing.T) {
 		// AttributeNameValue.value can be number/bool per schema —
 		// we stringify for presence checks.
 		f := &File{Resource: &Resource{
-			Attributes: []ResourceAttribute{
+			Attributes: []AttributeNameValue{
 				{Name: "service.version", Value: 2},
 				{Name: "sampling.enabled", Value: true},
 			},
