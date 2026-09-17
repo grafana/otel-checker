@@ -8,11 +8,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"os"
+	"text/tabwriter"
 
 	"github.com/grafana/otel-checker/checks/utils"
 
+	"github.com/charmbracelet/lipgloss"
+	"github.com/charmbracelet/lipgloss/table"
 	"github.com/fatih/color"
 	"go.yaml.in/yaml/v3"
+	"golang.org/x/term"
 )
 
 const (
@@ -27,51 +32,155 @@ type Renderer interface {
 	Render(w io.Writer, reporter *utils.Reporter) error
 }
 
-// TextRenderer prints a human-readable summary. ANSI color codes are emitted
-// when fatih/color's runtime detection decides the output is a terminal
-// (respects NO_COLOR, FORCE_COLOR, and isatty checks).
+// TextRenderer prints a table with columns: STATUS | COMPONENT | MESSAGE | EXPLAIN_ID,
+// bordered and sized to the terminal width when styling is available,
+// tab-aligned fallback otherwise (piped output, NO_COLOR, non-TTY).
 type TextRenderer struct{}
+
+var textHeaders = []string{"STATUS", "COMPONENT", "MESSAGE", "EXPLAIN_ID"}
 
 func (TextRenderer) Render(w io.Writer, reporter *utils.Reporter) error {
 	res := reporter.Results()
+	total := len(res.Errors) + len(res.Warnings) + len(res.Checks)
+	if total == 0 {
+		return nil
+	}
 
-	green := color.New(color.FgGreen)
-	yellow := color.New(color.FgYellow)
-	red := color.New(color.FgRed)
-
+	rows := make([][]string, 0, total)
 	anyExplainID := false
-	renderLine := func(c *color.Color, prefix string, m utils.ComponentResult) {
-		suffix := ""
+	appendRow := func(status string, m utils.ComponentResult) {
 		if m.ExplainID != "" {
-			suffix = " [" + m.ExplainID + "]"
 			anyExplainID = true
 		}
-		_, _ = c.Fprintf(w, "%s %s: %s%s \n", prefix, m.Component, m.Message, suffix)
+		rows = append(rows, []string{status, m.Component, m.Message, m.ExplainID})
 	}
 
-	if len(res.Errors) > 0 {
-		_, _ = red.Fprintf(w, "\n%d Error(s)\n", len(res.Errors))
-		for _, m := range res.Errors {
-			renderLine(red, "✖", m)
+	for _, m := range res.Errors {
+		appendRow("FAIL", m)
+	}
+	for _, m := range res.Warnings {
+		appendRow("WARN", m)
+	}
+	for _, m := range res.Checks {
+		appendRow("OK", m)
+	}
+
+	if stylingEnabled() {
+		if err := renderStyledTable(w, rows); err != nil {
+			return err
+		}
+	} else {
+		if err := renderPlainTable(w, rows); err != nil {
+			return err
 		}
 	}
-	if len(res.Warnings) > 0 {
-		_, _ = yellow.Fprintf(w, "\n%d Warning(s)\n", len(res.Warnings))
-		for _, m := range res.Warnings {
-			renderLine(yellow, "•", m)
-		}
-	}
-	if len(res.Checks) > 0 {
-		_, _ = green.Fprintf(w, "\n%d Successful Check(s)\n", len(res.Checks))
-		for _, m := range res.Checks {
-			renderLine(green, "✔", m)
-		}
-	}
+
+	_, _ = fmt.Fprintf(w, "%d %s, %d %s, %d successful %s.\n",
+		len(res.Errors), pluralize("error", len(res.Errors)),
+		len(res.Warnings), pluralize("warning", len(res.Warnings)),
+		len(res.Checks), pluralize("check", len(res.Checks)),
+	)
 	if anyExplainID {
-		_, _ = fmt.Fprintln(w, `
-Run "otel-checker explain <id>" for guidance on any finding above.`)
+		_, _ = fmt.Fprintln(w, `Run "otel-checker explain <id>" for guidance on any finding above.`)
 	}
 	return nil
+}
+
+func renderStyledTable(w io.Writer, rows [][]string) error {
+	width := terminalWidth()
+
+	borderColor := lipgloss.Color("#44474E")
+	primaryColor := lipgloss.Color("#6E9FFF")
+	errorColor := lipgloss.Color("#E24D42")
+	warnColor := lipgloss.Color("#EAB839")
+	okColor := lipgloss.Color("#508642")
+
+	headerStyle := lipgloss.NewStyle().
+		Bold(true).
+		Foreground(primaryColor).
+		Padding(0, 1)
+	cellStyle := lipgloss.NewStyle().Padding(0, 1)
+	evenRow := cellStyle.Foreground(lipgloss.Color("#CCCCCC"))
+	oddRow := cellStyle.Foreground(lipgloss.Color("#999999"))
+
+	t := table.New().
+		Border(lipgloss.NormalBorder()).
+		BorderStyle(lipgloss.NewStyle().Foreground(borderColor)).
+		Headers(textHeaders...).
+		Rows(rows...).
+		Width(width).
+		StyleFunc(func(row, col int) lipgloss.Style {
+			var s lipgloss.Style
+			switch {
+			case row == table.HeaderRow:
+				s = headerStyle
+			case row%2 == 0:
+				s = evenRow
+			default:
+				s = oddRow
+			}
+			// Color the STATUS cell per severity so failing rows are
+			// visually distinct from warnings and successes.
+			if col == 0 && row >= 0 && row < len(rows) {
+				switch rows[row][0] {
+				case "FAIL":
+					s = s.Foreground(errorColor).Bold(true)
+				case "WARN":
+					s = s.Foreground(warnColor)
+				case "OK":
+					s = s.Foreground(okColor)
+				}
+			}
+			return s
+		})
+
+	_, err := fmt.Fprintln(w, t)
+	return err
+}
+
+// renderPlainTable is the plain fallback used when stdout is piped,
+// NO_COLOR is set, or the terminal doesn't support styling.
+func renderPlainTable(w io.Writer, rows [][]string) error {
+	tw := tabwriter.NewWriter(w, 0, 4, 2, ' ', tabwriter.TabIndent|tabwriter.DiscardEmptyColumns)
+	for i, h := range textHeaders {
+		if i > 0 {
+			_, _ = fmt.Fprint(tw, "\t")
+		}
+		_, _ = fmt.Fprint(tw, h)
+	}
+	_, _ = fmt.Fprintln(tw)
+	for _, row := range rows {
+		for i, v := range row {
+			if i > 0 {
+				_, _ = fmt.Fprint(tw, "\t")
+			}
+			_, _ = fmt.Fprint(tw, v)
+		}
+		_, _ = fmt.Fprintln(tw)
+	}
+	return tw.Flush()
+}
+
+func stylingEnabled() bool {
+	if color.NoColor {
+		return false
+	}
+	return term.IsTerminal(int(os.Stdout.Fd()))
+}
+
+func terminalWidth() int {
+	w, _, err := term.GetSize(int(os.Stdout.Fd()))
+	if err != nil || w <= 0 {
+		return 100
+	}
+	return w
+}
+
+func pluralize(singular string, count int) string {
+	if count == 1 {
+		return singular
+	}
+	return singular + "s"
 }
 
 // JSONRenderer emits Reporter.Results() as JSON.

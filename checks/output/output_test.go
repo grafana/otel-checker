@@ -68,7 +68,16 @@ func TestRenderText(t *testing.T) {
 		t.Fatalf("Render(text): %v", err)
 	}
 	out := buf.String()
-	for _, want := range []string{"1 Successful Check", "SDK: foo", "1 Warning", "SDK: bar", "1 Error", "Collector: baz"} {
+	// The compact table renders one row per finding with columns
+	// STATUS, COMPONENT, MESSAGE, EXPLAIN_ID, plus a summary footer.
+	// Assert on the cell contents and footer counts rather than an
+	// exact table layout.
+	for _, want := range []string{
+		"FAIL", "WARN", "OK",
+		"SDK", "Collector",
+		"foo", "bar", "baz",
+		"1 error, 1 warning, 1 successful check.",
+	} {
 		if !strings.Contains(out, want) {
 			t.Errorf("text output missing %q.\nGot:\n%s", want, out)
 		}
@@ -84,7 +93,7 @@ func TestRenderDefaultsToText(t *testing.T) {
 	if err := Render(&buf, newReporter(t), ""); err != nil {
 		t.Fatalf("Render(empty format): %v", err)
 	}
-	if !strings.Contains(buf.String(), "1 Successful Check") {
+	if !strings.Contains(buf.String(), "1 successful check") {
 		t.Errorf("empty format did not produce text output. Got:\n%s", buf.String())
 	}
 }
@@ -116,14 +125,16 @@ func TestRenderTextExplainIDsAndFooter(t *testing.T) {
 	}
 	out := buf.String()
 
-	if !strings.Contains(out, "package.json missing [js.package-json.unreadable]") {
-		t.Errorf("warning line missing [explain-id] suffix.\nGot:\n%s", out)
-	}
-	if !strings.Contains(out, "node too old [js.node-version.too-old]") {
-		t.Errorf("error line missing [explain-id] suffix.\nGot:\n%s", out)
-	}
-	if strings.Contains(out, "no explain here [") {
-		t.Errorf("legacy line should not have a explain-id suffix.\nGot:\n%s", out)
+	// Compact table renders Details and Explain ID as separate cells,
+	// so we assert on the individual cell contents.
+	for _, want := range []string{
+		"js.package-json.unreadable", "package.json missing",
+		"js.node-version.too-old", "node too old",
+		"no explain here",
+	} {
+		if !strings.Contains(out, want) {
+			t.Errorf("text output missing %q.\nGot:\n%s", want, out)
+		}
 	}
 	if !strings.Contains(out, `Run "otel-checker explain <id>" for guidance`) {
 		t.Errorf("footer missing.\nGot:\n%s", out)
