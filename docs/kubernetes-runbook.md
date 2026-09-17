@@ -69,7 +69,6 @@ DEBUG_CONTAINER=otel-checker-debug   # only used by Option 1
    FROM alpine:3
    RUN apk add --no-cache ca-certificates bash
    COPY otel-checker /otel-checker
-   ENTRYPOINT ["/bin/bash"]
    ```
 
    Build and push to a registry the cluster can pull from:
@@ -149,8 +148,8 @@ DEBUG_CONTAINER=otel-checker-debug   # only used by Option 1
 
 ### What Part A catches
 
-Running `check grafana-cloud` and `check env` (or the default `check`
-without arguments, filtered to those components) validates:
+Running `check grafana-cloud` (or the default `check` without
+arguments) validates the following.
 
 - `OTEL_SERVICE_NAME`, `OTEL_RESOURCE_ATTRIBUTES` (including
   `service.instance.id`, `service.namespace`, `deployment.environment.name`)
