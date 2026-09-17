@@ -156,9 +156,7 @@ otel-checker serve --data=./out/results.yaml
 ## Kubernetes
 
 To validate an application deployed to a Kubernetes pod, see the
-[Kubernetes runbook](docs/kubernetes-runbook.md). It splits the work into
-env / Grafana Cloud checks against the running pod (via `kubectl debug`
-or `kubectl exec`) and SDK checks against the source repository.
+[Kubernetes runbook](docs/kubernetes-runbook.md).
 
 ## Checks
 
