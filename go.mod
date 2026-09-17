@@ -4,7 +4,7 @@ go 1.26.0
 
 require (
 	charm.land/glamour/v2 v2.0.1
-	github.com/charmbracelet/lipgloss v1.1.1-0.20250404203927-76690c660834
+	github.com/charmbracelet/lipgloss/v2 v2.0.6
 	github.com/fatih/color v1.19.0
 	github.com/gomarkdown/markdown v0.0.0-20260907091611-16791ada75cf
 	github.com/spf13/cobra v1.10.2
