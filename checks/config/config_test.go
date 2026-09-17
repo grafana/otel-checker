@@ -3,7 +3,6 @@ package config
 import (
 	"os"
 	"path/filepath"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -333,36 +332,52 @@ resource:
 		assert.Empty(t, unknown)
 	})
 
-	t.Run("top-level unknown field flagged", func(t *testing.T) {
+	t.Run("top-level unknowns are accepted (schema allows extensions at root)", func(t *testing.T) {
+		// The root schema is `additionalProperties: true`, so a
+		// key does NOT trigger an unknown-field finding.
 		path := filepath.Join(t.TempDir(), "otel-config.yaml")
 		yaml := `file_format: "1.1"
+telemetry_policy/development:
+  policy: allow
 totally_bogus_field: 42
 `
 		require.NoError(t, os.WriteFile(path, []byte(yaml), 0o600))
 		_, unknown, err := Load(path)
 		require.NoError(t, err)
-		require.Len(t, unknown, 1)
-		assert.Contains(t, unknown[0], "totally_bogus_field")
-		assert.Contains(t, unknown[0], "not found in type")
+		assert.Empty(t, unknown)
 	})
 
-	t.Run("nested unknown field flagged", func(t *testing.T) {
+	t.Run("unknown field under an additionalProperties:false container is flagged", func(t *testing.T) {
+		// `sampler_config` is not a field of tracer_provider in the
+		// schema, and TracerProvider is `additionalProperties: false`,
+		// so this really is an error the checker should surface.
 		path := filepath.Join(t.TempDir(), "otel-config.yaml")
-		// `resources` (plural typo) instead of `resource` at the root
-		// AND a nested `sampler_config` (fake) under tracer_provider.
 		yaml := `file_format: "1.1"
-resources:
-  attributes: []
 tracer_provider:
   sampler_config: fake
 `
 		require.NoError(t, os.WriteFile(path, []byte(yaml), 0o600))
 		_, unknown, err := Load(path)
 		require.NoError(t, err)
-		require.Len(t, unknown, 2)
-		joined := strings.Join(unknown, "\n")
-		assert.Contains(t, joined, "resources")
-		assert.Contains(t, joined, "sampler_config")
+		require.Len(t, unknown, 1)
+		assert.Contains(t, unknown[0], "sampler_config")
+	})
+
+	t.Run("custom sampler variant under Sampler is accepted (additionalProperties:true)", func(t *testing.T) {
+		// The Sampler schema is `additionalProperties: true`, that's
+		// how SDK ComponentProviders register custom sampler variants.
+		// These should NOT be flagged.
+		path := filepath.Join(t.TempDir(), "otel-config.yaml")
+		yaml := `file_format: "1.1"
+tracer_provider:
+  sampler:
+    my_custom_sampler:
+      ratio: 0.5
+`
+		require.NoError(t, os.WriteFile(path, []byte(yaml), 0o600))
+		_, unknown, err := Load(path)
+		require.NoError(t, err)
+		assert.Empty(t, unknown)
 	})
 }
 
