@@ -119,8 +119,7 @@ func renderStyledTable(w io.Writer, rows [][]string) error {
 			default:
 				s = oddRow
 			}
-			// Color the STATUS cell per severity so failing rows are
-			// visually distinct from warnings and successes.
+
 			if col == 0 && row >= 0 && row < len(rows) {
 				switch rows[row][0] {
 				case "FAIL":
