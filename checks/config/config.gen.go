@@ -550,7 +550,7 @@ type ExperimentalComposableSampler struct {
 	//
 	RuleBased *ExperimentalComposableRuleBasedSampler `yaml:"rule_based,omitempty"`
 
-	AdditionalProperties interface{} `mapstructure:",remain"`
+	AdditionalProperties map[string]any `yaml:",inline"`
 }
 
 type ExperimentalContainerResourceDetector map[string]interface{}
@@ -1211,7 +1211,7 @@ type ExperimentalResourceDetector struct {
 	//
 	Service ExperimentalServiceResourceDetector `yaml:"service,omitempty"`
 
-	AdditionalProperties interface{} `mapstructure:",remain"`
+	AdditionalProperties map[string]any `yaml:",inline"`
 }
 
 type ExperimentalRpcInstrumentation struct {
@@ -1476,7 +1476,7 @@ type IDGenerator struct {
 	//
 	Random RandomIDGenerator `yaml:"random,omitempty"`
 
-	AdditionalProperties interface{} `mapstructure:",remain"`
+	AdditionalProperties map[string]any `yaml:",inline"`
 }
 
 type IncludeExclude struct {
@@ -1533,7 +1533,7 @@ type LogRecordExporter struct {
 	//
 	OTLPHTTP *OTLPHTTPExporter `yaml:"otlp_http,omitempty"`
 
-	AdditionalProperties interface{} `mapstructure:",remain"`
+	AdditionalProperties map[string]any `yaml:",inline"`
 }
 
 type LogRecordLimits struct {
@@ -1599,7 +1599,7 @@ type LogRecordProcessor struct {
 	//
 	Simple *SimpleLogRecordProcessor `yaml:"simple,omitempty"`
 
-	AdditionalProperties interface{} `mapstructure:",remain"`
+	AdditionalProperties map[string]any `yaml:",inline"`
 }
 
 type LoggerProvider struct {
@@ -1674,7 +1674,7 @@ type MetricProducer struct {
 	//
 	Opencensus OpenCensusMetricProducer `yaml:"opencensus,omitempty"`
 
-	AdditionalProperties interface{} `mapstructure:",remain"`
+	AdditionalProperties map[string]any `yaml:",inline"`
 }
 
 type MetricReader struct {
@@ -2248,7 +2248,7 @@ type File struct {
 	//
 	TracerProvider *TracerProvider `yaml:"tracer_provider,omitempty"`
 
-	AdditionalProperties interface{} `mapstructure:",remain"`
+	AdditionalProperties map[string]any `yaml:",inline"`
 }
 
 // Configure if the SDK is disabled or not.
@@ -2373,7 +2373,7 @@ type PullMetricExporter struct {
 	//
 	PrometheusDevelopment *ExperimentalPrometheusMetricExporter `yaml:"prometheus/development,omitempty"`
 
-	AdditionalProperties interface{} `mapstructure:",remain"`
+	AdditionalProperties map[string]any `yaml:",inline"`
 }
 
 type PullMetricReader struct {
@@ -2414,7 +2414,7 @@ type PushMetricExporter struct {
 	//
 	OTLPHTTP *OTLPHTTPMetricExporter `yaml:"otlp_http,omitempty"`
 
-	AdditionalProperties interface{} `mapstructure:",remain"`
+	AdditionalProperties map[string]any `yaml:",inline"`
 }
 
 type RandomIDGenerator map[string]interface{}
@@ -2501,7 +2501,7 @@ type Sampler struct {
 	//
 	TraceIDRatioBased *TraceIDRatioBasedSampler `yaml:"trace_id_ratio_based,omitempty"`
 
-	AdditionalProperties interface{} `mapstructure:",remain"`
+	AdditionalProperties map[string]any `yaml:",inline"`
 }
 
 type SeverityNumber string
@@ -2566,7 +2566,7 @@ type SpanExporter struct {
 	//
 	OTLPHTTP *OTLPHTTPExporter `yaml:"otlp_http,omitempty"`
 
-	AdditionalProperties interface{} `mapstructure:",remain"`
+	AdditionalProperties map[string]any `yaml:",inline"`
 }
 
 type SpanKind string
@@ -2679,7 +2679,7 @@ type SpanProcessor struct {
 	//
 	Simple *SimpleSpanProcessor `yaml:"simple,omitempty"`
 
-	AdditionalProperties interface{} `mapstructure:",remain"`
+	AdditionalProperties map[string]any `yaml:",inline"`
 }
 
 type SumAggregation map[string]interface{}
@@ -2705,7 +2705,7 @@ type TextMapPropagator struct {
 	//
 	Tracecontext TraceContextPropagator `yaml:"tracecontext,omitempty"`
 
-	AdditionalProperties interface{} `mapstructure:",remain"`
+	AdditionalProperties map[string]any `yaml:",inline"`
 }
 
 type TraceContextPropagator map[string]interface{}

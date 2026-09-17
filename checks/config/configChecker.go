@@ -38,7 +38,7 @@ func CheckConfigSetup(reporter *utils.ComponentReporter, resolvedPath string, ca
 
 	for _, msg := range unknownFields {
 		reporter.AddWarningWithExplain("config.unknown-field",
-			fmt.Sprintf("%s: %s — not part of the OpenTelemetry Configuration schema; the SDK will ignore this value", resolvedPath, msg))
+			fmt.Sprintf("%s: %s", resolvedPath, msg))
 	}
 }
 

@@ -16,25 +16,22 @@ three things:
    `resources` (plural) instead of `resource`, etc.
 2. **A deprecated or renamed field**: the schema evolved and the
    file is on an older shape.
-3. **A vendor / distribution-specific extension**: the top-level
-   `distribution:` block is the spec-defined place for these; anything
-   else is unofficial.
+3. **A checker schema that's out of date**: the OpenTelemetry
+   Configuration schema added a field the checker hasn't been
+   regenerated against yet.
 
-In all three cases, the SDK will silently drop the field at runtime.
+The first two are typically real problems. The third is a false
+positive; the checker doesn't have the context.
 
 ## How to fix
 
-- Compare the field name against the
-  [schema reference](https://github.com/open-telemetry/opentelemetry-configuration/tree/main/schema).
-  Fix typos, remove obsolete fields, or move vendor-specific settings
-  under `distribution:`.
-- If the field is legitimate and you believe the checker's schema is
-  out of date, please
+- If the field looks like a typo, compare against the
+  [schema reference](https://github.com/open-telemetry/opentelemetry-configuration/tree/main/schema)
+  and correct it in the config.
+- If the field is legitimate and the checker's schema is out of
+  date, please
   [open an issue](https://github.com/grafana/otel-checker/issues/new)
   so we can regenerate the model.
-- If the field is intentionally custom and you want the checker to
-  stop warning about it, use `distribution:` (which is
-  `additionalProperties: true` per spec and is skipped by this check).
 
 ## Related
 
