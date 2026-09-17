@@ -46,14 +46,24 @@ way as Part B.
 The env and Grafana Cloud components need three things: the target
 container's env vars, the ability to reach the OTLP endpoint from the
 pod's network, and the `otel-checker` binary itself. Two ways to deliver
-the binary, pick whichever fits the customer's image:
+the binary, pick whichever fits the customer's image.
+
+Both options assume these variables are set in the shell you're
+running the commands from:
+
+```bash
+POD=<pod-name>
+NS=<namespace>
+APP_CONTAINER=<container-name>
+DEBUG_CONTAINER=otel-checker-debug   # only used by Option 1
+```
 
 ### Option 1: `kubectl debug` with a custom image (works with distroless / read-only apps)
 
 1. Build a minimal image that ships the checker. No official image is
    published — the Dockerfile is one layer. `bash` is installed so the
    debug shell can iterate the target's environment safely with
-   `read -d ''` (BusyBox `sh` doesn't support `-d`):
+   `read -d ''`:
 
    ```dockerfile
    FROM alpine:3
@@ -70,20 +80,15 @@ the binary, pick whichever fits the customer's image:
    ```
 
 2. Attach as an ephemeral debug container sharing the target's process
-   namespace. Pass `--container=otel-checker-debug` so the container
+   namespace. Pass `--container="$DEBUG_CONTAINER"` so the container
    has a stable name — without it, `kubectl` picks something like
    `debugger-abc12` and the `kubectl cp -c ...` step later can't find it:
 
    ```bash
-   POD=<pod-name>
-   NS=<namespace>
-   APP_CONTAINER=<container-name>
-   DEBUG_CONTAINER=otel-checker-debug
-
-   kubectl debug -it $POD -n $NS \
+   kubectl debug -it "$POD" -n "$NS" \
      --image=<your-registry>/otel-checker:latest \
-     --container=$DEBUG_CONTAINER \
-     --target=$APP_CONTAINER \
+     --container="$DEBUG_CONTAINER" \
+     --target="$APP_CONTAINER" \
      --profile=general \
      -- bash
    ```
@@ -98,10 +103,10 @@ the binary, pick whichever fits the customer's image:
 
    ```bash
    APP_PID=$(pgrep -n -f <app-binary-or-keyword>)   # e.g. dotnet, java, node, python
-   cd /proc/$APP_PID/cwd                            # target's working directory
+   cd "/proc/$APP_PID/cwd"                          # target's working directory
    while IFS= read -r -d '' entry; do
      export "$entry"
-   done < /proc/$APP_PID/environ
+   done < "/proc/$APP_PID/environ"
 
    /otel-checker check grafana-cloud --language=<lang> --format=json > /tmp/results.json
    cat /tmp/results.json
@@ -114,25 +119,29 @@ the binary, pick whichever fits the customer's image:
    match the `--container` name set in step 2:
 
    ```bash
-   kubectl cp $NS/$POD:/tmp/results.json ./results.json -c $DEBUG_CONTAINER
+   kubectl cp "$NS/$POD:/tmp/results.json" ./results.json -c "$DEBUG_CONTAINER"
    otel-checker serve --data=./results.json          # opens the local web UI
    otel-checker explain                              # markdown docs for every flagged ID
    ```
 
 ### Option 2: `kubectl cp` + `kubectl exec` (works only if the app image has `sh` and is writable)
 
-1. Copy the Linux binary into the running container:
+1. Copy the Linux binary into the running container. Note the
+   argument style difference: `kubectl cp` parses `namespace/pod`
+   from its positional argument, but `kubectl exec` interprets the
+   same string as `resource-type/name`, so `exec` takes the
+   namespace via `-n` and the pod as a separate positional arg:
 
    ```bash
-   kubectl cp ./otel-checker $NS/$POD:/tmp/otel-checker -c $APP_CONTAINER
-   kubectl exec $NS/$POD -c $APP_CONTAINER -- chmod +x /tmp/otel-checker
+   kubectl cp ./otel-checker "$NS/$POD:/tmp/otel-checker" -c "$APP_CONTAINER"
+   kubectl exec -n "$NS" "$POD" -c "$APP_CONTAINER" -- chmod +x /tmp/otel-checker
    ```
 
 2. Run it — the exec'd process automatically inherits the container's
    env, so no `/proc` juggling:
 
    ```bash
-   kubectl exec $NS/$POD -c $APP_CONTAINER -- \
+   kubectl exec -n "$NS" "$POD" -c "$APP_CONTAINER" -- \
      /tmp/otel-checker check grafana-cloud --language=<lang> --format=json > results.json
    ```
 
