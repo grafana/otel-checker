@@ -6,7 +6,7 @@ validating your Grafana token and more.
 
 ## Usage
 
-For source installs, you need Go 1.25 or higher. Prebuilt binaries are also
+For source installs, you need Go 1.26 or higher. Prebuilt binaries are also
 available from the [GitHub Releases](https://github.com/grafana/otel-checker/releases)
 page.
 
@@ -79,11 +79,13 @@ otel-checker check --language=js
 
 ## Explanations
 
-Each actionable finding (errors and warnings) is tagged with a stable explain ID
-shown in square brackets at the end of the line:
+Each actionable finding (errors and warnings) is tagged with a stable
+explain ID. In the default table output the ID appears in the
+`EXPLAIN_ID` column:
 
 ```text
-✖ SDK: package.json missing on path /src/inst [js.package-json.unreadable]
+ STATUS  COMPONENT  MESSAGE                              EXPLAIN_ID
+ FAIL    SDK        package.json missing on path /src/inst  js.package-json.unreadable
 ```
 
 Look up the guidance for any finding with:
@@ -334,6 +336,13 @@ Run `otel-checker check config`:
   contribute; per spec, `attributes` entries have higher priority than
   `attributes_list` when both declare the same key. Reported IDs:
   `config.service-name.unset`, `config.resource-attributes.missing`.
+- Every key in the file is checked against the generated schema
+  model. Fields the schema doesn't know about (typos, deprecated
+  fields, or a checker schema that's out of date) surface as
+  `config.unknown-field` warnings. Schema-level extension slots like
+  custom sampler / processor variants are silently accepted per
+  spec. The warning fires only for keys inside strict
+  (`additionalProperties: false`) containers.
 
 **Environment-variable substitution**
 is applied to every string value the checker consumes (endpoints,
