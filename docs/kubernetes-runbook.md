@@ -33,6 +33,10 @@ way as Part B.
 - For Part A via `kubectl debug`: permission on the
   `pods/ephemeralcontainers` subresource, and a cluster on Kubernetes
   1.25 or later (Ephemeral Containers GA).
+- For Part A via Option 2 (`kubectl cp` + `kubectl exec`): the target
+  container must have `tar` on its `PATH`. `kubectl cp` invokes
+  `tar` inside the container to stream the file. If the target has no
+  `tar`, use Option 1 instead.
 - A Linux `otel-checker` binary matching the pod's CPU architecture —
   download from
   [github.com/grafana/otel-checker/releases](https://github.com/grafana/otel-checker/releases).
