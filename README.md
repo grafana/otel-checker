@@ -155,6 +155,11 @@ otel-checker check sdk --language=go --format=json > results.json
 otel-checker serve --data=./out/results.yaml
 ```
 
+## Kubernetes
+
+To validate an application deployed to a Kubernetes pod, see the
+[Kubernetes runbook](docs/kubernetes-runbook.md).
+
 ## Checks
 
 ### Common Environment Variables
