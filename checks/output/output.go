@@ -13,8 +13,8 @@ import (
 
 	"github.com/grafana/otel-checker/checks/utils"
 
-	"github.com/charmbracelet/lipgloss"
-	"github.com/charmbracelet/lipgloss/table"
+	"charm.land/lipgloss/v2"
+	"charm.land/lipgloss/v2/table"
 	"github.com/fatih/color"
 	"go.yaml.in/yaml/v3"
 	"golang.org/x/term"
