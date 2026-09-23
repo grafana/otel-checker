@@ -1,2 +1,4 @@
 [default]
-extend-ignore-re = ['\.atMost\(']
+# Go pseudo-version hashes can contain words that typos flags; this immutable
+# dependency revision is not prose.
+extend-ignore-re = ['\.atMost\(', '53e2afe73ae5']
