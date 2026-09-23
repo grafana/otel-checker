@@ -1,2 +1,5 @@
 [default]
 extend-ignore-re = ['\.atMost\(']
+
+[files]
+extend-exclude = ["go.mod", "go.sum"]
