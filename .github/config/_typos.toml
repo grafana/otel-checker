@@ -1,4 +1,5 @@
 [default]
-# Go pseudo-version hashes can contain words that typos flags; this immutable
-# dependency revision is not prose.
-extend-ignore-re = ['\.atMost\(', '53e2afe73ae5']
+# Go pseudo-version hashes can contain words that typos flags; these immutable
+# dependency revisions are not prose. Keep the exception scoped to Go module
+# pseudo-versions so ordinary words and hashes remain checked.
+extend-ignore-re = ['\.atMost\(', '\bv\d+\.\d+\.\d+-[0-9A-Za-z.]*\d{14}-[0-9a-f]{12}\b']
