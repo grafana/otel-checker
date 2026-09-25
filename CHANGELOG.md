@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.1](https://github.com/grafana/otel-checker/compare/v0.4.0...v0.4.1) (2026-09-25)
+
+
+### Bug Fixes
+
+* **deps:** update github.com/gomarkdown/markdown digest to cc30ffa ([#578](https://github.com/grafana/otel-checker/issues/578)) ([cb5377a](https://github.com/grafana/otel-checker/commit/cb5377aa8ee5eef1e9471407f81654e6be0058c2))
+
 ## [0.4.0](https://github.com/grafana/otel-checker/compare/v0.3.3...v0.4.0) (2026-09-17)
 
 
