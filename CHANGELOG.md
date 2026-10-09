@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.4.1](https://github.com/grafana/otel-checker/compare/v0.4.0...v0.4.1) (2026-10-09)
+
+
+### Bug Fixes
+
+* **deps:** update github.com/gomarkdown/markdown digest to 94fc73f ([#588](https://github.com/grafana/otel-checker/issues/588)) ([83970cd](https://github.com/grafana/otel-checker/commit/83970cd4ed356cee3400529499f3cfb47c91563b))
+* **deps:** update github.com/gomarkdown/markdown digest to cc30ffa ([#578](https://github.com/grafana/otel-checker/issues/578)) ([cb5377a](https://github.com/grafana/otel-checker/commit/cb5377aa8ee5eef1e9471407f81654e6be0058c2))
+* **security/unknown/:** update module golang.org/x/net to v0.60.0 [security] ([#607](https://github.com/grafana/otel-checker/issues/607)) ([57bc39f](https://github.com/grafana/otel-checker/commit/57bc39f18fcd5612683266faf213488f4b6ea280))
+
 ## [0.4.0](https://github.com/grafana/otel-checker/compare/v0.3.3...v0.4.0) (2026-09-17)
 
 
