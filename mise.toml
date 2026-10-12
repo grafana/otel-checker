@@ -1,6 +1,6 @@
 [tools]
 go = "1.27.2"
-goreleaser = "2.18.2"
+goreleaser = "2.18.3"
 node = "24.21.0"
 uv = "0.12.24"
 
