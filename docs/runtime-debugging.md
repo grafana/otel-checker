@@ -1,25 +1,29 @@
 # Still missing telemetry?
 
-A static instrumentation finding is a starting point, not a runtime diagnosis.
-Passing dependency or configuration checks do not prove that the application
-executed, the agent attached, telemetry was exported, or a destination stored it.
-Even a successful destination connectivity check does not prove app ingestion.
+A static instrumentation finding can point you toward a problem, but it can't
+tell you what happened at runtime. Passing dependency or configuration checks
+doesn't show that the application ran, the agent attached, telemetry was
+exported, or a destination stored it. Even a successful connectivity check
+doesn't confirm that the application sent data.
 
-Use the existing gcx skills for runtime investigation. Follow the gcx-owned
-[diagnostic guide][diagnostics] for installation, skill setup, connection,
-evidence limits, repair approval, and cleanup; this page covers checker evidence.
-The linked gcx guide is pinned to v1.4.0. Check `gcx version` and the relevant
-command `--help` for your installed release, and record your actual checker and
-gcx versions when reproducing a problem.
+For runtime investigation, use the existing gcx skills and its
+[diagnostic guide][diagnostics]. That guide covers installation, skill setup,
+connecting to a destination, evidence limits, repair approval, and cleanup;
+this page focuses on what the checker can tell you. The gcx guide is pinned to
+v1.4.0, so check `gcx version` and the relevant command's `--help` for your
+installed release. When reproducing a problem, note the versions of both the
+checker and gcx that you actually used.
 
 ## Preserve the checker result
 
-Keep the original command, relevant output, and finding's `explain_id` locally.
-Use [Explanations](../README.md#explanations) to understand the finding before
-investigating runtime behavior. A missing explain ID is not a blocker: preserve
-the actual result instead of inventing an ID.
+Keep the command you ran, its relevant output, and the finding's `explain_id`
+locally. Before looking into runtime behavior, use
+[Explanations](../README.md#explanations) to understand the finding. Some
+results don't have an explain ID; that's fine—keep the actual result rather
+than trying to invent one.
 
-When sharing evidence with your agent, include:
+If you ask an agent to investigate, give it enough context to distinguish what
+you know from what still needs checking. Include:
 
 - The selected finding and its explanation, or that the relevant checks passed.
 - Language/runtime and the configuration being checked.
@@ -27,26 +31,28 @@ When sharing evidence with your agent, include:
 - The actual deployment/destination and time window, if known.
 - The application/Collector scope you own and what access is unavailable.
 
-Review output for credentials and sensitive paths before sharing it. Keep full
-result files local; don't embed findings, service names, paths, or secrets in
-guide URLs. A checker result describes the inspected configuration, which may
-not be the configuration used by the running process.
+Before sharing, check the output for credentials and sensitive paths. Keep full
+result files local, and don't put findings, service names, paths, or secrets in
+guide URLs. Remember that the checker reports on the configuration it
+inspected; the running process may be using something else.
 
 ## Establish runtime access
 
-You do not need gcx installed to start reading the shared guide: it begins with
-installation and skill setup. Backend queries require a reachable Grafana
-destination and appropriate permissions.
+You can start with the shared guide even if gcx isn't installed; it explains
+installation and skill setup. To query a backend, you'll need a reachable
+Grafana destination and the right permissions.
 
-If no backend exists, [start a local docker-lgtm instance][lgtm] and connect an
-approved example or application. This is a new local proof, not proof that an
-existing production exporter or inaccessible destination works. Do not change
-an application's exporter without permission. If access is missing, report that
-boundary as unobserved rather than claiming data loss.
+If you don't have access to a backend, you can [start a local docker-lgtm
+instance][lgtm] and connect an approved example or application. That lets you
+make a new local proof; it won't show that an existing production exporter or
+an inaccessible destination works. Don't change an application's exporter
+without permission. If you can't access a system, say that it wasn't observed
+rather than concluding that data was lost.
 
 ## Ask for an evidence-based investigation
 
-Start your agent in the relevant checkout after following the shared setup:
+Once you've followed the shared setup, you can start an investigation in the
+relevant checkout with a request like this:
 
 > otel-checker reported `<finding/explain ID>`, and I'm missing `<signal>` from
 > `<service>`. Use the existing gcx skills with `<config path and context>`.
@@ -55,12 +61,14 @@ Start your agent in the relevant checkout after following the shared setup:
 > do not infer data loss from missing access. Diagnose first and ask before
 > making changes, restarting resources, or enabling payload logging.
 
-If checks passed, replace the first sentence with the checks that passed and
-the remaining symptom. No finding is required to investigate missing telemetry.
+If the checks passed, replace the first sentence with the checks you ran and
+describe the remaining symptom. You don't need a finding to investigate missing
+telemetry.
 
-After an approved repair, exercise a fresh operation and verify the original
-symptom using the shared guide. Re-running static checks alone cannot establish
-runtime recovery. Record remaining unknowns and restore temporary diagnostics.
+After a repair is approved, exercise a fresh operation and use the shared guide
+to check whether the original symptom is gone. Re-running static checks alone
+can't confirm runtime recovery. Note anything that remains unknown, and remove
+any temporary diagnostics.
 
 [diagnostics]: https://github.com/grafana/gcx/blob/v1.4.0/docs/guides/diagnose-missing-telemetry.md
 [lgtm]: https://github.com/grafana/docker-otel-lgtm/blob/main/docs/gcx-integration.md
