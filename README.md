@@ -77,6 +77,13 @@ otel-checker check sdk,collector,beyla --language=js
 otel-checker check --language=js
 ```
 
+## Still missing telemetry?
+
+Static checks do not prove runtime export or ingestion. Whether a finding needs
+runtime investigation or checks passed but data is absent, follow
+[Runtime debugging with gcx](docs/runtime-debugging.md). The guide includes the
+setup path if you do not yet have gcx or a telemetry backend.
+
 ## Explanations
 
 Each actionable finding (errors and warnings) is tagged with a stable
