@@ -6,7 +6,7 @@ require (
 	charm.land/glamour/v2 v2.0.1
 	github.com/charmbracelet/lipgloss v1.1.1-0.20250404203927-76690c660834
 	github.com/fatih/color v1.19.0
-	github.com/gomarkdown/markdown v0.0.0-20261011113952-f83953680332
+	github.com/gomarkdown/markdown v0.0.0-20261022144421-6c848fa1b723
 	github.com/spf13/cobra v1.10.2
 	github.com/stretchr/testify v1.12.1
 	go.yaml.in/yaml/v3 v3.0.5
