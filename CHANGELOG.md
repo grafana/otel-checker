@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.4.1](https://github.com/grafana/otel-checker/compare/v0.4.0...v0.4.1) (2026-10-30)
+
+
+### Bug Fixes
+
+* **deps:** update github.com/gomarkdown/markdown digest to 6c848fa ([#644](https://github.com/grafana/otel-checker/issues/644)) ([6dfbf6c](https://github.com/grafana/otel-checker/commit/6dfbf6c1fbf7a9bd02f7cff60c8c82572f8b0e43))
+* **deps:** update github.com/gomarkdown/markdown digest to 79e163b ([#653](https://github.com/grafana/otel-checker/issues/653)) ([82deb1b](https://github.com/grafana/otel-checker/commit/82deb1b3fb8d6e7364ed53c4073ecc86aa3cbf42))
+* **deps:** update github.com/gomarkdown/markdown digest to 94fc73f ([#588](https://github.com/grafana/otel-checker/issues/588)) ([83970cd](https://github.com/grafana/otel-checker/commit/83970cd4ed356cee3400529499f3cfb47c91563b))
+* **deps:** update github.com/gomarkdown/markdown digest to cc30ffa ([#578](https://github.com/grafana/otel-checker/issues/578)) ([cb5377a](https://github.com/grafana/otel-checker/commit/cb5377aa8ee5eef1e9471407f81654e6be0058c2))
+* **deps:** update github.com/gomarkdown/markdown digest to f839536 ([#625](https://github.com/grafana/otel-checker/issues/625)) ([02e69bc](https://github.com/grafana/otel-checker/commit/02e69bc0ba528118a9af29cf8af3d2971acfb2a5))
+* **deps:** update module golang.org/x/mod to v0.42.0 ([#623](https://github.com/grafana/otel-checker/issues/623)) ([04026c5](https://github.com/grafana/otel-checker/commit/04026c5dab61b3b670f5cc82e6c14d90260155a7))
+* **deps:** update module golang.org/x/term to v0.47.0 ([#621](https://github.com/grafana/otel-checker/issues/621)) ([37a12cb](https://github.com/grafana/otel-checker/commit/37a12cb4a3f1bf45a37b0966aaf8ca28995ef138))
+* **security/unknown/:** update module golang.org/x/net to v0.60.0 [security] ([#607](https://github.com/grafana/otel-checker/issues/607)) ([57bc39f](https://github.com/grafana/otel-checker/commit/57bc39f18fcd5612683266faf213488f4b6ea280))
+* **security/unknown/:** update module golang.org/x/net to v0.62.0 [security] ([#650](https://github.com/grafana/otel-checker/issues/650)) ([ad4f124](https://github.com/grafana/otel-checker/commit/ad4f1247236b7c0e3e21cd947216863ffd730fec))
+
 ## [0.4.0](https://github.com/grafana/otel-checker/compare/v0.3.3...v0.4.0) (2026-09-17)
 
 
