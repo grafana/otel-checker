@@ -42,7 +42,7 @@ require (
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/spf13/pflag v1.0.10 // indirect
 	github.com/xo/terminfo v1.2.0 // indirect
-	github.com/yuin/goldmark v1.8.6 // indirect
+	github.com/yuin/goldmark v1.8.7 // indirect
 	github.com/yuin/goldmark-emoji v1.0.6 // indirect
 	golang.org/x/net v0.62.0 // indirect
 	golang.org/x/sync v0.24.0 // indirect
