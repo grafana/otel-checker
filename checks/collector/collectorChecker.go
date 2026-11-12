@@ -10,7 +10,7 @@ import (
 
 	"github.com/grafana/otel-checker/checks/utils"
 
-	"go.yaml.in/yaml/v3"
+	"go.yaml.in/yaml/v4"
 )
 
 func CheckCollectorSetup(reporter *utils.ComponentReporter, language string, configPath string) {

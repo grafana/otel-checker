@@ -16,7 +16,7 @@ import (
 	"regexp"
 	"strings"
 
-	"go.yaml.in/yaml/v3"
+	"go.yaml.in/yaml/v4"
 )
 
 // Load reads, env-var-expands, and parses the YAML at path.
