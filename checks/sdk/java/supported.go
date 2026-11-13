@@ -12,7 +12,7 @@ import (
 	"github.com/grafana/otel-checker/checks/sdk"
 	"github.com/grafana/otel-checker/checks/sdk/supported"
 	"github.com/grafana/otel-checker/checks/utils"
-	"go.yaml.in/yaml/v3"
+	"go.yaml.in/yaml/v4"
 	"golang.org/x/mod/semver"
 )
 

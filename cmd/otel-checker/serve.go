@@ -11,7 +11,7 @@ import (
 	"github.com/grafana/otel-checker/checks/webserver"
 
 	"github.com/spf13/cobra"
-	"go.yaml.in/yaml/v3"
+	"go.yaml.in/yaml/v4"
 )
 
 // candidateNames lists the default result-file names that `serve` searches

@@ -1,7 +1,7 @@
 package supported
 
 import (
-	"go.yaml.in/yaml/v3"
+	"go.yaml.in/yaml/v4"
 )
 
 // Library represents a library with its name and version
