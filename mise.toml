@@ -1,7 +1,7 @@
 [tools]
 go = "1.27.3"
 goreleaser = "2.20.0"
-node = "26.13.0"
+node = "26.13.1"
 uv = "0.13.7"
 
 # Linters
